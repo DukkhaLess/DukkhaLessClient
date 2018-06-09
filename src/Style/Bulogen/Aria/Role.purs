@@ -2,8 +2,8 @@ module Style.Bulogen.Aria.Role where
 
 import Halogen.HTML (AttrName(..))
 import Halogen.HTML.Properties as HP
-import Bulogen.Properties as BP
-import Bulogen.Properties (role)
+import Style.Bulogen.Properties as BP
+import Style.Bulogen.Properties (role)
 
 alert = role "alert"
 alertdialog = role "alertdialog"
