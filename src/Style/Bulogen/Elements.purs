@@ -36,8 +36,11 @@ classy elem cs as = element elem (withClasses cs as)
 classier :: forall p i. String -> Array ClassName -> Array (HTML p i) -> HTML p i
 classier elem cs = classy elem cs []
 
+a :: forall r p i. Array ClassName -> ClassProps r i -> Array (HTML p i) -> HTML p i
 a = classy "a"
+a_ :: forall p i. Array ClassName -> Array (HTML p i) -> HTML p i
 a_ = classier "a"
+
 abbr = classy "abbr"
 abbr_ = classier "abbr"
 address = classy "address"
