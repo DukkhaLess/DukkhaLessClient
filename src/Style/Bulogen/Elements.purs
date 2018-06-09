@@ -7,10 +7,8 @@ import Halogen.HTML (HTML, ElemName(..), ClassName(..))
 import Halogen.HTML.Properties as HP
 import Halogen.HTML.Elements as HE
 import Halogen.VDom.DOM.Prop (Prop)
-import Style.Bulogen (Class(..))
+import Style.Bulogen.TypeDefs (IPropArray)
 --classes :: forall r i. Array HH.ClassName -> Class r i
-
-type IPropArray r i = Array (HP.IProp ( "class" :: String | r) i)
 
 element :: forall p i t2. String -> Array (HP.IProp t2 i) -> Array (HTML p i) -> HTML p i
 element name = HH.element (ElemName name)

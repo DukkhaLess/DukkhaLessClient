@@ -3,8 +3,6 @@ module Style.Bulogen where
 import Halogen.HTML as HH
 import Halogen.HTML.Properties as HP
 
-type Class r i = HP.IProp ( "class" :: String | r ) i
-
 classify :: String -> HH.ClassName
 classify = HH.ClassName
 
