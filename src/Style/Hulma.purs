@@ -18,79 +18,71 @@ module Style.Hulma where
 
 import Halogen.HTML as HH
 import Halogen.HTML.Properties as HP
-
--- card :: forall p i. Array ClassName -> Array (HTML p i) -> HTML p i
--- card = HH.div []
-
-type Classy r i = HP.IProp ( "class" :: String | r  ) i
+import Style.Bulogen.TypeDefs (ClassProp)
 
 classify :: String -> HH.ClassName
 classify = HH.ClassName
 
-classes :: forall r i. Array HH.ClassName -> Classy r i
+classes :: forall r i. Array HH.ClassName -> ClassProp r i
 classes = HP.classes
 
 section :: HH.ClassName
 section = classify "section"
-sections :: forall r i. Classy r i
+sections :: forall r i. ClassProp r i
 sections = classes [ section ]
 container :: HH.ClassName
 container = classify "container"
-containers :: forall r i. Classy r i
+containers :: forall r i. ClassProp r i
 containers = classes [ container ]
 card :: HH.ClassName
 card = classify "card"
-cards :: forall r i. Classy r i
+cards :: forall r i. ClassProp r i
 cards = classes [ card ]
 cardHeader :: HH.ClassName
 cardHeader = classify "card-header"
-cardHeaders :: forall r i. Classy r i
+cardHeaders :: forall r i. ClassProp r i
 cardHeaders = classes [ cardHeader ]
 cardFooter :: HH.ClassName
 cardFooter = classify "card-footer"
-cardFooters :: forall r i. Classy r i
+cardFooters :: forall r i. ClassProp r i
 cardFooters = classes [ cardFooter ]
 cardFooterItem :: HH.ClassName
 cardFooterItem = classify "card-footer-item"
-cardFooterItems :: forall r i. Classy r i
+cardFooterItems :: forall r i. ClassProp r i
 cardFooterItems = classes [ cardFooterItem ]
 cardHeaderTitle :: HH.ClassName
 cardHeaderTitle = classify "card-header-title"
-cardHeaderTitles :: forall r i. Classy r i
+cardHeaderTitles :: forall r i. ClassProp r i
 cardHeaderTitles = classes [ cardHeaderTitle ]
 cardHeaderIcon :: HH.ClassName
 cardHeaderIcon = classify "card-header-icon"
-cardHeaderIcons :: forall r i. Classy r i
+cardHeaderIcons :: forall r i. ClassProp r i
 cardHeaderIcons = classes [ cardHeaderIcon ]
 cardImage :: HH.ClassName
 cardImage = classify "card-image"
-cardImages :: forall r i. Classy r i
+cardImages :: forall r i. ClassProp r i
 cardImages = classes [ cardImage ]
 cardContent :: HH.ClassName
 cardContent = classify "card-content"
-cardContents :: forall r i. Classy r i
+cardContents :: forall r i. ClassProp r i
 cardContents = classes [ cardContent ]
 media :: HH.ClassName
 media = classify "media"
-medias :: forall r i. Classy r i
+medias :: forall r i. ClassProp r i
 medias = classes [ media ]
 mediaLeft :: HH.ClassName
 mediaLeft = classify "media-left"
-mediaLefts :: forall r i. Classy r i
+mediaLefts :: forall r i. ClassProp r i
 mediaLefts = classes [ mediaLeft ]
 mediaContent :: HH.ClassName
 mediaContent = classify "media-content"
-mediaContents :: forall r i. Classy r i
+mediaContents :: forall r i. ClassProp r i
 mediaContents = classes [ mediaContent ]
 title :: HH.ClassName
 title = classify "title"
-titles :: forall r i. Classy r i
+titles :: forall r i. ClassProp r i
 titles = classes [ title ]
 subtitle :: HH.ClassName
 subtitle = classify "subtitle"
-subtitles :: forall r i. Classy r i
+subtitles :: forall r i. ClassProp r i
 subtitles = classes [ subtitle ]
---  :: HH.ClassName
---  = classify ""
---  :: forall r i. Classy r i
--- s = classes [ Class ]
