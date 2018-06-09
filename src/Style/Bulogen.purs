@@ -157,26 +157,44 @@ inverted = HH.ClassName "is-inverted"
 
 -- Text properties
 
+textLight :: HH.ClassName
 textLight = HH.ClassName "has-text-light"
+textDark :: HH.ClassName
 textDark = HH.ClassName "has-text-dark"
+textPrimary :: HH.ClassName
 textPrimary = HH.ClassName "has-text-primary"
+textInfo :: HH.ClassName
 textInfo = HH.ClassName "has-text-info"
+textSuccess :: HH.ClassName
 textSuccess = HH.ClassName "has-text-success"
+textWarning :: HH.ClassName
 textWarning = HH.ClassName "has-text-warning"
+textDanger :: HH.ClassName
 textDanger = HH.ClassName "has-text-danger"
 
+textWhite :: HH.ClassName
 textWhite = HH.ClassName "has-text-white"
+textWhiteBis :: HH.ClassName
 textWhiteBis = HH.ClassName "has-text-white-bis"
+textWhiteTer :: HH.ClassName
 textWhiteTer = HH.ClassName "has-text-white-ter-"
 
+textBlack :: HH.ClassName
 textBlack = HH.ClassName "has-text-black"
+textBlackBis :: HH.ClassName
 textBlackBis = HH.ClassName "has-text-black-bis"
+textBlackTer :: HH.ClassName
 textBlackTer = HH.ClassName "has-text-black-ter"
 
+textGrey :: HH.ClassName
 textGrey = HH.ClassName "has-text-grey"
+textGreyDarker :: HH.ClassName
 textGreyDarker = HH.ClassName "has-text-grey-darker"
+textGreyDark :: HH.ClassName
 textGreyDark = HH.ClassName "has-text-grey-dark"
+textGreyLight :: HH.ClassName
 textGreyLight = HH.ClassName "has-text-grey-light"
+textGreyLighter :: HH.ClassName
 textGreyLighter = HH.ClassName "has-text-grey-lighter"
 
 textCentered = HH.ClassName "has-text-centered"
