@@ -14,7 +14,6 @@ See the License for the specific language governing permissions and
 limitations under the License.
 -}
 
-
 module Style.Bulogen.Elements where
 
 import Data.Array (snoc)
@@ -22,7 +21,6 @@ import Halogen.HTML as HH
 import Halogen.HTML (HTML, ElemName(..), ClassName)
 import Halogen.HTML.Properties as HP
 import Style.Bulogen.TypeDefs (ClassProps)
---classes :: forall r i. Array HH.ClassName -> Class r i
 
 element :: forall p i t2. String -> Array (HP.IProp t2 i) -> Array (HTML p i) -> HTML p i
 element name = HH.element (ElemName name)
