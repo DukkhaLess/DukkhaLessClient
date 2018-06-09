@@ -18,10 +18,10 @@ element name = HH.element (ElemName name)
 withClasses :: forall r i. Array ClassName -> IPropArray r i -> IPropArray r i
 withClasses cs as = snoc as (HP.classes cs)
 
-classy :: forall r p i. String -> Array (ClassName) -> IPropArray r i -> Array (HTML p i) -> HTML p i
+classy :: forall r p i. String -> Array ClassName -> IPropArray r i -> Array (HTML p i) -> HTML p i
 classy elem cs as = element elem (withClasses cs as)
 
-classier :: forall p i. String -> Array (ClassName) -> Array (HTML p i) -> HTML p i
+classier :: forall p i. String -> Array ClassName -> Array (HTML p i) -> HTML p i
 classier elem cs = classy elem cs []
 
 a = classy "a"
