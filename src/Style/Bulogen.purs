@@ -19,79 +19,140 @@ module Style.Bulogen where
 import Halogen.HTML as HH
 
 -- Colours
-
+white :: HH.ClassName
 white = HH.ClassName "is-white"
+black :: HH.ClassName
 black = HH.ClassName "is-black"
+light :: HH.ClassName
 light = HH.ClassName "is-light"
+dark :: HH.ClassName
 dark = HH.ClassName "is-dark"
+primary :: HH.ClassName
 primary = HH.ClassName "is-primary"
+link :: HH.ClassName
 link = HH.ClassName "is-link"
+info :: HH.ClassName
 info = HH.ClassName "is-info"
+success :: HH.ClassName
 success = HH.ClassName "is-success"
+warning :: HH.ClassName
 warning = HH.ClassName "is-warning"
+danger :: HH.ClassName
 danger = HH.ClassName "is-danger"
 
 -- States
 
+loading :: HH.ClassName
 loading = HH.ClassName "is-loading"
+normal :: HH.ClassName
 normal = HH.ClassName "is-normal"
+hovered :: HH.ClassName
 hovered = HH.ClassName "is-hovered"
+focused :: HH.ClassName
 focused = HH.ClassName "is-focused"
 
 -- Sizes
 
+small :: HH.ClassName
 small = HH.ClassName "is-small"
+medium :: HH.ClassName
 medium = HH.ClassName "is-medium"
+large :: HH.ClassName
 large = HH.ClassName "is-large"
 
 -- Text sizes
 
+size1 :: HH.ClassName
 size1 = HH.ClassName "is-size-1"
+size1Mobile :: HH.ClassName
 size1Mobile = HH.ClassName "is-size-1-mobile"
+size1Tablet :: HH.ClassName
 size1Tablet = HH.ClassName "is-size-1-tablet"
+size1Touch :: HH.ClassName
 size1Touch = HH.ClassName "is-size-1-touch"
+size1Desktop :: HH.ClassName
 size1Desktop = HH.ClassName "is-size-1-desktop"
+size1Widescreen :: HH.ClassName
 size1Widescreen = HH.ClassName "is-size-1-widescreen"
-size1Fullhd = HH.ClassName "is-size-1-fullhd"
+size1FullHd :: HH.ClassName
+size1FullHd = HH.ClassName "is-size-1-fullhd"
+size2 :: HH.ClassName
 size2 = HH.ClassName "is-size-2"
+size2Mobile :: HH.ClassName
 size2Mobile = HH.ClassName "is-size-2-mobile"
+size2Tablet :: HH.ClassName
 size2Tablet = HH.ClassName "is-size-2-tablet"
+size2Touch :: HH.ClassName
 size2Touch = HH.ClassName "is-size-2-touch"
+size2Desktop :: HH.ClassName
 size2Desktop = HH.ClassName "is-size-2-desktop"
+size2Widescreen :: HH.ClassName
 size2Widescreen = HH.ClassName "is-size-2-widescreen"
-size2Fullhd = HH.ClassName "is-size-2-fullhd"
+size2FullHd :: HH.ClassName
+size2FullHd = HH.ClassName "is-size-2-fullhd"
+size3 :: HH.ClassName
 size3 = HH.ClassName "is-size-3"
+size3Mobile :: HH.ClassName
 size3Mobile = HH.ClassName "is-size-3-mobile"
+size3Tablet :: HH.ClassName
 size3Tablet = HH.ClassName "is-size-3-tablet"
+size3Touch :: HH.ClassName
 size3Touch = HH.ClassName "is-size-3-touch"
+size3Desktop :: HH.ClassName
 size3Desktop = HH.ClassName "is-size-3-desktop"
+size3Widescreen :: HH.ClassName
 size3Widescreen = HH.ClassName "is-size-3-widescreen"
-size3Fullhd = HH.ClassName "is-size-3-fullhd"
+size3FullHd :: HH.ClassName
+size3FullHd = HH.ClassName "is-size-3-fullhd"
+size4 :: HH.ClassName
 size4 = HH.ClassName "is-size-4"
+size4Mobile :: HH.ClassName
 size4Mobile = HH.ClassName "is-size-4-mobile"
+size4Tablet :: HH.ClassName
 size4Tablet = HH.ClassName "is-size-4-tablet"
+size4Touch :: HH.ClassName
 size4Touch = HH.ClassName "is-size-4-touch"
+size4Desktop :: HH.ClassName
 size4Desktop = HH.ClassName "is-size-4-desktop"
+size4Widescreen :: HH.ClassName
 size4Widescreen = HH.ClassName "is-size-4-widescreen"
-size4Fullhd = HH.ClassName "is-size-4-fullhd"
+size4FullHd :: HH.ClassName
+size4FullHd = HH.ClassName "is-size-4-fullhd"
+size5 :: HH.ClassName
 size5 = HH.ClassName "is-size-5"
+size5Mobile :: HH.ClassName
 size5Mobile = HH.ClassName "is-size-5-mobile"
+size5Tablet :: HH.ClassName
 size5Tablet = HH.ClassName "is-size-5-tablet"
+size5Touch :: HH.ClassName
 size5Touch = HH.ClassName "is-size-5-touch"
+size5Desktop :: HH.ClassName
 size5Desktop = HH.ClassName "is-size-5-desktop"
+size5Widescreen :: HH.ClassName
 size5Widescreen = HH.ClassName "is-size-5-widescreen"
-size5Fullhd = HH.ClassName "is-size-5-fullhd"
+size5FullHd :: HH.ClassName
+size5FullHd = HH.ClassName "is-size-5-fullhd"
+size6 :: HH.ClassName
 size6 = HH.ClassName "is-size-6"
+size6Mobile :: HH.ClassName
 size6Mobile = HH.ClassName "is-size-6-mobile"
+size6Tablet :: HH.ClassName
 size6Tablet = HH.ClassName "is-size-6-tablet"
+size6Touch :: HH.ClassName
 size6Touch = HH.ClassName "is-size-6-touch"
+size6Desktop :: HH.ClassName
 size6Desktop = HH.ClassName "is-size-6-desktop"
+size6Widescreen :: HH.ClassName
 size6Widescreen = HH.ClassName "is-size-6-widescreen"
-size6Fullhd = HH.ClassName "is-size-6-fullhd"
+size6FullHd :: HH.ClassName
+size6FullHd = HH.ClassName "is-size-6-fullhd"
 
+active :: HH.ClassName
 active = HH.ClassName "is-active"
 
+outlined :: HH.ClassName
 outlined = HH.ClassName "is-outlined"
+inverted :: HH.ClassName
 inverted = HH.ClassName "is-inverted"
 
 -- Text properties
@@ -127,7 +188,7 @@ textCenteredDesktop = HH.ClassName "has-text-centered-desktop"
 textCenteredDesktopOnly = HH.ClassName "has-text-centered-desktop-only"
 textCenteredWidescreen = HH.ClassName "has-text-centered-widescreen"
 textCenteredWidescreenOnly = HH.ClassName "has-text-centered-widescreen-only"
-textCenteredFullhd = HH.ClassName "has-text-centered-fullhd"
+textCenteredFullHd = HH.ClassName "has-text-centered-fullhd"
 textJustified = HH.ClassName "has-text-justified"
 textJustifiedMobile = HH.ClassName "has-text-justified-mobile"
 textJustifiedTablet = HH.ClassName "has-text-justified-tablet"
@@ -137,7 +198,7 @@ textJustifiedDesktop = HH.ClassName "has-text-justified-desktop"
 textJustifiedDesktopOnly = HH.ClassName "has-text-justified-desktop-only"
 textJustifiedWidescreen = HH.ClassName "has-text-justified-widescreen"
 textJustifiedWidescreenOnly = HH.ClassName "has-text-justified-widescreen-only"
-textJustifiedFullhd = HH.ClassName "has-text-justified-fullhd"
+textJustifiedFullHd = HH.ClassName "has-text-justified-fullhd"
 textLeft = HH.ClassName "has-text-left"
 textLeftMobile = HH.ClassName "has-text-left-mobile"
 textLeftTablet = HH.ClassName "has-text-left-tablet"
@@ -147,7 +208,7 @@ textLeftDesktop = HH.ClassName "has-text-left-desktop"
 textLeftDesktopOnly = HH.ClassName "has-text-left-desktop-only"
 textLeftWidescreen = HH.ClassName "has-text-left-widescreen"
 textLeftWidescreenOnly = HH.ClassName "has-text-left-widescreen-only"
-textLeftFullhd = HH.ClassName "has-text-left-fullhd"
+textLeftFullHd = HH.ClassName "has-text-left-fullhd"
 textRight = HH.ClassName "has-text-right"
 textRightMobile = HH.ClassName "has-text-right-mobile"
 textRightTablet = HH.ClassName "has-text-right-tablet"
@@ -157,7 +218,7 @@ textRightDesktop = HH.ClassName "has-text-right-desktop"
 textRightDesktopOnly = HH.ClassName "has-text-right-desktop-only"
 textRightWidescreen = HH.ClassName "has-text-right-widescreen"
 textRightWidescreenOnly = HH.ClassName "has-text-right-widescreen-only"
-textRightFullhd = HH.ClassName "has-text-right-fullhd"
+textRightFullHd = HH.ClassName "has-text-right-fullhd"
 
 textWeightLight = HH.ClassName "has-text-weight-light"
 textWeightNormal = HH.ClassName "has-text-weight-normal"
@@ -504,12 +565,17 @@ paginationEllipsis = HH.ClassName "pagination-ellipsis"
 
 -- Panel
 
+panel :: HH.ClassName
 panel = HH.ClassName "panel"
+panelHeading :: HH.ClassName
 panelHeading = HH.ClassName "panel-heading"
+panelTabs :: HH.ClassName
 panelTabs = HH.ClassName "panel-tabs"
+panelBlock :: HH.ClassName
 panelBlock = HH.ClassName "panel-block"
 
 -- Tabs
 
+tabs :: HH.ClassName
 tabs = HH.ClassName "tabs"
 
