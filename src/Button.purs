@@ -1,6 +1,9 @@
 module Button where
 
 import Prelude
+import Style.Bulogen
+import Style.Hulma
+
 import Data.Maybe (Maybe(..))
 import Halogen as H
 import Halogen.HTML as HH
@@ -36,6 +39,10 @@ myButton =
       HH.button
         [ HP.title label
         , HE.onClick (HE.input_ Toggle)
+        , classes
+          [ button
+          , primary
+          ]
         ]
         [ HH.text label ]
 
