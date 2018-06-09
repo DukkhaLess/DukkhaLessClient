@@ -10,15 +10,15 @@ import Halogen.VDom.DOM.Prop (Prop)
 import Style.Bulogen (Class(..))
 --classes :: forall r i. Array HH.ClassName -> Class r i
 
+type IPropArray r i = Array (HP.IProp ( "class" :: String | r) i)
+
 element :: forall p i t2. String -> Array (HP.IProp t2 i) -> Array (HTML p i) -> HTML p i
 element name = HH.element (ElemName name)
 
-withClasses :: forall r i.
-                Array ClassName -> Array (HP.IProp ( "class" :: String | r) i) ->
-                Array (HP.IProp ( "class" :: String | r) i)
+withClasses :: forall r i. Array ClassName -> IPropArray r i -> IPropArray r i
 withClasses cs as = snoc as (HP.classes cs)
 
-classy :: forall r p i. String -> Array (ClassName) -> Array (HP.IProp ( "class" :: String | r) i) -> Array (HTML p i) -> HTML p i
+classy :: forall r p i. String -> Array (ClassName) -> IPropArray r i -> Array (HTML p i) -> HTML p i
 classy elem cs as = element elem (withClasses cs as)
 
 classier :: forall p i. String -> Array (ClassName) -> Array (HTML p i) -> HTML p i
