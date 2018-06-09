@@ -1,0 +1,73 @@
+module Style.Bulogen.Aria.Role where
+
+import Halogen.HTML (AttrName(..))
+import Halogen.HTML.Properties as HP
+import Bulogen.Properties as BP
+import Bulogen.Properties (role)
+
+alert = role "alert"
+alertdialog = role "alertdialog"
+button = role "button"
+checkbox = role "checkbox"
+dialog = role "dialog"
+gridcell = role "gridcell"
+link = role "link"
+log = role "log"
+marquee = role "marquee"
+menuitem = role "menuitem"
+menuitemcheckbox = role "menuitemcheckbox"
+menuitemradio = role "menuitemradio"
+option = role "option"
+progressbar = role "progressbar"
+radio = role "radio"
+scrollbar = role "scrollbar"
+slider = role "slider"
+spinbutton = role "spinbutton"
+status = role "status"
+tab = role "tab"
+tabpanel = role "tabpanel"
+textbox = role "textbox"
+timer = role "timer"
+tooltip = role "tooltip"
+treeitem = role "treeitem"
+
+
+combobox = role "combobox"
+grid = role "grid"
+listbox = role "listbox"
+menu = role "menu"
+menubar = role "menubar"
+radiogroup = role "radiogroup"
+tablist = role "tablist"
+tree = role "tree"
+treegrid = role "treegrid"
+
+
+article = role "article"
+columnheader = role "columnheader"
+definition = role "definition"
+directory = role "directory"
+document = role "document"
+group = role "group"
+heading = role "heading"
+img = role "img"
+list = role "list"
+listitem = role "listitem"
+math = role "math"
+note = role "note"
+presentation = role "presentation"
+region = role "region"
+row = role "row"
+rowheader = role "rowheader"
+separator = role "separator"
+toolbar = role "toolbar"
+
+
+application = role "application"
+banner = role "banner"
+complementary = role "complementary"
+contentinfo = role "contentinfo"
+form = role "form"
+main = role "main"
+navigation = role "navigation"
+search = role "search"
