@@ -17,12 +17,16 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 -}
+
 module Main where
 
-import Prelude        (Unit)
+import Prelude
 import Effect         (Effect)
-import Effect.Console (log)
+import Halogen.Aff as HA
+import Halogen.VDom.Driver (runUI)
+import Button as B
 
 main :: Effect Unit
-main = do
-  log "Hello sailor!"
+main = HA.runHalogenAff do
+  body <- HA.awaitBody
+  runUI B.myButton unit body
