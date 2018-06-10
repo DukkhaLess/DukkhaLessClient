@@ -1,7 +1,7 @@
 module Intl.English where
 
 import Data.Maybe (Maybe(..))
-import Intl.TypeDefs (Term(..))
+import Intl.Terms (Term(..))
 
 localiseEnglishString :: Term -> Maybe String
 localiseEnglishString Unit = Just "Nothing"
