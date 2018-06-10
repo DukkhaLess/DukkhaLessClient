@@ -44,8 +44,6 @@ gulp.task("docs", function () {
     return purescript.docs({
         src: sources,
         docgen: {
-            "Name.Of.Module1": "docs/Name/Of/Module1.md",
-            "Name.Of.Module2": "docs/Name/Of/Module2.md"
         }
     });
 });
