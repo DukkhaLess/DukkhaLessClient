@@ -21,12 +21,18 @@
 module Main where
 
 import Prelude
-import Effect         (Effect)
+
+import Button as B
+import Effect (Effect)
+import Effect.Class (liftEffect)
 import Halogen.Aff as HA
 import Halogen.VDom.Driver (runUI)
-import Button as B
+import Intl.Locales (preferredUserLanguages)
+import Intl         (localiseString)
 
 main :: Effect Unit
 main = HA.runHalogenAff do
   body <- HA.awaitBody
+  userLanguages <- liftEffect preferredUserLanguages
+  let translate = localiseString userLanguages
   runUI B.myButton unit body
