@@ -5,7 +5,8 @@ const rev = require("gulp-rev");
 const filter = require('gulp-filter');
 const revRewrite = require('gulp-rev-rewrite');
 const del = require("del");
-const serve = require("gulp-serve");
+var browserSync = require('browser-sync').create();
+var reload      = browserSync.reload;
 
 const sources = [
     "src/**/*.purs",
@@ -45,7 +46,15 @@ gulp.task("revisionRewrite", ['revision'], function() {
         .pipe(gulp.dest('dist'));
 });
 
-gulp.task('devServer', serve('dist'));
+gulp.task('devServer', function() {
+    // Serve files from the root of this project
+    browserSync.init({
+        server: {
+            baseDir: "./dist"
+        }
+    });
+    gulp.watch("dist/**/*").on("change", reload);
+});
 
 gulp.task("docs", function () {
     return purescript.docs({
@@ -70,6 +79,7 @@ gulp.task("dev", ['devServer'], function() {
     gulp.watch('./src/**/*.purs', DEV_TASK);
     gulp.watch('./src/**/*.js', DEV_TASK);
     gulp.watch('./index.html', DEV_TASK);
+    gulp.watch('dist/**/*').on("change", reload);
 });
 
 gulp.task("default", ["bundle", "docs", "test"]);
