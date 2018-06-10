@@ -1,5 +1,6 @@
 module Intl
-  (localiseString
+  ( localiseString
+  , LocaliseFn
   ) where
 
 import Data.Array (catMaybes, head)
@@ -8,6 +9,8 @@ import Intl.English (localiseEnglishString)
 import Intl.Locales (Language(..))
 import Intl.Terms (Term)
 import Prelude (map, ($))
+
+type LocaliseFn = Term -> String
 
 localiseString :: Array Language -> Term -> String
 localiseString languages term = fromMaybe ">> Translation Missing <<" bestTerm where
