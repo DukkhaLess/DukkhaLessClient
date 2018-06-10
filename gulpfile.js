@@ -1,8 +1,8 @@
-var gulp = require("gulp");
-var purescript = require("gulp-purescript");
-var run = require("gulp-run");
+const gulp = require("gulp");
+const purescript = require("gulp-purescript");
+const run = require("gulp-run");
 
-var sources = [
+const sources = [
     "src/**/*.purs",
     "bower_components/purescript-*/src/**/*.purs",
 ];
@@ -13,6 +13,13 @@ gulp.task("make", function () {
 
 gulp.task("bundle", ["make"], function () {
     return purescript.bundle({ src: "output/**/*.js", output: "dist/bundle.js", module: "Main" });
+});
+
+const DEV_TASK = ["bundle"];
+gulp.task("dev", function() {
+    gulp.watch('./src/**/*.purs', DEV_TASK);
+    gulp.watch('./src/**/*.js', DEV_TASK);
+    gulp.watch('./index.html', DEV_TASK);
 });
 
 gulp.task("docs", function () {

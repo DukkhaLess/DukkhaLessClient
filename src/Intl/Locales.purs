@@ -6,12 +6,12 @@ module Intl.Locales
   ) where
 
 import Prelude
-import Control.Bind   (bindFlipped)
-import Data.Maybe     (Maybe(..))
-import Data.Array     (snoc, head, catMaybes)
-import Data.String    (split, Pattern(..))
-import Effect         (Effect)
 
+import Control.Bind (bindFlipped)
+import Data.Array (snoc, head, catMaybes)
+import Data.Maybe (Maybe(..))
+import Data.String (split, Pattern(..))
+import Effect (Effect)
 
 data Polity
   = Sweden

@@ -1,4 +1,8 @@
 module Intl.Terms where
 
+data Introduction
+  = Explanation
+
 data Term
-  = Unit
+  = MySelfCare
+  | Intro Introduction

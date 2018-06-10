@@ -7,7 +7,8 @@
   "author": "Alexandra DeWit <alexa.dewit@gmail.com>",
   "license": "GPL3",
   "scripts": {
-    "build": "gulp bundle"
+    "build": "gulp bundle",
+    "dev":   "gulp dev"
   },
   "dependencies": {
     "babel-loader": "^7.1.4",
@@ -16,13 +17,9 @@
     "gulp": "^3.9.1",
     "gulp-purescript": "^2.0.1",
     "gulp-run": "^1.7.1",
+    "gulp-watch": "^5.0.0",
     "pulp": "^12.3.0",
     "purescript": "^0.12.0",
-    "purescript-psa": "^0.6.0",
-    "webpack": "^4.12.0",
-    "webpack-dev-server": "^3.1.4"
-  },
-  "devDependencies": {
-    "webpack-cli": "^3.0.3"
+    "purescript-psa": "^0.6.0"
   }
 }
