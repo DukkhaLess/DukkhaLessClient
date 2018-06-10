@@ -9,7 +9,7 @@
   "scripts": {
     "build": "gulp version",
     "dev": "gulp dev",
-    "setup": "bower install && yarn install"
+    "setup": "yarn install && bower install"
   },
   "dependencies": {
     "babel-loader": "^7.1.4",
