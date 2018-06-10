@@ -19,13 +19,10 @@
     "gulp": "^3.9.1",
     "gulp-filter": "^5.1.0",
     "gulp-purescript": "^2.0.1",
-    "gulp-replace": "^1.0.0",
     "gulp-rev": "^8.1.1",
-    "gulp-rev-delete-original": "^0.2.3",
     "gulp-rev-rewrite": "^1.1.1",
     "gulp-run": "^1.7.1",
     "gulp-serve": "^1.4.0",
-    "gulp-watch": "^5.0.0",
     "pulp": "^12.3.0",
     "purescript": "^0.12.0",
     "purescript-psa": "^0.6.0"

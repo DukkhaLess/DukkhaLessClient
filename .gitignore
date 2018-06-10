@@ -10,3 +10,12 @@
 *.log
 dist
 intermediate
+i# -*- mode: gitignore; -*-
+*~
+\#*\#
+/.emacs.desktop
+/.emacs.desktop.lock
+*.elc
+auto-save-list
+tramp
+.\#*
