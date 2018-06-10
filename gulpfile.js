@@ -1,21 +1,39 @@
 const gulp = require("gulp");
 const purescript = require("gulp-purescript");
 const run = require("gulp-run");
+const rev = require("gulp-rev");
+const filter = require('gulp-filter');
+const del = require("del");
 
 const sources = [
     "src/**/*.purs",
     "bower_components/purescript-*/src/**/*.purs",
 ];
 
+gulp.task("clean", function() {
+    return del([
+        "dist/**/*"
+    ]);
+});
+
 gulp.task("make", function () {
     return purescript.compile({ src: sources });
 });
 
 gulp.task("bundle", ["make"], function () {
-    return purescript.bundle({ src: "output/**/*.js", output: "dist/bundle.js", module: "Main" });
+    return purescript
+        .bundle({ src: "output/**/*.js", output: "intermediate/app.js", module: "Main" });
 });
 
-const DEV_TASK = ["bundle"];
+gulp.task("version", ["clean", "bundle"], function() {
+    const assetFilter = filter(['**/*', '!**/index.html'], { restore: true });
+    return gulp.src('intermediate/app.js')
+        .pipe(assetFilter)
+        .pipe(rev())
+        .pipe(gulp.dest('dist'));
+});
+
+const DEV_TASK = ["version"];
 gulp.task("dev", function() {
     gulp.watch('./src/**/*.purs', DEV_TASK);
     gulp.watch('./src/**/*.js', DEV_TASK);

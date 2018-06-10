@@ -8,5 +8,5 @@
 /.purs*
 /.psa*
 *.log
-dist/*.js
-dist/**/*.js
+dist
+intermediate
