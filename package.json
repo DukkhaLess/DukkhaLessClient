@@ -7,7 +7,7 @@
   "author": "Alexandra DeWit <alexa.dewit@gmail.com>",
   "license": "GPLv3",
   "scripts": {
-    "build": "gulp version",
+    "build": "gulp revisionRewrite",
     "dev": "gulp dev",
     "setup": "yarn install && bower install"
   },
@@ -24,6 +24,7 @@
     "gulp-rev-delete-original": "^0.2.3",
     "gulp-rev-rewrite": "^1.1.1",
     "gulp-run": "^1.7.1",
+    "gulp-serve": "^1.4.0",
     "gulp-watch": "^5.0.0",
     "pulp": "^12.3.0",
     "purescript": "^0.12.0",

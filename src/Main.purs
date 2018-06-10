@@ -30,9 +30,10 @@ import Halogen.VDom.Driver (runUI)
 import Intl.Locales (preferredUserLanguages)
 import Intl         (localiseString)
 
+
 main :: Effect Unit
 main = HA.runHalogenAff do
-  body <- HA.awaitBody
   userLanguages <- liftEffect preferredUserLanguages
   let translate = localiseString userLanguages
+  body <- HA.awaitBody
   runUI B.myButton unit body
