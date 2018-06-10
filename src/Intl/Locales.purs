@@ -3,8 +3,9 @@ module Intl.Locales
   , Language(..)
   , defaultPolityLanguage
   , preferredUserLanguages
-  , globalFallbackLanguage
-  )where
+  ) where
+
+import Data.Array (snoc)
 
 data Polity
   = Sweden
@@ -21,7 +22,8 @@ defaultPolityLanguage Sweden = Swedish
 defaultPolityLanguage Canada = English
 
 preferredUserLanguages :: Array Language
-preferredUserLanguages = []
+preferredUserLanguages = snoc chosenLanguages globalFallbackLanguage where
+  chosenLanguages = []
 
 -- | Provides the universal fallback langauge when text cannot be localised for a user.
 -- | English is chosen for two reasons:

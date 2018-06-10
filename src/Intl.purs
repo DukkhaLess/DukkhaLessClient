@@ -4,15 +4,15 @@ module Intl
 
 import Prelude       (map)
 import Control.Alt   ((<|>))
-import Data.Array    (foldr, snoc)
+import Data.Array    (foldr)
 import Data.Maybe    (Maybe(..), fromMaybe)
 import Intl.Terms    (Term)
-import Intl.Locales  (Language(..), globalFallbackLanguage)
+import Intl.Locales  (Language(..))
 import Intl.English  (localiseEnglishString)
 
 localiseString :: Array Language -> Term -> String
 localiseString languages term = fromMaybe "Could not translate term." bestTerm where
-  maybeTerms = map toTerm (snoc languages globalFallbackLanguage)
+  maybeTerms = map toTerm languages
   bestTerm :: Maybe String
   bestTerm = foldr (<|>) Nothing maybeTerms
 
