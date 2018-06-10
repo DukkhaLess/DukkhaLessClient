@@ -8,7 +8,8 @@
   "license": "GPL3",
   "scripts": {
     "build": "gulp bundle",
-    "dev":   "gulp dev"
+    "dev": "gulp dev",
+    "setup": "bower install && yarn install"
   },
   "dependencies": {
     "babel-loader": "^7.1.4",
@@ -16,6 +17,7 @@
     "global": "^4.3.2",
     "gulp": "^3.9.1",
     "gulp-purescript": "^2.0.1",
+    "gulp-replace": "^1.0.0",
     "gulp-run": "^1.7.1",
     "gulp-watch": "^5.0.0",
     "pulp": "^12.3.0",
