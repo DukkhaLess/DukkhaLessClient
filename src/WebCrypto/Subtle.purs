@@ -1,9 +1,10 @@
 module WebCrypto.Subtle where
 
-import Prelude         (($), map)
-import Data.Show       (class Show, show)
-import Effect.Aff      (Aff)
-import Control.Promise (toAff, Promise)
+import Prelude          (($), map)
+import Data.Show        (class Show, show)
+import Data.String.Read (class Read, read)
+import Effect.Aff       (Aff)
+import Control.Promise  (toAff, Promise)
 import Data.Function.Uncurried (Fn3, runFn3)
 
 foreign import data Algorithm :: Type
