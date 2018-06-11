@@ -11,10 +11,10 @@ foreign import data BufferSource :: Type
 foreign import data ArrayBuffer :: Type
 
 foreign import encryptImpl :: Fn3 Algorithm CryptoKey BufferSource (Promise ArrayBuffer)
-foreign import decryptImpl :: Fn3 Algorithm CryptoKey BufferSource (Promise String)
+foreign import decryptImpl :: Fn3 Algorithm CryptoKey BufferSource (Promise ArrayBuffer)
 
 encrypt :: Algorithm -> CryptoKey -> BufferSource -> Aff ArrayBuffer
 encrypt alg key source = toAff $ runFn3 encryptImpl alg key source
 
-decrypt :: Algorithm -> CryptoKey -> BufferSource -> Aff String
+decrypt :: Algorithm -> CryptoKey -> BufferSource -> Aff ArrayBuffer
 decrypt alg key source = toAff $ runFn3 decryptImpl alg key source
