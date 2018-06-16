@@ -8,7 +8,7 @@
   "license": "GPLv3",
   "scripts": {
     "build": "gulp revisionRewrite",
-    "dev": "gulp dev",
+    "dev": "gulp revisionRewrite && gulp dev",
     "setup": "yarn install && bower install"
   },
   "dependencies": {
