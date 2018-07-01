@@ -14,7 +14,8 @@
     "purescript-aff":     "^5.0.0",
     "purescript-aff-promise": "^2.0.0",
     "purescript-spec": "^3.0.0",
-    "purescript-arraybuffer-types": "^2.0.0"
+    "purescript-arraybuffer-types": "^2.0.0",
+    "purescript-arraybuffer": "^7.1.0"
   },
   "devDependencies": {
     "purescript-psci-support": "^4.0.0"
