@@ -14,11 +14,6 @@ data CipherText = CipherText ArrayBuffer
 
 data PlainText = PlainText ArrayBuffer
 
-foreign import showArrayBufferImpl :: ArrayBuffer -> String
-
-instance showPlainText :: Show PlainText where
-  show (PlainText buffer) = showArrayBufferImpl buffer
-
 foreign import encryptImpl :: Fn3 Algorithm CryptoKey ArrayBuffer (Promise ArrayBuffer)
 foreign import decryptImpl :: Fn3 Algorithm CryptoKey ArrayBuffer (Promise ArrayBuffer)
 
