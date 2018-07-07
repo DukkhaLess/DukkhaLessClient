@@ -22,7 +22,7 @@ module Main where
 
 import Prelude
 
-import Button as B
+import Components.Intro as I
 import Effect (Effect)
 import Effect.Class (liftEffect)
 import Halogen.Aff as HA
@@ -40,4 +40,4 @@ main = HA.runHalogenAff do
   let initialModel = ML.initial translate
   body <- HA.awaitBody
   _ <- liftEffect removeLoader
-  runUI B.myButton unit body
+  runUI (I.intro initialModel.localiseFn) unit body

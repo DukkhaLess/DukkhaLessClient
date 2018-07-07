@@ -2,7 +2,7 @@ module Intl.Terms where
 
 data Introduction
   = Explanation
-  | Test
+  | Title
 
 data Term
   = MySelfCare

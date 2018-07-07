@@ -5,7 +5,7 @@ module Intl
 
 import Data.Array (catMaybes, head)
 import Data.Maybe (Maybe(..), fromMaybe)
-import Intl.English (localiseEnglishString)
+import Intl.English as ENG
 import Intl.Locales (Language(..))
 import Intl.Terms (Term)
 import Prelude (map, ($))
@@ -19,6 +19,6 @@ localiseString languages term = fromMaybe ">> Translation Missing <<" bestTerm w
 
   -- | Language function mappings
   toTerm :: Language -> Maybe String
-  toTerm English = localiseEnglishString term
+  toTerm English = ENG.localise term
   toTerm Swedish = Nothing
 

@@ -1,12 +1,46 @@
 module Components.Intro where
 
-import Style.Bulogen as BG
-import Style.Hulma as HM
+import Prelude
+import Style.Bulogen
+
+import Data.Maybe (Maybe(..))
 import Halogen as H
 import Halogen.HTML as HH
 import Halogen.HTML.Events as HE
 import Halogen.HTML.Properties as HP
 
-import Data.Maybe (Maybe(..))
+import Intl.Terms as Term
 
+type State = (Term.Term -> String)
 
+data Query a = Query a
+
+type Message = Unit
+
+intro :: forall m. State -> H.Component HH.HTML Query Unit Message m
+intro localiseFn =
+  H.component
+    { initialState: const localiseFn
+    , render
+    , eval
+    , receiver: const Nothing
+    }
+  where
+
+  render :: State -> H.ComponentHTML Query
+  render state =
+    let
+      pageTitle = state $ Term.Intro Term.Title
+      pageExplanation = state $ Term.Intro Term.Explanation
+    in
+      HH.section [HP.classes [hero]]
+        [ HH.div [HP.classes [heroBody]]
+          [ HH.div [HP.classes [container]]
+            [ HH.h1 [ HP.classes [title]] [ HH.text pageTitle ]
+            , HH.h2 [ HP.classes [subtitle]] [ HH.text pageExplanation]
+            ]
+          ]
+        ]
+
+  eval :: Query ~> H.ComponentDSL State Query Message m
+  eval (Query a)= pure a
