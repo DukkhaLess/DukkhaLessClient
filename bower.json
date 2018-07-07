@@ -10,6 +10,7 @@
     "purescript-prelude": "^4.0.0",
     "purescript-console": "^4.1.0",
     "purescript-halogen": "^4.0.0",
+    "purescript-bulma": "2.0.0",
     "purescript-css":     "^4.0.0",
     "purescript-aff":     "^5.0.0",
     "purescript-aff-promise": "^2.0.0",

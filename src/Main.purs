@@ -29,6 +29,7 @@ import Halogen.Aff as HA
 import Halogen.VDom.Driver (runUI)
 import Intl (localiseString)
 import Intl.Locales (preferredUserLanguages)
+import Model as ML
 
 foreign import removeLoader :: Effect Unit
 
@@ -36,6 +37,7 @@ main :: Effect Unit
 main = HA.runHalogenAff do
   userLanguages <- liftEffect preferredUserLanguages
   let translate = localiseString userLanguages
+  let initialModel = ML.initial translate
   body <- HA.awaitBody
   _ <- liftEffect removeLoader
   runUI B.myButton unit body
