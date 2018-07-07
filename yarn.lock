@@ -4480,6 +4480,10 @@ term-size@^1.2.0:
   dependencies:
     execa "^0.7.0"
 
+text-encoding@^0.6.4:
+  version "0.6.4"
+  resolved "https://registry.yarnpkg.com/text-encoding/-/text-encoding-0.6.4.tgz#e399a982257a276dae428bb92845cb71bdc26d19"
+
 tfunk@^3.0.1:
   version "3.1.0"
   resolved "https://registry.yarnpkg.com/tfunk/-/tfunk-3.1.0.tgz#38e4414fc64977d87afdaa72facb6d29f82f7b5b"
@@ -4589,6 +4593,10 @@ tty-truncate@^1.0.0:
     inspect-with-kind "^1.0.4"
     slice-ansi "^1.0.0"
     string-width "^2.1.1"
+
+tweetnacl@^1.0.0:
+  version "1.0.0"
+  resolved "https://registry.yarnpkg.com/tweetnacl/-/tweetnacl-1.0.0.tgz#713d8b818da42068740bf68386d0479e66fc8a7b"
 
 typedarray@^0.0.6, typedarray@~0.0.5:
   version "0.0.6"
