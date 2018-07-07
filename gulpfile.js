@@ -35,7 +35,7 @@ gulp.task("minify", ["bundle"], function() {
     .pipe(gulp.dest('intermediate'));
 });
 
-gulp.task("revision", ["clean", "minify"], function() {
+gulp.task("revision", ["minify"], function() {
   const assetFilter = filter(['**/*', '!**/index.html'], { restore: true });
   return gulp.src('intermediate/app-min.js')
     .pipe(assetFilter)

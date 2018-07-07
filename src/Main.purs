@@ -30,7 +30,6 @@ import Halogen.VDom.Driver (runUI)
 import Intl.Locales (preferredUserLanguages)
 import Intl         (localiseString)
 
-
 main :: Effect Unit
 main = HA.runHalogenAff do
   userLanguages <- liftEffect preferredUserLanguages
