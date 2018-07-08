@@ -9,6 +9,10 @@ data Routes
   = Intro
   | Resources
 
+instance showRoutes :: Show Routes where
+  show Intro = "Intro"
+  show Resources = "Resources"
+
 
 routes :: Match Routes
 routes = oneOf
