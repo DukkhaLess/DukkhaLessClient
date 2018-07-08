@@ -22,7 +22,6 @@ module Main where
 
 import Prelude
 
-import Components.Intro as Intro
 import Effect (Effect)
 import Effect.Class (liftEffect)
 import Halogen.Aff as HA
@@ -30,6 +29,7 @@ import Halogen.VDom.Driver (runUI)
 import Intl (localiseString)
 import Intl.Locales (preferredUserLanguages)
 import Model as ML
+import AppRouting.Router as Router
 
 foreign import removeLoader :: Effect Unit
 
@@ -40,4 +40,4 @@ main = HA.runHalogenAff do
   let initialModel = ML.initial translate
   body <- HA.awaitBody
   _ <- liftEffect removeLoader
-  runUI (Intro.component initialModel.localiseFn) unit body
+  runUI (Router.component initialModel) unit body
