@@ -1,4 +1,4 @@
-module Components.Intro where
+module Components.Resources where
 
 import Prelude
 import Style.Bulogen
@@ -10,7 +10,7 @@ import Halogen.HTML.Events as HE
 import Halogen.HTML.Properties as HP
 
 import Intl.Terms as Term
-import Intl.Terms.Introduction as Intro
+import Intl.Terms.Resources as Resource
 
 type State = (Term.Term -> String)
 
@@ -31,14 +31,12 @@ component localiseFn =
   render :: State -> H.ComponentHTML Query
   render state =
     let
-      pageTitle = state $ Term.Intro Intro.Title
-      pageExplanation = state $ Term.Intro Intro.Explanation
+      pageTitle = state $ Term.Resource Resource.Title
     in
       HH.section [HP.classes [hero]]
         [ HH.div [HP.classes [heroBody]]
           [ HH.div [HP.classes [container]]
             [ HH.h1 [ HP.classes [title]] [ HH.text pageTitle ]
-            , HH.h2 [ HP.classes [subtitle]] [ HH.text pageExplanation]
             ]
           ]
         ]

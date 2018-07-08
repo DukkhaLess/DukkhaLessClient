@@ -1,9 +1,9 @@
 module Intl.Terms where
 
-data Introduction
-  = Explanation
-  | Title
+import Intl.Terms.Introduction as INTRO
+import Intl.Terms.Resources as RESOURCE
 
 data Term
   = MySelfCare
-  | Intro Introduction
+  | Intro INTRO.Introduction
+  | Resource RESOURCE.Resources
