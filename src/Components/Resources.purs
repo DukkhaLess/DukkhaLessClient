@@ -8,17 +8,15 @@ import Halogen as H
 import Halogen.HTML as HH
 import Halogen.HTML.Events as HE
 import Halogen.HTML.Properties as HP
-
+import Intl (LocaliseFn)
 import Intl.Terms as Term
 import Intl.Terms.Resources as Resource
-
-type State = (Term.Term -> String)
 
 data Query a = Query a
 
 type Message = Unit
 
-component :: forall m. State -> H.Component HH.HTML Query Unit Message m
+component :: forall m. LocaliseFn -> H.Component HH.HTML Query Unit Message m
 component localiseFn =
   H.component
     { initialState: const localiseFn
@@ -28,7 +26,7 @@ component localiseFn =
     }
   where
 
-  render :: State -> H.ComponentHTML Query
+  render :: LocaliseFn -> H.ComponentHTML Query
   render state =
     let
       pageTitle = state $ Term.Resource Resource.Title
@@ -41,5 +39,5 @@ component localiseFn =
           ]
         ]
 
-  eval :: Query ~> H.ComponentDSL State Query Message m
+  eval :: Query ~> H.ComponentDSL LocaliseFn Query Message m
   eval (Query a)= pure a

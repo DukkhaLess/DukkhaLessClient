@@ -10,12 +10,12 @@ data Routes
   | Resources
 
 instance showRoutes :: Show Routes where
-  show Intro = "Intro"
-  show Resources = "Resources"
+  show Intro = "intro"
+  show Resources = "resources"
 
 
 routes :: Match Routes
 routes = oneOf
-  [ Intro <$ lit "intro"
-  , Resources <$ lit "resources"
+  [ Intro <$ lit (show Intro)
+  , Resources <$ lit (show Resources)
   ]
