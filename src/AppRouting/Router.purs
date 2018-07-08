@@ -12,7 +12,7 @@ import Data.Maybe (Maybe(..))
 data Input a
   = Goto Routes a
 
-type ChildQuery = Unit
+data ChildQuery a = Unit
 type ChildSlot = Unit
 
 component :: forall m. Model -> H.Component HH.HTML Input Unit Void m
@@ -25,10 +25,6 @@ component model = H.parentComponent
   where
     render :: Model -> H.ParentHTML Input ChildQuery ChildSlot m
     render mdl =
-      viewPage mdl.currentPage
-
-    viewPage :: Routes -> H.ParentHTML Input ChildQuery ChildSlot m
-    viewPage _ =
       HH.div_ []
 
     eval :: Input ~> H.ParentDSL Model Input ChildQuery ChildSlot Void m
