@@ -14,12 +14,6 @@ const sources = [
   "bower_components/purescript-*/src/**/*.purs",
 ];
 
-gulp.task("clean", function() {
-  return del([
-    "dist/**/*"
-  ]);
-});
-
 gulp.task("make", function () {
   return purescript.compile({ src: sources });
 });
@@ -35,7 +29,13 @@ gulp.task("minify", ["bundle"], function() {
     .pipe(gulp.dest('intermediate'));
 });
 
-gulp.task("revision", ["minify"], function() {
+gulp.task("cleanAndMinify", ["minify"], function() {
+  return del([
+    "dist/**/*"
+  ]);
+});
+
+gulp.task("revision", ["cleanAndMinify"], function() {
   const assetFilter = filter(['**/*', '!**/index.html'], { restore: true });
   return gulp.src('intermediate/app-min.js')
     .pipe(assetFilter)
