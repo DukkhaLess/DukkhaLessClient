@@ -1,27 +1,29 @@
 module AppRouting.Router where
 
 import AppRouting.Routes
-import Prelude
+import Prelude (type (~>), Unit, Void, const, pure, unit)
 import Halogen as H
 import Halogen.HTML as HH
-import Halogen.HTML.Events as HE
-import Halogen.HTML.Properties as HP
-import Model (Model(..))
+import Model (Model)
 import Data.Maybe (Maybe(..))
-import Data.Functor.Coproduct (Coproduct)
 import Halogen.Component.ChildPath (ChildPath, cpR, cpL)
+import Halogen.Data.Prism (type (<\/>), type (\/))
 import Components.Intro as Intro
-import Data.Either (Either(..))
 import Components.Resources as Resources
 
 data Input a
   = Goto Routes a
 
-type ChildQuery = Coproduct Intro.Query Resources.Query
-type ChildSlot = Either Intro.Slot Resources.Slot
+type ChildQuery
+  = Intro.Query
+  <\/> Resources.Query
+
+type ChildSlot
+  = Intro.Slot
+  \/ Resources.Slot
 
 
-nada  :: forall f o. o -> Maybe (f Unit)
+nada  :: forall a b. a -> Maybe b
 nada = const Nothing
 
 pathToIntro :: ChildPath Intro.Query ChildQuery Intro.Slot ChildSlot
