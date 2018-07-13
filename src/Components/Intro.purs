@@ -16,6 +16,10 @@ data Query a = Query a
 
 type Message = Unit
 
+data Slot = Slot
+derive instance eqSlot :: Eq Slot
+derive instance ordSlot :: Ord Slot
+
 component :: forall m. LocaliseFn -> H.Component HH.HTML Query Unit Message m
 component localiseFn =
   H.component
