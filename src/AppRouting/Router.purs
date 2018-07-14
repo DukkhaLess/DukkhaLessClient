@@ -64,7 +64,7 @@ component initialModel = H.parentComponent
     render :: Model -> H.ParentHTML Input ChildQuery ChildSlot m
     render model =
       HH.div_
-        [ HH.ul_ (map link [Intro, Resources])
+        [ HH.ul_ (map link [Intro, Resources, Sessions])
         , viewPage model model.currentPage
         ]
 
@@ -72,11 +72,26 @@ component initialModel = H.parentComponent
 
     viewPage :: Model -> Routes -> H.ParentHTML Input ChildQuery ChildSlot m
     viewPage model Intro =
-      HH.slot' pathToIntro Intro.Slot (Intro.component model.localiseFn) unit nada
+      HH.slot'
+        pathToIntro
+        Intro.Slot
+        (Intro.component model.localiseFn)
+        unit
+        nada
     viewPage model Resources =
-      HH.slot' pathToResources Resources.Slot (Resources.component model.localiseFn) unit nada
+      HH.slot'
+        pathToResources
+        Resources.Slot
+        (Resources.component model.localiseFn)
+        unit
+        nada
     viewPage model Sessions =
-      HH.slot' pathToSessions Sessions.Slot (Sessions.component $ model.localiseFn) (Sessions.ExistingSession model.session) mapSessionMessage
+      HH.slot'
+        pathToSessions
+        Sessions.Slot
+        (Sessions.component model.localiseFn)
+        (Sessions.ExistingSession model.session)
+        mapSessionMessage
 
     eval :: Input ~> H.ParentDSL Model Input ChildQuery ChildSlot Void m
     eval (Goto loc next) = do
