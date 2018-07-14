@@ -48,7 +48,7 @@ component initialModel = H.parentComponent
   { initialState: const initialModel
   , render
   , eval
-  , receiver: const Nothing
+  , receiver: nada
   }
   where
     render :: Model -> H.ParentHTML Input ChildQuery ChildSlot m
