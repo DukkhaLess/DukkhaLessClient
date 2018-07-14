@@ -9,7 +9,8 @@
   "scripts": {
     "build": "gulp revisionRewrite",
     "dev": "gulp revisionRewrite && gulp dev",
-    "setup": "yarn install && bower install"
+    "setup": "yarn install && bower install",
+    "purty": "find src/ -iname '*.purs' -exec purty --write --dynamic {} \\;"
   },
   "dependencies": {
     "bulma": "^0.7.1",
