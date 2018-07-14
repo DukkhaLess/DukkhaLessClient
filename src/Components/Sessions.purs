@@ -15,7 +15,8 @@ import Model (Session)
 
 data Query a = Query a
 
-type Message = Unit
+data Message
+  = SessionCreated Session
 
 type State =
   { session :: Maybe Session
@@ -53,5 +54,5 @@ component initialSession localiseFn =
         ]
 
   eval :: Query ~> H.ComponentDSL State Query Message m
-  eval (Query a)= pure a
+  eval (Query a) = pure a
 

@@ -16,16 +16,17 @@ import Effect.Console (log)
 import Effect.Unsafe (unsafePerformEffect)
 import Halogen as H
 import Halogen.Aff as HA
-import Halogen.Component.ChildPath (ChildPath, cp1, cp2, cp3, cpL, cpR, compose)
+import Halogen.Component.ChildPath (ChildPath, cp1, cp2, cp3, cpL, cpR, compose, (:>))
 import Halogen.Data.Prism (type (<\/>), type (\/))
 import Halogen.HTML as HH
 import Halogen.HTML.Properties as HP
-import Model (Model)
-import Prelude (type (~>), Unit, Void, const, pure, unit, (<<<), bind, ($), discard, map, (<>), show)
+import Model (Model, Session)
+import Prelude (type (~>), Unit, Void, const, pure, unit, (<<<), bind, ($), discard, map, (<>), show, (-))
 import Routing.Hash (matches)
 
 data Input a
   = Goto Routes a
+  | UpdateSession Session a
 
 type ChildQuery
   = Intro.Query
@@ -47,10 +48,10 @@ pathToIntro :: ChildPath Intro.Query ChildQuery Intro.Slot ChildSlot
 pathToIntro = cpL
 
 pathToResources :: ChildPath Resources.Query ChildQuery Resources.Slot ChildSlot
-pathToResources = cp2
+pathToResources = cpR :> cpL
 
 pathToSessions :: ChildPath Sessions.Query ChildQuery Sessions.Slot ChildSlot
-pathToSessions = cp3
+pathToSessions = cpR :> cpR :> cpL
 
 component :: forall m. Model -> H.Component HH.HTML Input Unit Void m
 component initialModel = H.parentComponent
@@ -75,11 +76,14 @@ component initialModel = H.parentComponent
     viewPage model Resources =
       HH.slot' pathToResources Resources.Slot (Resources.component model.localiseFn) unit nada
     viewPage model Sessions =
-      HH.slot' pathToSessions Sessions.Slot (Sessions.component model.session model.localiseFn) unit nada
+      HH.slot' pathToSessions Sessions.Slot (Sessions.component model.session model.localiseFn) unit mapSessionMessage
 
     eval :: Input ~> H.ParentDSL Model Input ChildQuery ChildSlot Void m
     eval (Goto loc next) = do
       H.modify_ (_{ currentPage = loc})
+      pure next
+    eval (UpdateSession sess next) = do
+      H.modify_ (_{ session = Just sess })
       pure next
 
 routeSignal :: H.HalogenIO Input Void Aff -> Aff (Effect Unit)
@@ -89,3 +93,6 @@ routeSignal driver = liftEffect do
     hashChanged _ newRoute = do
       _ <- launchAff $ driver.query <<< H.action <<< Goto $ newRoute
       pure unit
+
+mapSessionMessage :: Sessions.Message -> Maybe (Input Unit)
+mapSessionMessage (Sessions.SessionCreated session) = Just (UpdateSession session unit)
