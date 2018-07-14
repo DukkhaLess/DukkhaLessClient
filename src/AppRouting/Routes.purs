@@ -20,9 +20,12 @@ instance showRoutes :: Show Routes where
 class ReverseRoute a where
   reverseRoute :: a -> String
 
+leader :: String
+leader = "#/"
+
 instance reverseRouteRoutes :: ReverseRoute Routes where
   reverseRoute route = case route of
-    r -> toLower $ show $ r
+    r -> leader <> (toLower $ show $ r)
 
 routes :: Match Routes
 routes

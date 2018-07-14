@@ -54,11 +54,11 @@ component initialModel = H.parentComponent
     render :: Model -> H.ParentHTML Input ChildQuery ChildSlot m
     render model =
       HH.div_
-        [ HH.ul_ (map link [show Intro, show Resources])
+        [ HH.ul_ (map link [Intro, Resources])
         , viewPage model model.currentPage
         ]
 
-    link s = HH.li_ [ HH.a [ HP.href ("#/" <> toLower s) ] [ HH.text s ] ]
+    link r = HH.li_ [ HH.a [ HP.href $ reverseRoute r ] [ HH.text $ show r ] ]
 
     viewPage :: Model -> Routes -> H.ParentHTML Input ChildQuery ChildSlot m
     viewPage model Intro =
