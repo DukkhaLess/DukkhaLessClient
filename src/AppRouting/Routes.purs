@@ -3,6 +3,7 @@ module AppRouting.Routes where
 import Prelude
 import Data.Generic.Rep as G
 import Data.Generic.Rep.Show as GShow
+import Data.String (toLower)
 import Control.Alternative ((<|>))
 import Routing.Match (Match, lit)
 
@@ -16,17 +17,17 @@ derive instance genericRoutes :: G.Generic Routes _
 instance showRoutes :: Show Routes where
   show r = GShow.genericShow r
 
-class ReverseRoutable a where
+class ReverseRoute a where
   reverseRoute :: a -> String
+
+instance reverseRouteRoutes :: ReverseRoute Routes where
+  reverseRoute route = case route of
+    r -> toLower $ show $ r
 
 routes :: Match Routes
 routes
-  = intro
-  <|> resources
+  = route Intro
+  <|> route Resources
 
   where
-    intro = Intro <$ route (show Intro)
-    resources = Resources <$ route (show Resources)
-
-
-    route str = lit "" *> lit str
+    route r = r <$ (lit "" *> lit (toLower $ show $ r))
