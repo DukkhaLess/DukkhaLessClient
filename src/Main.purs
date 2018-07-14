@@ -17,7 +17,6 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 -}
-
 module Main where
 
 import Prelude
@@ -25,23 +24,24 @@ import Prelude
 import Effect (Effect)
 import Effect.Aff (forkAff)
 import Effect.Class (liftEffect)
-import Halogen.Aff as HA
 import Halogen.VDom.Driver (runUI)
 import Intl (localiseString)
 import Intl.Locales (preferredUserLanguages)
-import Model as ML
+
 import AppRouting.Router as Router
+import Halogen.Aff as HA
+import Model as ML
 
 foreign import removeLoader :: Effect Unit
 
 main :: Effect Unit
 main = HA.runHalogenAff do
-  userLanguages <- liftEffect preferredUserLanguages
-  let translate = localiseString userLanguages
-  let initialModel = ML.initial translate
-  body <- HA.awaitBody
-  _ <- liftEffect removeLoader
-  router <- runUI (Router.component initialModel) unit body
-  forkAff $ Router.routeSignal router
-
-
+    userLanguages <- liftEffect preferredUserLanguages
+    let translate = localiseString userLanguages
+        
+    let initialModel = ML.initial translate
+        
+    body <- HA.awaitBody
+    _ <- liftEffect removeLoader
+    router <- runUI (Router.component initialModel) unit body
+    forkAff $ Router.routeSignal router

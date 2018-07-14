@@ -13,11 +13,12 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 -}
+
+
 module Style.Bulogen.Aria.Role where
 
-import Style.Bulogen.Properties (role)
-
 import Halogen.HTML.Properties as HP
+import Style.Bulogen.Properties (role)
 
 alert :: forall r i. HP.IProp r i
 alert = role "alert"
@@ -94,6 +95,7 @@ tooltip = role "tooltip"
 treeItem :: forall r i. HP.IProp r i
 treeItem = role "treeitem"
 
+
 comboBox :: forall r i. HP.IProp r i
 comboBox = role "combobox"
 
@@ -120,6 +122,7 @@ tree = role "tree"
 
 treeGrid :: forall r i. HP.IProp r i
 treeGrid = role "treegrid"
+
 
 article :: forall r i. HP.IProp r i
 article = role "article"
@@ -174,6 +177,7 @@ separator = role "separator"
 
 toolbar :: forall r i. HP.IProp r i
 toolbar = role "toolbar"
+
 
 application :: forall r i. HP.IProp r i
 application = role "application"

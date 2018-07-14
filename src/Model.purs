@@ -1,13 +1,16 @@
 module Model where
 
-import Intl.Terms (Term)
 import Prelude (show)
-
+import Intl.Terms (Term)
 import AppRouting.Routes as Routes
 
-type Model
-  = {localiseFn :: Term ->
-  String, currentPage :: Routes.Routes}
+type Model =
+  { localiseFn :: Term -> String
+  , currentPage :: Routes.Routes
+  }
 
 initial :: (Term -> String) -> Model
-initial f = {localiseFn: f, currentPage: Routes.Resources}
+initial f =
+  { localiseFn: f
+  , currentPage: Routes.Resources
+  }

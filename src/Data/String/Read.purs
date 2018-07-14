@@ -22,39 +22,66 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 -}
 {- Original Author published code at: https://github.com/truqu/purescript-read -}
+
 module Data.String.Read
-  (class Read, read, class Zero, zero, readDefault)
-  where
+  -- * Classes
+  ( class Read, read
+  , class Zero, zero
+
+  -- * Utility
+  , readDefault
+  ) where
+
+import Prelude ((>>>), pure)
 
 import Data.Maybe (Maybe(..), fromMaybe)
 import Data.String.CodeUnits (charAt)
-import Prelude (pure, (>>>))
+
 
 -- | Represent types that can be read from strings (enum-like ADT)
 class Read a where
-  read :: String -> Maybe a
+  read
+    :: String
+    -> Maybe a
+
+
 -- | Represent types that have a zero value
 class Zero a where
   zero :: a
+
+
 -- | Read a value `a` from a `String` but fallback on `Zero a` on failure
-readDefault :: forall a. Read a => Zero a => String -> a
-readDefault = read >>> fromMaybe zero
+readDefault
+  :: forall a. Read a => Zero a
+  => String
+  -> a
+readDefault =
+  read >>> fromMaybe zero
+
 
 instance readString :: Read String where
-  read = pure
-  
+  read =
+    pure
+
+
 instance readChar :: Read Char where
-  read = charAt 0
-  
+  read =
+    charAt 0
+
+
 instance readBoolean :: Read Boolean where
-  read s = case s of
-      "true" -> pure true
+  read s =
+    case s of
+      "true"  -> pure true
       "false" -> pure false
-      _ -> Nothing
-  
+      _       -> Nothing
+
+
 instance zeroString :: Zero String where
-  zero = ""
-  
+  zero =
+    ""
+
+
 instance zeroBoolean :: Zero Boolean where
-  zero = false
-  
+  zero =
+    false

@@ -1,13 +1,16 @@
 module Intl.Locales
-  (Polity(..), Language(..), defaultPolityLanguage, preferredUserLanguages)
-  where
+  ( Polity(..)
+  , Language(..)
+  , defaultPolityLanguage
+  , preferredUserLanguages
+  ) where
 
 import Prelude
 
 import Control.Bind (bindFlipped)
-import Data.Array (catMaybes, head, snoc)
+import Data.Array (snoc, head, catMaybes)
 import Data.Maybe (Maybe(..))
-import Data.String (Pattern(..), split)
+import Data.String (split, Pattern(..))
 import Effect (Effect)
 
 data Polity
@@ -22,20 +25,19 @@ data Language
 -- | This means that even though nations like Canada have large "minority language" populations, Canada will default to its majority, English.
 defaultPolityLanguage :: Polity -> Language
 defaultPolityLanguage Sweden = Swedish
-
 defaultPolityLanguage Canada = English
 
 foreign import userLanguages :: Effect (Array String)
 
 preferredUserLanguages :: Effect (Array Language)
 preferredUserLanguages = do
-    languageStrings <- userLanguages
-    let chosenLanguages = catMaybes $ map ((bindFlipped langStringToLanguage) <<< head <<< split (Pattern "-")) languageStrings
-        
-    pure $ snoc chosenLanguages globalFallbackLanguage
+  languageStrings <- userLanguages
+  let chosenLanguages = catMaybes $ map ((bindFlipped langStringToLanguage) <<< head <<< split (Pattern "-")) languageStrings
+  pure $ snoc chosenLanguages globalFallbackLanguage
 
 langStringToLanguage :: String -> Maybe Language
 langStringToLanguage _ = Just English
+
 
 -- | Provides the universal fallback langauge when text cannot be localised for a user.
 -- | English is chosen for two reasons:
