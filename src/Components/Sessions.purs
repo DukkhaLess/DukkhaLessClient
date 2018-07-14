@@ -13,30 +13,34 @@ import Intl.Terms as Term
 import Intl.Terms.Resources as Resource
 import Model (Session)
 
-data Query a = Query a
+data Query a =
+  Init (Maybe Session) a
 
 data Message
   = SessionCreated Session
+
+data Input
+  = ExistingSession (Maybe Session)
 
 type State =
   { session :: Maybe Session
   , registering :: Boolean
   }
 
-initialState :: forall a. Maybe Session -> a -> State
-initialState session = const { session: session, registering: false }
+initialState :: forall a. a -> State
+initialState = const { session: Nothing, registering: false }
 
 data Slot = Slot
 derive instance eqSlot :: Eq Slot
 derive instance ordSlot :: Ord Slot
 
-component :: forall m. Maybe Session -> LocaliseFn -> H.Component HH.HTML Query Unit Message m
-component initialSession localiseFn =
+component :: forall m. LocaliseFn -> H.Component HH.HTML Query Input Message m
+component localiseFn =
   H.component
-    { initialState: initialState initialSession
+    { initialState: initialState
     , render
     , eval
-    , receiver: const Nothing
+    , receiver: receive
     }
   where
 
@@ -54,5 +58,9 @@ component initialSession localiseFn =
         ]
 
   eval :: Query ~> H.ComponentDSL State Query Message m
-  eval (Query a) = pure a
+  eval (Init session next) = do
+    H.modify_ (_{ session = session })
+    pure next
 
+receive :: Input -> Maybe (Query Unit)
+receive (ExistingSession session) = Just $ Init session unit

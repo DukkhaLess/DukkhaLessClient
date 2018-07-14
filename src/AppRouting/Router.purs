@@ -76,7 +76,7 @@ component initialModel = H.parentComponent
     viewPage model Resources =
       HH.slot' pathToResources Resources.Slot (Resources.component model.localiseFn) unit nada
     viewPage model Sessions =
-      HH.slot' pathToSessions Sessions.Slot (Sessions.component model.session model.localiseFn) unit mapSessionMessage
+      HH.slot' pathToSessions Sessions.Slot (Sessions.component $ model.localiseFn) (Sessions.ExistingSession model.session) mapSessionMessage
 
     eval :: Input ~> H.ParentDSL Model Input ChildQuery ChildSlot Void m
     eval (Goto loc next) = do
