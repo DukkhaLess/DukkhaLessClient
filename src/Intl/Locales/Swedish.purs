@@ -1,4 +1,4 @@
-module Intl.Swedish where
+module Intl.Locales.Swedish where
 
 import Intl.Terms (j, n)
 import Intl.Terms as Term

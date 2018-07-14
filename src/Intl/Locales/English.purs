@@ -1,4 +1,4 @@
-module Intl.English where
+module Intl.Locales.English where
 
 import Intl.Terms (j, n)
 import Intl.Terms as Term
