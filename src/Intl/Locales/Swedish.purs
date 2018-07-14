@@ -11,6 +11,7 @@ localise :: Term.Term -> Maybe String
 localise Term.MySelfCare = n
 localise (Term.Intro intro) = localiseIntro intro
 localise (Term.Resource resource) = localiseResource resource
+localise (Term.Session session) = n
 
 localiseIntro :: Intro.Introduction -> Maybe String
 localiseIntro Intro.Title = n
