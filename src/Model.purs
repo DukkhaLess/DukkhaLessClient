@@ -13,6 +13,7 @@ newtype KeyChain = KeyChain
 type Session =
   { userName :: String
   , keyChains :: KeyChain
+  , sessionToken :: String
   }
 
 type Model =

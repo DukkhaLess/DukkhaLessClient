@@ -10,6 +10,7 @@ import Routing.Match (Match, lit)
 data Routes
   = Intro
   | Resources
+  | Sessions
 
 
 derive instance genericRoutes :: G.Generic Routes _
@@ -31,6 +32,7 @@ routes :: Match Routes
 routes
   = route Intro
   <|> route Resources
+  <|> route Sessions
 
   where
     route r = r <$ (lit "" *> lit (toLower $ show $ r))
