@@ -1,18 +1,23 @@
 module AppRouting.Routes where
 
 import Prelude
+import Data.Generic.Rep as G
+import Data.Generic.Rep.Show as GShow
 import Control.Alternative ((<|>))
-import Data.Foldable (oneOf)
-import Routing.Match (Match, lit, int, str, end)
+import Routing.Match (Match, lit)
 
 data Routes
   = Intro
   | Resources
 
-instance showRoutes :: Show Routes where
-  show Intro = "intro"
-  show Resources = "resources"
 
+derive instance genericRoutes :: G.Generic Routes _
+
+instance showRoutes :: Show Routes where
+  show r = GShow.genericShow r
+
+class ReverseRoutable a where
+  reverseRoute :: a -> String
 
 routes :: Match Routes
 routes
