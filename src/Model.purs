@@ -12,5 +12,5 @@ type Model =
 initial :: (Term -> String) -> Model
 initial f =
   { localiseFn: f
-  , currentPage: Routes.Intro
+  , currentPage: Routes.Resources
   }

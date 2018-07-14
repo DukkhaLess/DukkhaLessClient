@@ -23,6 +23,7 @@ module Main where
 import Prelude
 
 import Effect (Effect)
+import Effect.Aff (forkAff)
 import Effect.Class (liftEffect)
 import Halogen.Aff as HA
 import Halogen.VDom.Driver (runUI)
@@ -40,4 +41,7 @@ main = HA.runHalogenAff do
   let initialModel = ML.initial translate
   body <- HA.awaitBody
   _ <- liftEffect removeLoader
-  runUI (Router.component initialModel) unit body
+  router <- runUI (Router.component initialModel) unit body
+  forkAff $ Router.routeSignal router
+
+

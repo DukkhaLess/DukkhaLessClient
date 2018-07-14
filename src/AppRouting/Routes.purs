@@ -15,7 +15,13 @@ instance showRoutes :: Show Routes where
 
 
 routes :: Match Routes
-routes = oneOf
-  [ Intro <$ lit (show Intro)
-  , Resources <$ lit (show Resources)
-  ]
+routes
+  = intro
+  <|> resources
+
+  where
+    intro = Intro <$ route (show Intro)
+    resources = Resources <$ route (show Resources)
+
+
+    route str = lit "" *> lit str
