@@ -1,24 +1,26 @@
 module AppRouting.Router where
 
 import AppRouting.Routes
-import Prelude (type (~>), Unit, Void, const, pure, unit, (<<<), bind, ($), discard, map, (<>), show)
-import Data.String (toLower)
-import Routing.Hash (matches)
-import Halogen as H
-import Effect (Effect(..))
-import Effect.Class (liftEffect)
-import Effect.Console (log)
-import Effect.Aff (Aff, launchAff)
-import Halogen.HTML as HH
-import Halogen.Aff as HA
-import Halogen.HTML.Properties as HP
-import Model (Model)
-import Data.Maybe (Maybe(..))
-import Data.Tuple (Tuple(..))
-import Halogen.Component.ChildPath (ChildPath, cpR, cpL)
-import Halogen.Data.Prism (type (<\/>), type (\/))
+
 import Components.Intro as Intro
 import Components.Resources as Resources
+import Data.Maybe (Maybe(..))
+import Data.String (toLower)
+import Data.Tuple (Tuple(..))
+import Effect (Effect(..))
+import Effect.Aff (Aff, launchAff)
+import Effect.Class (liftEffect)
+import Effect.Console (log)
+import Effect.Unsafe (unsafePerformEffect)
+import Halogen as H
+import Halogen.Aff as HA
+import Halogen.Component.ChildPath (ChildPath, cpR, cpL)
+import Halogen.Data.Prism (type (<\/>), type (\/))
+import Halogen.HTML as HH
+import Halogen.HTML.Properties as HP
+import Model (Model)
+import Prelude (type (~>), Unit, Void, const, pure, unit, (<<<), bind, ($), discard, map, (<>), show)
+import Routing.Hash (matches)
 
 data Input a
   = Goto Routes a
@@ -42,31 +44,31 @@ pathToResources :: ChildPath Resources.Query ChildQuery Resources.Slot ChildSlot
 pathToResources = cpR
 
 component :: forall m. Model -> H.Component HH.HTML Input Unit Void m
-component model = H.parentComponent
-  { initialState: const model
+component initialModel = H.parentComponent
+  { initialState: const initialModel
   , render
   , eval
   , receiver: const Nothing
   }
   where
     render :: Model -> H.ParentHTML Input ChildQuery ChildSlot m
-    render mdl =
+    render model =
       HH.div_
         [ HH.ul_ (map link [show Intro, show Resources])
-        , viewPage model.currentPage
+        , viewPage model model.currentPage
         ]
 
     link s = HH.li_ [ HH.a [ HP.href ("#/" <> toLower s) ] [ HH.text s ] ]
 
-    viewPage :: Routes -> H.ParentHTML Input ChildQuery ChildSlot m
-    viewPage Intro =
+    viewPage :: Model -> Routes -> H.ParentHTML Input ChildQuery ChildSlot m
+    viewPage model Intro =
       HH.slot' pathToIntro Intro.Slot (Intro.component model.localiseFn) unit nada
-    viewPage Resources =
+    viewPage model Resources =
       HH.slot' pathToResources Resources.Slot (Resources.component model.localiseFn) unit nada
 
     eval :: Input ~> H.ParentDSL Model Input ChildQuery ChildSlot Void m
     eval (Goto loc next) = do
-      H.modify_ (_ {currentPage = loc })
+      H.modify_ (_{ currentPage = loc})
       pure next
 
 routeSignal :: H.HalogenIO Input Void Aff -> Aff (Effect Unit)
