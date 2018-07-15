@@ -6,15 +6,28 @@ const filter = require('gulp-filter');
 const revRewrite = require('gulp-rev-rewrite');
 const del = require("del");
 const minify = require('gulp-minify');
-var browserSync = require('browser-sync').create();
-var reload      = browserSync.reload;
+const gzip = require('gulp-gzip');
+const replace = require('gulp-replace');
+const browserSync = require('browser-sync').create();
+const reload      = browserSync.reload;
 
 const sources = [
   "src/**/*.purs",
-  "bower_components/purescript-*/src/**/*.purs",
-];
+  "bower_components/purescript-*/src/**/*.purs",];
 
-gulp.task("make", function () {
+gulp.task("cleanIntermediate", function() {
+  return del([
+    "intermediate/**/**",
+  ]);
+});
+
+gulp.task("cleanDist", function() {
+  return del([
+    "dist/**/**",
+  ]);
+});
+
+gulp.task("make", ["cleanIntermediate"], function () {
   return purescript.compile({ src: sources });
 });
 
@@ -25,32 +38,50 @@ gulp.task("bundle", ["make"], function () {
 
 gulp.task("minify", ["bundle"], function() {
   return gulp.src('intermediate/app.js')
-    .pipe(minify())
+    .pipe(minify({
+      mangle: false,
+    }))
     .pipe(gulp.dest('intermediate'));
 });
 
-gulp.task("cleanAndMinify", ["minify"], function() {
-  return del([
-    "dist/**/*"
-  ]);
-});
+function revisionFn(fileName) {
+  return () => {
+    const assetFilter = filter(['**/*', '!**/index.html'], { restore: true });
+    gulp.src(`index.html`)
+      .pipe(replace("static/app.js", `static/${fileName}`))
+      .pipe(gulp.dest('intermediate'));
+    return gulp.src(`intermediate/${fileName}`)
+      .pipe(assetFilter)
+      .pipe(rev())
+      .pipe(gulp.dest('dist/static'))
+      .pipe(rev.manifest())
+      .pipe(gulp.dest('intermediate'));
+  };
+}
 
-gulp.task("revision", ["cleanAndMinify"], function() {
-  const assetFilter = filter(['**/*', '!**/index.html'], { restore: true });
-  return gulp.src('intermediate/app-min.js')
-    .pipe(assetFilter)
-    .pipe(rev())
-    .pipe(gulp.dest('dist/static'))
-    .pipe(rev.manifest())
-    .pipe(gulp.dest('intermediate'));
-});
+gulp.task("revisionProd", ["minify", "cleanDist"], revisionFn("app-min.js"));
+gulp.task("revision", ["bundle", "cleanDist"], revisionFn("app.js"));
 
-gulp.task("revisionRewrite", ['revision'], function() {
+function revisionRewriteFn() {
   const manifest = gulp.src('intermediate/rev-manifest.json');
 
-  return gulp.src('index.html')
+  return gulp.src('intermediate/index.html')
     .pipe(revRewrite({manifest}))
     .pipe(gulp.dest('dist'));
+}
+
+gulp.task("revisionRewrite", ['revision'], revisionRewriteFn);
+
+gulp.task("revisionRewriteProd", ['revisionProd'], revisionRewriteFn);
+
+gulp.task("buildToProd", ['revisionRewriteProd'], function() {
+  return gulp.src('dist/static/*.js')
+    .pipe(gzip({
+      gzipOptions: {
+        level: 9
+      },
+    }))
+    .pipe(gulp.dest('dist/static'));
 });
 
 gulp.task('devServer', function() {
