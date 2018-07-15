@@ -1,2 +1,25 @@
 @charset "utf-8";
+
+// My SelfCare Colours
+// Visualised - coolors.co/292828-474036-63494d-bd5173-6b437b
+$darkUmber: rgba(41, 40, 40, 1);
+$darkBrown: rgba(71, 64, 54, 1);
+$rust: rgba(99, 73, 77, 1);
+$lightPink: rgba(189, 81, 115, 1);
+$lightPurple: rgba(107, 67, 123, 1);
+$warmGrey: #DAE2DF;
+
+// Update Bulma Globals
+// https://bulma.io/documentation/customize/variables/
+// Especially: https://bulma.io/documentation/customize/variables/#initial-variables
+$grey-dark: $darkUmber;
+$grey-light: $darkBrown;
+$primary: $lightPurple;
+$link: $rust;
+$body-background-color: $darkUmber;
+$info: $lightPink;
+$success: $warmGrey;
+$warning: $rust;
+$danger: $rust;
+
 @import "../node_modules/bulma/bulma.sass";

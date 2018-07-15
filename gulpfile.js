@@ -88,17 +88,22 @@ gulp.task("revision", ["bundle", "cleanDist"], revisionFn(false));
 function revisionRewriteFn() {
   const manifest = gulp.src('intermediate/rev-manifest.json');
 
-  return gulp.src('intermediate/index.html')
+  return gulp.src(['intermediate/*.html'])
     .pipe(revRewrite({manifest}))
     .pipe(gulp.dest('dist'));
 }
 
-gulp.task("revisionRewrite", ['revision'], revisionRewriteFn);
+gulp.task("designPage", ["revision"], function(){
+  return gulp.src("styles/designPage.html")
+    .pipe(gulp.dest("intermediate"));
+});
+
+gulp.task("revisionRewrite", ['designPage'], revisionRewriteFn);
 
 gulp.task("revisionRewriteProd", ['revisionProd'], revisionRewriteFn);
 
 gulp.task("buildToProd", ['revisionRewriteProd'], function() {
-  return gulp.src('dist/static/*.js')
+  return gulp.src(['dist/static/*.js', 'dist/static/*.css'])
     .pipe(gzip({
       gzipOptions: {
         level: 9
@@ -124,7 +129,6 @@ gulp.task("docs", function () {
     }
   });
 });
-
 gulp.task("dotpsci", function () {
   return purescript.psci({ src: sources })
     .pipe(gulp.dest("."));
