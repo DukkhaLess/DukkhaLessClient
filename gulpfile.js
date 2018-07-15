@@ -5,9 +5,9 @@ const rev = require("gulp-rev");
 const filter = require('gulp-filter');
 const revRewrite = require('gulp-rev-rewrite');
 const del = require("del");
-const minify = require('gulp-minify');
 const gzip = require('gulp-gzip');
 const replace = require('gulp-replace');
+const closureCompiler = require('google-closure-compiler').gulp();
 const browserSync = require('browser-sync').create();
 const reload      = browserSync.reload;
 
@@ -38,8 +38,13 @@ gulp.task("bundle", ["make"], function () {
 
 gulp.task("minify", ["bundle"], function() {
   return gulp.src('intermediate/app.js')
-    .pipe(minify({
-      mangle: false,
+    .pipe(closureCompiler({
+      compilation_level: 'ADVANCED',
+      warning_level: 'QUIET',
+      language_in: 'ECMASCRIPT6_STRICT',
+      language_out: 'ECMASCRIPT5_STRICT',
+      output_wrapper: '(function(){\n%output%\n}).call(this)',
+      js_output_file: 'app-min.js',
     }))
     .pipe(gulp.dest('intermediate'));
 });
