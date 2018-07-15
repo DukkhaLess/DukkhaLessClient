@@ -27,12 +27,12 @@ A safe place to write your thoughts, and track the progress of mental health rec
   - The `symmetric key` that is used to encrypt your data for you to read. This key should be treated as securely as the private key as it represents your personal access to your data. 
 
 
-## Problems That Still Require Solving
+### Problems That Still Require Solving
 
 - User password recovery without invading user privacy (ie. demanding an email address)
 - Risk of user data loss when they key is lost.
 
-### Software Licensing
+## Software Licensing
 This program is licensed under the GNU General Public License Version 3. For details consult the LICENSE file.
 
 Some source files are special cases and licensed under more permissive licenses such as Apache Version 2. This is done where
