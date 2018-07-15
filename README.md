@@ -71,3 +71,10 @@ do not be confused, and to protect and thank those authors who made this work po
 - Submit a pull request with the feature you wish to add and a short description of intent for the PR.
 - I'm not super particular about it, I'll read the code anyway to see what it does, after all.
 - When adding issues, please try to describe as much as possible the state that application needs to be in to replicate the issue, if appropraite.
+
+
+## Working with the bulma design stuff
+
+- Once set up, run `yarn dev` to load the auto-reloading browser.
+- Edit `styles/styles.scss` to define appropriate style sheets to be used in the application, and configure bulma variables
+- View the work on `localhost:3000/designPage.html`

@@ -145,6 +145,7 @@ gulp.task("dev", ['devServer'], function() {
   gulp.watch('./src/**/*.js', DEV_TASK);
   gulp.watch('./index.html', DEV_TASK);
   gulp.watch('./styles/**/*.scss', DEV_TASK);
+  gulp.watch('./styles/**/*.html', DEV_TASK);
   gulp.watch('dist/**/*').on("change", reload);
 });
 
