@@ -40,7 +40,7 @@ gulp.task("revision", ["cleanAndMinify"], function() {
   return gulp.src('intermediate/app-min.js')
     .pipe(assetFilter)
     .pipe(rev())
-    .pipe(gulp.dest('dist'))
+    .pipe(gulp.dest('dist/static'))
     .pipe(rev.manifest())
     .pipe(gulp.dest('intermediate'));
 });

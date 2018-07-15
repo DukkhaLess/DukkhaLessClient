@@ -35,7 +35,7 @@ derive instance eqSlot :: Eq Slot
 derive instance ordSlot :: Ord Slot
 
 component :: forall m. LocaliseFn -> H.Component HH.HTML Query Input Message m
-component localiseFn =
+component t =
   H.component
     { initialState: initialState
     , render
@@ -47,7 +47,7 @@ component localiseFn =
   render :: State -> H.ComponentHTML Query
   render state =
     let
-      pageTitle = localiseFn $ Term.Resource Resource.Title
+      pageTitle = t $ Term.Resource Resource.Title
     in
       HH.section [HP.classes [hero]]
         [ HH.div [HP.classes [heroBody]]
