@@ -34,6 +34,16 @@ A safe place to write your thoughts, and track the progress of mental health rec
 - User password recovery without invading user privacy (ie. demanding an email address)
 - Risk of user data loss when they key is lost.
 
+
+## Planned Features
+
+1. Secure Diaries
+2. Configurable Calendars with support for mood/diet logging.
+3. Secure Tagging of items for searching/filtering. The tags will be stored in a hashed format so they can be queried and searched without recording their text.
+4. Secure sharing of diaries/calendars with explicitly whitelisted parties.
+5. Support for creating and visualising timelines of events.
+6. More to come, this is just the initial steps. User feedback and information will play a major role in where we go in the future.
+
 ## Software Licensing
 This program is licensed under the GNU General Public License Version 3. For details consult the LICENSE file.
 
