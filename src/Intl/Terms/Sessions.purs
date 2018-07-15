@@ -4,3 +4,5 @@ module Intl.Terms.Sessions
 data Sessions
   = Login
   | Register
+  | Username
+  | KeyInstructions

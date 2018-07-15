@@ -22,4 +22,7 @@ localiseResource :: Resource.Resources -> Maybe String
 localiseResource Resource.Title = j "Resources"
 
 localiseSession :: Sessions.Sessions -> Maybe String
-localiseSession _ = n
+localiseSession Sessions.Login = j "Login"
+localiseSession Sessions.Register = j "Register"
+localiseSession Sessions.Username = j "Username"
+localiseSession Sessions.KeyInstructions = j "Download yo keys!"

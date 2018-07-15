@@ -10,11 +10,12 @@ import Halogen.HTML.Events as HE
 import Halogen.HTML.Properties as HP
 import Intl (LocaliseFn)
 import Intl.Terms as Term
-import Intl.Terms.Resources as Resource
+import Intl.Terms.Sessions as Sessions
 import Model (Session)
 
-data Query a =
-  Init (Maybe Session) a
+data Query a
+  = ToggleRegister a
+  | Init (Maybe Session) a
 
 data Message
   = SessionCreated Session
@@ -47,7 +48,7 @@ component t =
   render :: State -> H.ComponentHTML Query
   render state =
     let
-      pageTitle = t $ Term.Resource Resource.Title
+      pageTitle = t $ Term.Session Sessions.Login
     in
       HH.section [HP.classes [hero]]
         [ HH.div [HP.classes [heroBody]]
@@ -60,6 +61,11 @@ component t =
   eval :: Query ~> H.ComponentDSL State Query Message m
   eval (Init session next) = do
     H.modify_ (_{ session = session })
+    pure next
+  eval (ToggleRegister next) = do
+    state <- H.get
+    let nextState = state { registering = not state.registering }
+    H.put nextState
     pure next
 
 receive :: Input -> Maybe (Query Unit)
