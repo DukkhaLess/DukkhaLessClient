@@ -10,7 +10,7 @@ A safe place to write your thoughts, and track the progress of mental health rec
   - `Secretbox` algorithm is used to secure user data for their own viewing
   - `Secretbox` makes use of your `symmetric key`.
 
-2. The user must be able to send data to a specific individual (ie. their physician** such that only that individual can read it.)
+2. The user must be able to send data to a specific individual (ie. their physician such that only that individual can read it.)
   - `Box` algorithm is used to send data between users.
   - `Box` makes use of your `private key` and the recipient's `public key`
 
