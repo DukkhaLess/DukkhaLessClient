@@ -65,3 +65,9 @@ do not be confused, and to protect and thank those authors who made this work po
 ## Getting oriented.
 - The project uses [purescript-halogen](https://github.com/slamdata/purescript-halogen) For rendering
 - It's important to note that the documentation for halogen on [pursuit](https://pursuit.purescript.org/packages/purescript-halogen/) are not up to date.
+
+## Contributing
+
+- Submit a pull request with the feature you wish to add and a short description of intent for the PR.
+- I'm not super particular about it, I'll read the code anyway to see what it does, after all.
+- When adding issues, please try to describe as much as possible the state that application needs to be in to replicate the issue, if appropraite.
