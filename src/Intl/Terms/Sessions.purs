@@ -8,3 +8,7 @@ data Sessions
   | Password
   | KeyRing
   | KeyRingInstructions
+  | RegisterButtonText
+  | Logout
+  | LoginInstead
+  | RegisterInstead

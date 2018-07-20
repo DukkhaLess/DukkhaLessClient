@@ -1,12 +1,11 @@
 module Intl.Locales.English where
 
+import Data.Maybe (Maybe(..))
 import Intl.Terms (j, n)
 import Intl.Terms as Term
 import Intl.Terms.Introduction as Intro
 import Intl.Terms.Resources as Resource
 import Intl.Terms.Sessions as Sessions
-
-import Data.Maybe (Maybe(..))
 
 localise :: Term.Term -> Maybe String
 localise Term.MySelfCare = Just "My Selfcare"
@@ -28,4 +27,8 @@ localiseSession Sessions.Register = j "Register"
 localiseSession Sessions.Username = j "Username"
 localiseSession Sessions.KeyRing = j "Your secret keys"
 localiseSession Sessions.KeyRingInstructions = j "Please save your secret keys. If they are lost, you will no longer be able to access your data."
+localiseSession Sessions.RegisterButtonText = j "Register and Download Keys"
+localiseSession Sessions.Logout = j "Logout"
+localiseSession Sessions.LoginInstead = j "Already have an account? Login!"
+localiseSession Sessions.RegisterInstead = j "Don't have an account? Register!"
 

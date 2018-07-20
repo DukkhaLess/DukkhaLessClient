@@ -9,7 +9,7 @@ import Intl.Terms as Term
 import Intl.Terms.Sessions as Sessions
 import Model (Session, KeyRing(..))
 import Prelude (type (~>), Unit, bind, const, discard, pure, unit, not, ($), class Ord, class Eq)
-import Style.Bulogen (container, hero, heroBody, input, textarea, title)
+import Style.Bulogen (container, hero, heroBody, input, textarea, title, primary, button)
 
 data Query a
   = ToggleRegister a
@@ -46,20 +46,42 @@ component t =
 
   render :: State -> H.ComponentHTML Query
   render state =
-    let
-      pageTitle = t $ Term.Session Sessions.Login
-    in
-      HH.section [HP.classes [hero]]
+      case state.session of
+        Just session -> HH.text "Logout"
+        Nothing -> if state.registering then registerForm state else loginForm state
+
+  loginForm :: State -> H.ComponentHTML Query
+  loginForm state =
+    HH.section [HP.classes [hero]]
         [ HH.div [HP.classes [heroBody]]
           [ HH.div [HP.classes [container]]
-            [ HH.h1 [ HP.classes [title]] [ HH.text pageTitle ]
+            [ HH.h1 [ HP.classes [title]] [ HH.text $ t $ Term.Session Sessions.Login ]
             , HH.input [HP.classes [input], HP.placeholder $ t $ Term.Session Sessions.Username]
             , HH.input [HP.type_ HP.InputPassword, HP.classes [input], HP.placeholder $ t (Term.Session Sessions.Password)]
             , HH.textarea [HP.classes [textarea]]
             , HH.text $ t $ Term.Session Sessions.KeyRingInstructions
+            , HH.button [HP.classes [button, primary]] [HH.text $ t $ Term.Session Sessions.RegisterInstead]
             ]
           ]
         ]
+
+
+
+  registerForm :: State -> H.ComponentHTML Query
+  registerForm state =
+    HH.section [HP.classes [hero]]
+        [ HH.div [HP.classes [heroBody]]
+          [ HH.div [HP.classes [container]]
+            [ HH.h1 [ HP.classes [title]] [ HH.text $ t $ Term.Session Sessions.Register ]
+            , HH.input [HP.classes [input], HP.placeholder $ t $ Term.Session Sessions.Username]
+            , HH.input [HP.type_ HP.InputPassword, HP.classes [input], HP.placeholder $ t (Term.Session Sessions.Password)]
+            , HH.textarea [HP.classes [textarea]]
+            , HH.text $ t $ Term.Session Sessions.KeyRingInstructions
+            , HH.button [HP.classes [button, primary]] [HH.text $ t $ Term.Session Sessions.LoginInstead]
+            ]
+          ]
+        ]
+
 
   eval :: Query ~> H.ComponentDSL State Query Message m
   eval (Init session next) = do
