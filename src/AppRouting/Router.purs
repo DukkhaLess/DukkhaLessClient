@@ -1,27 +1,35 @@
 module AppRouting.Router where
 
-import AppRouting.Routes
 
+import Prelude
+  ( type (~>)
+  , Unit
+  , Void
+  , const
+  , pure
+  , unit
+  , (<<<)
+  , bind
+  , ($)
+  , discard
+  , map
+  , show
+  )
+import AppRouting.Routes
 import Components.Intro as Intro
 import Components.Resources as Resources
 import Components.Sessions as Sessions
-import Data.Const (Const(..))
+import Data.Const (Const)
 import Data.Maybe (Maybe(..))
-import Data.String (toLower)
-import Data.Tuple (Tuple(..))
-import Effect (Effect(..))
+import Effect (Effect)
 import Effect.Aff (Aff, launchAff)
 import Effect.Class (liftEffect)
-import Effect.Console (log)
-import Effect.Unsafe (unsafePerformEffect)
 import Halogen as H
-import Halogen.Aff as HA
-import Halogen.Component.ChildPath (ChildPath, cp1, cp2, cp3, cpL, cpR, compose, (:>))
+import Halogen.Component.ChildPath (ChildPath, cpL, cpR, (:>))
 import Halogen.Data.Prism (type (<\/>), type (\/))
 import Halogen.HTML as HH
 import Halogen.HTML.Properties as HP
 import Model (Model, Session)
-import Prelude (type (~>), Unit, Void, const, pure, unit, (<<<), bind, ($), discard, map, (<>), show, (-))
 import Routing.Hash (matches)
 
 data Input a

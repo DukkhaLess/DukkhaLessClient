@@ -1,12 +1,22 @@
 module Components.Sessions where
 
 import Prelude
-import Style.Bulogen
-
+  ( type (~>)
+  , Unit
+  , bind
+  , const
+  , discard
+  , pure
+  , unit
+  , not
+  , ($)
+  , class Ord
+  , class Eq
+  )
+import Style.Bulogen (hero, heroBody, title, container)
 import Data.Maybe (Maybe(..))
 import Halogen as H
 import Halogen.HTML as HH
-import Halogen.HTML.Events as HE
 import Halogen.HTML.Properties as HP
 import Intl (LocaliseFn)
 import Intl.Terms as Term
