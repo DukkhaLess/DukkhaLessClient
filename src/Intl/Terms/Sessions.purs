@@ -5,4 +5,6 @@ data Sessions
   = Login
   | Register
   | Username
-  | KeyInstructions
+  | Password
+  | KeyRing
+  | KeyRingInstructions

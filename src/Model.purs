@@ -5,14 +5,14 @@ import Crypt.NaCl.Types (BoxKeyPair, SecretBoxKey)
 import Data.Maybe (Maybe(..))
 import Intl.Terms (Term)
 
-newtype KeyChain = KeyChain
+newtype KeyRing = KeyRing
   { secretBoxKey :: SecretBoxKey
   , boxKeyPair :: BoxKeyPair
   }
 
 type Session =
   { userName :: String
-  , keyChains :: KeyChain
+  , keyChains :: KeyRing
   , sessionToken :: String
   }
 

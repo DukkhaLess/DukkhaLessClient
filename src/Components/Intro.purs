@@ -1,12 +1,24 @@
 module Components.Intro where
 
 import Prelude
+  ( class Eq
+  , class Ord
+  , type (~>)
+  , Unit
+  , const
+  , pure
+  , ($)
+  )
 import Style.Bulogen
-
+  ( container
+  , hero
+  , heroBody
+  , subtitle
+  , title
+  )
 import Data.Maybe (Maybe(..))
 import Halogen as H
 import Halogen.HTML as HH
-import Halogen.HTML.Events as HE
 import Halogen.HTML.Properties as HP
 import Intl (LocaliseFn)
 import Intl.Terms as Term
