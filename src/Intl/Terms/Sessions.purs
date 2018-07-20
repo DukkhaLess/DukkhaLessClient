@@ -6,6 +6,7 @@ data Sessions
   | Register
   | Username
   | Password
+  | ConfirmPassword
   | KeyRing
   | KeyRingInstructions
   | RegisterButtonText

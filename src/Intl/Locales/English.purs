@@ -23,6 +23,7 @@ localiseResource Resource.Title = j "Resources"
 localiseSession :: Sessions.Sessions -> Maybe String
 localiseSession Sessions.Login = j "Login"
 localiseSession Sessions.Password = j "Password"
+localiseSession Sessions.ConfirmPassword = j "Confirm Password"
 localiseSession Sessions.Register = j "Register"
 localiseSession Sessions.Username = j "Username"
 localiseSession Sessions.KeyRing = j "Your secret keys"

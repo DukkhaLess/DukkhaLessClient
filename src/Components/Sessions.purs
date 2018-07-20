@@ -4,6 +4,7 @@ import Data.Maybe (Maybe(..))
 import Halogen as H
 import Halogen.HTML as HH
 import Halogen.HTML.Properties as HP
+import Halogen.HTML.Events as HE
 import Intl (LocaliseFn)
 import Intl.Terms as Term
 import Intl.Terms.Sessions as Sessions
@@ -56,11 +57,23 @@ component t =
         [ HH.div [HP.classes [heroBody]]
           [ HH.div [HP.classes [container]]
             [ HH.h1 [ HP.classes [title]] [ HH.text $ t $ Term.Session Sessions.Login ]
-            , HH.input [HP.classes [input], HP.placeholder $ t $ Term.Session Sessions.Username]
-            , HH.input [HP.type_ HP.InputPassword, HP.classes [input], HP.placeholder $ t (Term.Session Sessions.Password)]
+            , HH.input
+              [ HP.classes [input]
+              , HP.placeholder $ t $ Term.Session Sessions.Username
+              ]
+            , HH.input
+              [ HP.type_ HP.InputPassword
+              , HP.classes [input]
+              , HP.placeholder $ t (Term.Session Sessions.Password)
+              ]
             , HH.textarea [HP.classes [textarea]]
             , HH.text $ t $ Term.Session Sessions.KeyRingInstructions
-            , HH.button [HP.classes [button, primary]] [HH.text $ t $ Term.Session Sessions.RegisterInstead]
+            , HH.button
+              [ HP.classes [button, primary]
+              , HE.onClick (HE.input_ ToggleRegister)
+              ]
+              [ HH.text $ t $ Term.Session Sessions.RegisterInstead
+              ]
             ]
           ]
         ]
@@ -73,11 +86,28 @@ component t =
         [ HH.div [HP.classes [heroBody]]
           [ HH.div [HP.classes [container]]
             [ HH.h1 [ HP.classes [title]] [ HH.text $ t $ Term.Session Sessions.Register ]
-            , HH.input [HP.classes [input], HP.placeholder $ t $ Term.Session Sessions.Username]
-            , HH.input [HP.type_ HP.InputPassword, HP.classes [input], HP.placeholder $ t (Term.Session Sessions.Password)]
+            , HH.input
+              [ HP.classes [input]
+              , HP.placeholder $ t $ Term.Session Sessions.Username
+              ]
+            , HH.input
+              [ HP.type_ HP.InputPassword
+              , HP.classes [input]
+              , HP.placeholder $ t (Term.Session Sessions.Password)
+              ]
+            , HH.input
+              [ HP.type_ HP.InputPassword
+              , HP.classes [input]
+              , HP.placeholder $ t (Term.Session Sessions.ConfirmPassword)
+              ]
             , HH.textarea [HP.classes [textarea]]
             , HH.text $ t $ Term.Session Sessions.KeyRingInstructions
-            , HH.button [HP.classes [button, primary]] [HH.text $ t $ Term.Session Sessions.LoginInstead]
+            , HH.button
+              [ HP.classes [button, primary]
+              , HE.onClick (HE.input_ ToggleRegister)
+              ]
+              [ HH.text $ t $ Term.Session Sessions.LoginInstead
+              ]
             ]
           ]
         ]
