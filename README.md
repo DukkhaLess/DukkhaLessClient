@@ -1,4 +1,5 @@
 [![Build Status](https://travis-ci.org/MySelfCare/MySelfcareClient.svg?branch=master)](https://travis-ci.org/MySelfCare/MySelfcareClient)
+[![Known Vulnerabilities](https://snyk.io/test/github/MySelfCare/MySelfcareClient/badge.svg?targetFile=package.json)](https://snyk.io/test/github/MySelfCare/MySelfcareClient?targetFile=package.json)
 
 # My SelfCare Client
 
