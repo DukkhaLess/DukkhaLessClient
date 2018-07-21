@@ -20,7 +20,7 @@ import Data.Base64 (Base64(..), decodeBase64, encodeBase64, runBase64)
 import Data.Either (Either(..), note)
 import Effect (Effect)
 import Foreign.Object (Object)
-import Prelude (pure, bind, ($), (<<<), (=<<), (#), (>>=), apply, (<#>))
+import Prelude (pure, bind, ($), (<<<), (>>=), (<#>))
 
 generateKeyring :: Effect Keyring
 generateKeyring = do
