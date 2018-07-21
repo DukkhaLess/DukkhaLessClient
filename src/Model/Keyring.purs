@@ -16,11 +16,11 @@ import Data.Argonaut.Encode.Combinators ((~>), (:=))
 import Data.ArrayBuffer.DataView (whole, buffer)
 import Data.ArrayBuffer.Typed (asUint8Array, dataView)
 import Data.ArrayBuffer.Types (Uint8Array)
-import Data.Base64 (encodeBase64, decodeBase64, runBase64)
-import Data.Either (Either(..))
+import Data.Base64 (Base64(..), decodeBase64, encodeBase64, runBase64)
+import Data.Either (Either(..), note)
 import Effect (Effect)
 import Foreign.Object (Object)
-import Prelude (pure, bind, ($), (<<<))
+import Prelude (pure, bind, ($), (<<<), (=<<), (#), (>>=), apply, (<#>))
 
 generateKeyring :: Effect Keyring
 generateKeyring = do
@@ -30,6 +30,12 @@ generateKeyring = do
 
 encodeKey :: Uint8Array -> String
 encodeKey = runBase64 <<< encodeBase64 <<< buffer <<< dataView
+
+decodeKey :: String -> Either String Uint8Array
+decodeKey rawStr = dv <#> asUint8Array where
+  decoded = decodeBase64 (Base64 rawStr)
+  eithered = note "Could not decode base64 content" decoded
+  dv = eithered <#> whole
 
 newtype Keyring = Keyring
   { secretBoxKey :: SecretBoxKey
@@ -59,6 +65,6 @@ instance decodeKeyringJson :: DecodeJson Keyring where
     caseJsonObject (Left "Keyring input was not a JSON Object") parseRingObj json where
     parseRingObj :: Object Json -> Either String Keyring
     parseRingObj ringObj = do
-      sbk <- ringObj .? "secretBoxKey"
+      sbk <- ringObj .? "secretBoxKey" >>= decodeKey
       bkp <- ringObj .? "boxKeyPair"
       pure $ Keyring { secretBoxKey: sbk, boxKeyPair: bkp }
