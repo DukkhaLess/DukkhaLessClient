@@ -6,7 +6,7 @@ module Model.Keyring
   , Keyring(..)
   ) where
 
-import Crypt.NaCl (BoxKeyPair(..), SecretBoxKey, generateBoxKeyPair, generateSecretBoxKey, toUint8Array)
+import Crypt.NaCl (BoxKeyPair(..), SecretBoxKey, generateBoxKeyPair, generateSecretBoxKey, toUint8Array, fromUint8Array)
 import Crypt.NaCl.Types (BoxKeyPair, SecretBoxKey)
 import Data.Argonaut.Core (Json, caseJsonObject, jsonEmptyObject)
 import Data.Argonaut.Decode (class DecodeJson)
@@ -66,5 +66,11 @@ instance decodeKeyringJson :: DecodeJson Keyring where
     parseRingObj :: Object Json -> Either String Keyring
     parseRingObj ringObj = do
       sbk <- ringObj .? "secretBoxKey" >>= decodeKey
-      bkp <- ringObj .? "boxKeyPair"
-      pure $ Keyring { secretBoxKey: sbk, boxKeyPair: bkp }
+      bkp <- ringObj .? "boxKeyPair" >>= caseJsonObject (Left "BoxKeyPair field did not contain a json object") decodeBoxKeyPair
+      pure $ Keyring { secretBoxKey: fromUint8Array sbk, boxKeyPair: bkp }
+
+decodeBoxKeyPair :: Object Json -> Either String BoxKeyPair
+decodeBoxKeyPair boxKeyPairObj = do
+  publicKey <- boxKeyPairObj .? "publicKey" >>= decodeKey
+  secretKey <- boxKeyPairObj .? "secretKey" >>= decodeKey
+  pure $ BoxKeyPair { publicKey: fromUint8Array publicKey, secretKey: fromUint8Array secretKey }
