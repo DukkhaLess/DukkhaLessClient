@@ -8,7 +8,8 @@ import Halogen.HTML.Events as HE
 import Intl (LocaliseFn)
 import Intl.Terms as Term
 import Intl.Terms.Sessions as Sessions
-import Model (Session, KeyRing(..))
+import Model (Session)
+import Model.Keyring (Keyring(..))
 import Prelude (type (~>), Unit, bind, const, discard, pure, unit, not, ($), class Ord, class Eq)
 import Style.Bulogen (container, hero, heroBody, input, textarea, title, primary, button)
 
@@ -25,7 +26,7 @@ data Input
 type State =
   { session :: Maybe Session
   , registering :: Boolean
-  , preparedRing :: Maybe KeyRing
+  , preparedRing :: Maybe Keyring
   }
 
 initialState :: forall a. a -> State

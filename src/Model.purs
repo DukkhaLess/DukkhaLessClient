@@ -1,18 +1,13 @@
 module Model where
 
 import AppRouting.Routes as Routes
-import Crypt.NaCl.Types (BoxKeyPair, SecretBoxKey)
 import Data.Maybe (Maybe(..))
 import Intl.Terms (Term)
-
-newtype KeyRing = KeyRing
-  { secretBoxKey :: SecretBoxKey
-  , boxKeyPair :: BoxKeyPair
-  }
+import Model.Keyring (Keyring)
 
 type Session =
   { userName :: String
-  , keyChains :: KeyRing
+  , keyChains :: Keyring
   , sessionToken :: String
   }
 
