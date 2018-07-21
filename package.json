@@ -16,9 +16,7 @@
     "global": "^4.3.2",
     "bulma": "0.7.1",
     "tweetnacl": "^1.0.0",
-    "text-encoding": "^0.6.4"
-  },
-  "devDependencies": {
+    "text-encoding": "^0.6.4",
     "babel-loader": "^7.1.4",
     "del": "^3.0.0",
     "browser-sync": "^2.24.4",
