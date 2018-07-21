@@ -1,3 +1,5 @@
+[![Build Status](https://travis-ci.org/MySelfCare/MySelfcareClient.svg?branch=master)](https://travis-ci.org/MySelfCare/MySelfcareClient)
+
 # My SelfCare Client
 
 A safe place to write your thoughts, and track the progress of mental health recovery.
