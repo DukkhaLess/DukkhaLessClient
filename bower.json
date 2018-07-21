@@ -22,7 +22,8 @@
     "purescript-tuples": "^5.0.0",
     "purescript-generics-rep": "^6.0.0",
     "purescript-routing": "^8.0.0",
-    "purescript-tweetnacl": "^0.4.0"
+    "purescript-tweetnacl": "^0.4.1",
+    "purescript-argonaut": "^4.0.1"
   },
   "devDependencies": {
     "purescript-psci-support": "^4.0.0"
