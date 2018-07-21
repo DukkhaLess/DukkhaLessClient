@@ -1,6 +1,6 @@
 module Model.Keyring where
 
-import Crypt.NaCl (generateBoxKeyPair, generateSecretBoxKey, toUint8Array)
+import Crypt.NaCl (SecretBoxKey, generateBoxKeyPair, generateSecretBoxKey, toUint8Array)
 import Crypt.NaCl.Types (BoxKeyPair, SecretBoxKey)
 import Data.Argonaut.Core (Json, caseJsonObject, jsonEmptyObject)
 import Data.Argonaut.Decode (class DecodeJson)
@@ -30,12 +30,12 @@ newtype Keyring = Keyring
   , boxKeyPair :: BoxKeyPair
   }
 
-runSecretBoxKey :: Keyring -> Uint8Array
-runSecretBoxKey (Keyring keyring) = toUint8Array $ keyring.secretBoxKey
+runSecretBoxKey :: Keyring -> SecretBoxKey
+runSecretBoxKey (Keyring keyring) = keyring.secretBoxKey
 
 instance encodeKeyringJson :: EncodeJson Keyring where
   encodeJson ring
-    = assoc "secretBoxKey" (encodeKey $ runSecretBoxKey ring)
+    = assoc "secretBoxKey" (encodeKey $ toUint8Array $ runSecretBoxKey ring)
     ~> jsonEmptyObject
 
 instance decodeKeyringJson :: DecodeJson Keyring where
