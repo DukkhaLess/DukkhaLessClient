@@ -20,7 +20,7 @@ import Data.Base64 (Base64(..), decodeBase64, encodeBase64, runBase64)
 import Data.Either (Either(..), note)
 import Effect (Effect)
 import Foreign.Object (Object)
-import Prelude (pure, bind, ($), (<<<), (>>=), (<#>))
+import Prelude (pure, bind, ($), (<<<), (>>=), (<#>), class Eq)
 
 generateKeyring :: Effect Keyring
 generateKeyring = do
@@ -41,6 +41,8 @@ newtype Keyring = Keyring
   { secretBoxKey :: SecretBoxKey
   , boxKeyPair :: BoxKeyPair
   }
+
+derive instance eqKeyring :: Eq Keyring
 
 runSecretBoxKey :: Keyring -> SecretBoxKey
 runSecretBoxKey (Keyring keyring) = keyring.secretBoxKey
