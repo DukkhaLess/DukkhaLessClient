@@ -26,6 +26,7 @@
     "purescript-argonaut": "^4.0.1"
   },
   "devDependencies": {
+    "purescript-quickcheck": "^5.0.0",
     "purescript-psci-support": "^4.0.0"
   }
 }
