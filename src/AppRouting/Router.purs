@@ -68,7 +68,7 @@ pathToSessions = cpR :> cpR :> cpL
 pathToNotFound :: ChildPath NotFound.Query ChildQuery NotFound.Slot ChildSlot
 pathToNotFound = cpR :> cpR :> cpR :> cpL
 
-component :: forall m. Model -> H.Component HH.HTML Input Unit Void m
+component :: Model -> H.Component HH.HTML Input Unit Void Aff
 component initialModel = H.parentComponent
   { initialState: const initialModel
   , render
@@ -76,7 +76,7 @@ component initialModel = H.parentComponent
   , receiver: nada
   }
   where
-    render :: Model -> H.ParentHTML Input ChildQuery ChildSlot m
+    render :: Model -> H.ParentHTML Input ChildQuery ChildSlot Aff
     render model =
       HH.div_
         [ HH.ul_ (map link [R.Intro, R.Resources, R.Sessions])
@@ -85,7 +85,7 @@ component initialModel = H.parentComponent
 
     link r = HH.li_ [ HH.a [ HP.href $ R.reverseRoute r ] [ HH.text $ show r ] ]
 
-    viewPage :: Model -> R.Routes -> H.ParentHTML Input ChildQuery ChildSlot m
+    viewPage :: Model -> R.Routes -> H.ParentHTML Input ChildQuery ChildSlot Aff
     viewPage model R.Intro =
       HH.slot'
         pathToIntro
@@ -115,7 +115,7 @@ component initialModel = H.parentComponent
         unit
         nada
 
-    eval :: Input ~> H.ParentDSL Model Input ChildQuery ChildSlot Void m
+    eval :: Input ~> H.ParentDSL Model Input ChildQuery ChildSlot Void Aff
     eval (Goto loc next) = do
       H.modify_ (_{ currentPage = loc})
       pure next

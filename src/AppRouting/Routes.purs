@@ -5,7 +5,7 @@ import Data.Generic.Rep as G
 import Data.Generic.Rep.Show as GShow
 import Data.String (toLower)
 import Control.Alternative ((<|>))
-import Routing.Match (Match, lit, end, root)
+import Routing.Match (Match, lit, end)
 
 data Routes
   = Intro
