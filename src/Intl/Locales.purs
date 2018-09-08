@@ -40,6 +40,7 @@ instance ordLanguage :: Ord Language where
 
 -- | Returns the statistically most dominantly spoken language for a given State/Country/Empire/Whatever
 -- | This means that even though nations like Canada have large "minority language" populations, Canada will default to its majority, English.
+-- | TODO: Determine at what order of importance this should be used, if at all, and how it is expected to be determined, if at all.
 defaultPolityLanguage :: Polity -> Language
 defaultPolityLanguage Sweden = Swedish
 defaultPolityLanguage Canada = English
