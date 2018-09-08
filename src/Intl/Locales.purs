@@ -50,9 +50,7 @@ preferredUserLanguages :: Effect (Array Language)
 preferredUserLanguages = do
   languageStrings <- userLanguages
   let chosenLanguages = catMaybes $ map ((bindFlipped langStringToLanguage) <<< head <<< split (Pattern "-")) languageStrings
-  let languages = nub $ snoc chosenLanguages globalFallbackLanguage
-  log $ foldl (\a b -> a <> ", " <> b) "" (map show languages)
-  pure languages
+  pure $ nub $ snoc chosenLanguages globalFallbackLanguage
 
 langStringToLanguage :: String -> Maybe Language
 langStringToLanguage "en" = Just English
