@@ -1,9 +1,10 @@
 module Components.Sessions where
 
 import Control.Apply (lift2)
+import Data.Argonaut.Core (stringify)
+import Data.Argonaut.Encode (encodeJson)
 import Data.Maybe (Maybe(..), fromMaybe)
 import Effect.Aff (Aff)
-import Effect.Class (liftEffect)
 import Flags (EditLevel(..))
 import Halogen as H
 import Halogen.HTML as HH
@@ -15,7 +16,7 @@ import Intl.Terms as Term
 import Intl.Terms.Sessions as Sessions
 import Model (Session)
 import Model.Keyring (Keyring(..), generateKeyring)
-import Prelude (type (~>), Unit, bind, const, discard, pure, unit, not, ($), class Ord, class Eq, (<>))
+import Prelude (type (~>), Unit, bind, const, discard, pure, unit, not, ($), class Ord, class Eq, (<>), (<$>), (<<<))
 import Style.Bulogen (block, button, container, hero, heroBody, input, link, offsetThreeQuarters, primary, pullRight, spaced, subtitle, textarea, title)
 
 data Query a
@@ -60,79 +61,80 @@ component t =
       case state.session of
         Just session -> HH.text "Logout"
         Nothing -> case state.sessionCreationMode of
-          Register -> registerForm state
-          Login    -> loginForm state
+          Register -> registerForm
+          Login    -> loginForm
+      where
 
-  loginForm :: State -> H.ComponentHTML Query
-  loginForm state =
-    HH.section [HP.classes [hero]]
-        [ HH.div [HP.classes [heroBody]]
-          [ HH.div [HP.classes [container]]
-            [ HH.h1 [ HP.classes [title]] [ HH.text $ t $ Term.Session Sessions.Login ]
-            , HH.input
-              [ HP.classes [input]
-              , HP.placeholder $ t $ Term.Session Sessions.Username
+        loginForm :: H.ComponentHTML Query
+        loginForm =
+          HH.section [HP.classes [hero]]
+              [ HH.div [HP.classes [heroBody]]
+                [ HH.div [HP.classes [container]]
+                  [ HH.h1 [ HP.classes [title]] [ HH.text $ t $ Term.Session Sessions.Login ]
+                  , HH.input
+                    [ HP.classes [input]
+                    , HP.placeholder $ t $ Term.Session Sessions.Username
+                    ]
+                  , HH.input
+                    [ HP.type_ HP.InputPassword
+                    , HP.classes [input]
+                    , HP.placeholder $ t (Term.Session Sessions.Password)
+                    ]
+                  , keyBox ReadWrite state.preparedRing
+                  , HH.button
+                    [ HP.classes [button, primary, block]
+                    , HE.onClick (HE.input_ ToggleRegister)
+                    ]
+                    [ HH.text $ t $ Term.Session Sessions.RegisterInstead
+                    ]
+                  ]
+                ]
               ]
-            , HH.input
-              [ HP.type_ HP.InputPassword
-              , HP.classes [input]
-              , HP.placeholder $ t (Term.Session Sessions.Password)
-              ]
-            , keyBox ReadWrite
-            , HH.button
-              [ HP.classes [button, primary, block]
-              , HE.onClick (HE.input_ ToggleRegister)
-              ]
-              [ HH.text $ t $ Term.Session Sessions.RegisterInstead
-              ]
-            ]
-          ]
-        ]
 
 
 
-  registerForm :: State -> H.ComponentHTML Query
-  registerForm state =
-    HH.section [HP.classes [hero]]
-        [ HH.div [HP.classes [heroBody]]
-          [ HH.div [HP.classes [container]]
-            [ HH.h1 [ HP.classes [title]] [ HH.text $ t $ Term.Session Sessions.Register ]
-            , HH.input
-              [ HP.classes [input]
-              , HP.placeholder $ t $ Term.Session Sessions.Username
+        registerForm :: H.ComponentHTML Query
+        registerForm =
+          HH.section [HP.classes [hero]]
+              [ HH.div [HP.classes [heroBody]]
+                [ HH.div [HP.classes [container]]
+                  [ HH.h1 [ HP.classes [title]] [ HH.text $ t $ Term.Session Sessions.Register ]
+                  , HH.input
+                    [ HP.classes [input]
+                    , HP.placeholder $ t $ Term.Session Sessions.Username
+                    ]
+                  , HH.input
+                    [ HP.type_ HP.InputPassword
+                    , HP.classes [input]
+                    , HP.placeholder $ t (Term.Session Sessions.Password)
+                    ]
+                  , HH.input
+                    [ HP.type_ HP.InputPassword
+                    , HP.classes [input]
+                    , HP.placeholder $ t (Term.Session Sessions.ConfirmPassword)
+                    ]
+                  , secretKeyHeader
+                  , HH.text $ t $ Term.Session Sessions.KeyRingInstructions
+                  , HH.a
+                    [ HP.classes [link, pullRight, spaced]
+                    ]
+                    [ HH.text $ t $ Term.Session Sessions.CopyKey
+                    ]
+                  , HH.a
+                    [ HP.classes [link, pullRight]
+                    ]
+                    [ HH.text $ t $ Term.Session Sessions.DownloadKey
+                    ]
+                  , keyBox ReadOnly state.preparedRing
+                  , HH.button
+                    [ HP.classes [button, primary, block]
+                    , HE.onClick (HE.input_ ToggleRegister)
+                    ]
+                    [ HH.text $ t $ Term.Session Sessions.LoginInstead
+                    ]
+                  ]
+                ]
               ]
-            , HH.input
-              [ HP.type_ HP.InputPassword
-              , HP.classes [input]
-              , HP.placeholder $ t (Term.Session Sessions.Password)
-              ]
-            , HH.input
-              [ HP.type_ HP.InputPassword
-              , HP.classes [input]
-              , HP.placeholder $ t (Term.Session Sessions.ConfirmPassword)
-              ]
-            , secretKeyHeader
-            , HH.text $ t $ Term.Session Sessions.KeyRingInstructions
-            , HH.a
-              [ HP.classes [link, pullRight, spaced]
-              ]
-              [ HH.text $ t $ Term.Session Sessions.CopyKey
-              ]
-            , HH.a
-              [ HP.classes [link, pullRight]
-              ]
-              [ HH.text $ t $ Term.Session Sessions.DownloadKey
-              ]
-            , keyBox ReadOnly
-            , HH.button
-              [ HP.classes [button, primary, block]
-              , HE.onClick (HE.input_ ToggleRegister)
-              ]
-              [ HH.text $ t $ Term.Session Sessions.LoginInstead
-              ]
-            ]
-          ]
-        ]
 
   secretKeyHeader :: forall p i. HH.HTML p i
   secretKeyHeader =
@@ -142,15 +144,18 @@ component t =
       [ HH.text $ t $ Term.Session Sessions.KeySubtitle
       ]
 
-  keyBox :: forall p i. EditLevel -> HH.HTML p i
-  keyBox editLevel =
+  keyBox :: forall p i. EditLevel -> Maybe Keyring -> HH.HTML p i
+  keyBox editLevel keyring =
     HH.textarea $
       [ HP.classes [textarea]
       , HP.placeholder "Your secret keys."
       ] <> additionalProps
       where
         additionalProps = case editLevel of
-          ReadOnly -> [HP.readOnly true]
+          ReadOnly ->
+            [ HP.readOnly true
+            , HP.value $ fromMaybe "" (stringify <<< encodeJson <$> keyring)
+            ]
           ReadWrite -> []
 
   eval :: Query ~> H.ComponentDSL State Query Message Aff
@@ -161,9 +166,9 @@ component t =
     state <- H.get
     nextState <- case state.sessionCreationMode of
           Login -> do
---            keyring <- H.liftEffect $ generateKeyring
+            keyring <- H.liftEffect $ generateKeyring
             pure $ state { sessionCreationMode = Register
-                         , preparedRing = Nothing
+                         , preparedRing = Just keyring
                          }
           Register -> pure $ state { sessionCreationMode = Login
                                    , preparedRing = Nothing
