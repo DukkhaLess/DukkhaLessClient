@@ -24,6 +24,7 @@ import Data.Maybe (Maybe(..))
 import Effect (Effect)
 import Effect.Aff (Aff, launchAff)
 import Effect.Class (liftEffect)
+import Effect.Console (log)
 import Halogen as H
 import Halogen.Component.ChildPath (ChildPath, cpL, cpR, (:>))
 import Halogen.Data.Prism (type (<\/>), type (\/))
@@ -61,7 +62,7 @@ pathToResources = cpR :> cpL
 pathToSessions :: ChildPath Sessions.Query ChildQuery Sessions.Slot ChildSlot
 pathToSessions = cpR :> cpR :> cpL
 
-component :: forall m. Model -> H.Component HH.HTML Input Unit Void m
+component :: Model -> H.Component HH.HTML Input Unit Void Aff
 component initialModel = H.parentComponent
   { initialState: const initialModel
   , render
@@ -69,7 +70,7 @@ component initialModel = H.parentComponent
   , receiver: nada
   }
   where
-    render :: Model -> H.ParentHTML Input ChildQuery ChildSlot m
+    render :: Model -> H.ParentHTML Input ChildQuery ChildSlot Aff
     render model =
       HH.div_
         [ HH.ul_ (map link [Intro, Resources, Sessions])
@@ -78,7 +79,7 @@ component initialModel = H.parentComponent
 
     link r = HH.li_ [ HH.a [ HP.href $ reverseRoute r ] [ HH.text $ show r ] ]
 
-    viewPage :: Model -> Routes -> H.ParentHTML Input ChildQuery ChildSlot m
+    viewPage :: Model -> Routes -> H.ParentHTML Input ChildQuery ChildSlot Aff
     viewPage model Intro =
       HH.slot'
         pathToIntro
@@ -101,9 +102,10 @@ component initialModel = H.parentComponent
         (Sessions.ExistingSession model.session)
         mapSessionMessage
 
-    eval :: Input ~> H.ParentDSL Model Input ChildQuery ChildSlot Void m
+    eval :: Input ~> H.ParentDSL Model Input ChildQuery ChildSlot Void Aff
     eval (Goto loc next) = do
       H.modify_ (_{ currentPage = loc})
+      liftEffect $ log $ show loc
       pure next
     eval (UpdateSession sess next) = do
       H.modify_ (_{ session = Just sess })

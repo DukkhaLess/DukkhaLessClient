@@ -2,6 +2,8 @@ module Components.Sessions where
 
 import Control.Apply (lift2)
 import Data.Maybe (Maybe(..), fromMaybe)
+import Effect.Aff (Aff)
+import Effect.Class (liftEffect)
 import Flags (EditLevel(..))
 import Halogen as H
 import Halogen.HTML as HH
@@ -12,7 +14,7 @@ import Intl (LocaliseFn)
 import Intl.Terms as Term
 import Intl.Terms.Sessions as Sessions
 import Model (Session)
-import Model.Keyring (Keyring(..))
+import Model.Keyring (Keyring(..), generateKeyring)
 import Prelude (type (~>), Unit, bind, const, discard, pure, unit, not, ($), class Ord, class Eq, (<>))
 import Style.Bulogen (block, button, container, hero, heroBody, input, link, offsetThreeQuarters, primary, pullRight, spaced, subtitle, textarea, title)
 
@@ -26,20 +28,24 @@ data Message
 data Input
   = ExistingSession (Maybe Session)
 
+data SessionCreationMode
+  = Login
+  | Register
+
 type State =
   { session :: Maybe Session
-  , registering :: Boolean
+  , sessionCreationMode :: SessionCreationMode
   , preparedRing :: Maybe Keyring
   }
 
 initialState :: forall a. a -> State
-initialState = const { session: Nothing, registering: false, preparedRing: Nothing }
+initialState = const { session: Nothing, sessionCreationMode: Login, preparedRing: Nothing }
 
 data Slot = Slot
 derive instance eqSlot :: Eq Slot
 derive instance ordSlot :: Ord Slot
 
-component :: forall m. LocaliseFn -> H.Component HH.HTML Query Input Message m
+component :: LocaliseFn -> H.Component HH.HTML Query Input Message Aff
 component t =
   H.component
     { initialState: initialState
@@ -53,7 +59,9 @@ component t =
   render state =
       case state.session of
         Just session -> HH.text "Logout"
-        Nothing -> if state.registering then registerForm state else loginForm state
+        Nothing -> case state.sessionCreationMode of
+          Register -> registerForm state
+          Login    -> loginForm state
 
   loginForm :: State -> H.ComponentHTML Query
   loginForm state =
@@ -145,13 +153,21 @@ component t =
           ReadOnly -> [HP.readOnly true]
           ReadWrite -> []
 
-  eval :: Query ~> H.ComponentDSL State Query Message m
+  eval :: Query ~> H.ComponentDSL State Query Message Aff
   eval (Init session next) = do
     H.modify_ (_{ session = session })
     pure next
   eval (ToggleRegister next) = do
     state <- H.get
-    let nextState = state { registering = not state.registering }
+    nextState <- case state.sessionCreationMode of
+          Login -> do
+--            keyring <- H.liftEffect $ generateKeyring
+            pure $ state { sessionCreationMode = Register
+                         , preparedRing = Nothing
+                         }
+          Register -> pure $ state { sessionCreationMode = Login
+                                   , preparedRing = Nothing
+                                   }
     H.put nextState
     pure next
 

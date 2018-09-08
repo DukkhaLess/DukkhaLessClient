@@ -20,6 +20,6 @@ type Model =
 initial :: (Term -> String) -> Model
 initial f =
   { localiseFn: f
-  , currentPage: Routes.Resources
+  , currentPage: Routes.Intro
   , session: Nothing
   }

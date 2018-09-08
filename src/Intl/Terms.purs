@@ -7,6 +7,7 @@ module Intl.Terms
 import Intl.Terms.Introduction (Introduction)
 import Intl.Terms.Resources (Resources)
 import Intl.Terms.Sessions (Sessions)
+import Intl.Terms.NotFound (NotFound)
 
 import Data.Maybe (Maybe(..))
 
@@ -20,3 +21,4 @@ data Term
   = Intro Introduction
   | Resource Resources
   | Session Sessions
+  | NotFound NotFound

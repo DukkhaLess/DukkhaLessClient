@@ -6,11 +6,13 @@ import Intl.Terms as Term
 import Intl.Terms.Introduction as Intro
 import Intl.Terms.Resources as Resource
 import Intl.Terms.Sessions as Sessions
+import Intl.Terms.NotFound as NotFound
 
 localise :: Term.Term -> Maybe String
 localise (Term.Intro intro) = localiseIntro intro
 localise (Term.Resource resource) = localiseResource resource
 localise (Term.Session session) = localiseSession session
+localise (Term.NotFound notFound) = localiseNotFound notFound
 
 localiseIntro :: Intro.Introduction -> Maybe String
 localiseIntro Intro.Title = j "My Selfcare"
@@ -35,3 +37,7 @@ localiseSession Sessions.CopyKey = j "Copy"
 localiseSession Sessions.DownloadKey = j "Download"
 localiseSession Sessions.KeySubtitle = j "Your Secret Keys"
 
+localiseNotFound :: NotFound.NotFound -> Maybe String
+localiseNotFound t = j case t of
+  NotFound.Title -> "Not Found"
+  NotFound.Explanation -> "The desired page could not be located"
