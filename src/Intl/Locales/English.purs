@@ -8,7 +8,6 @@ import Intl.Terms.Resources as Resource
 import Intl.Terms.Sessions as Sessions
 
 localise :: Term.Term -> Maybe String
-localise Term.MySelfCare = Just "My Selfcare"
 localise (Term.Intro intro) = localiseIntro intro
 localise (Term.Resource resource) = localiseResource resource
 localise (Term.Session session) = localiseSession session
