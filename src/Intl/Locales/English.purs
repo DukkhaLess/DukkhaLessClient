@@ -32,4 +32,7 @@ localiseSession Sessions.RegisterButtonText = j "Register and Download Keys"
 localiseSession Sessions.Logout = j "Logout"
 localiseSession Sessions.LoginInstead = j "Already have an account? Login!"
 localiseSession Sessions.RegisterInstead = j "Don't have an account? Register!"
+localiseSession Sessions.CopyKey = j "Copy"
+localiseSession Sessions.DownloadKey = j "Download"
+localiseSession Sessions.KeySubtitle = j "Your Secret Keys"
 

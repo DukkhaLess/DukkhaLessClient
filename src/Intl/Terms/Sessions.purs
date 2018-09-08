@@ -13,3 +13,6 @@ data Sessions
   | Logout
   | LoginInstead
   | RegisterInstead
+  | CopyKey
+  | DownloadKey
+  | KeySubtitle
