@@ -5,16 +5,15 @@ import Intl.Terms as Term
 import Intl.Terms.Introduction as Intro
 import Intl.Terms.Resources as Resource
 
-import Data.Maybe (Maybe(..))
+import Data.Maybe (Maybe)
 
 localise :: Term.Term -> Maybe String
-localise Term.MySelfCare = n
 localise (Term.Intro intro) = localiseIntro intro
 localise (Term.Resource resource) = localiseResource resource
 localise (Term.Session session) = n
 
 localiseIntro :: Intro.Introduction -> Maybe String
-localiseIntro Intro.Title = n
+localiseIntro Intro.Title = j "Mitt Sjävvård"
 localiseIntro Intro.Explanation = n
 
 localiseResource :: Resource.Resources -> Maybe String

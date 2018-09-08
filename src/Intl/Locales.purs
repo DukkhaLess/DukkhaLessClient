@@ -8,10 +8,16 @@ module Intl.Locales
 import Prelude
 
 import Control.Bind (bindFlipped)
-import Data.Array (snoc, head, catMaybes)
+import Data.Array (snoc, head, catMaybes, nub)
+import Data.Foldable (foldl)
+import Data.Generic.Rep as G
+import Data.Generic.Rep.Show as GShow
+import Data.Generic.Rep.Eq as GEq
+import Data.Generic.Rep.Ord as GOrd
 import Data.Maybe (Maybe(..))
 import Data.String (split, Pattern(..))
 import Effect (Effect)
+import Effect.Console (log)
 
 data Polity
   = Sweden
@@ -21,8 +27,20 @@ data Language
   = English
   | Swedish
 
+derive instance genericLanguage :: G.Generic Language _
+
+instance showLanguage :: Show Language where
+  show = GShow.genericShow
+
+instance eqLanguage :: Eq Language where
+  eq = GEq.genericEq
+
+instance ordLanguage :: Ord Language where
+  compare = GOrd.genericCompare
+
 -- | Returns the statistically most dominantly spoken language for a given State/Country/Empire/Whatever
 -- | This means that even though nations like Canada have large "minority language" populations, Canada will default to its majority, English.
+-- | TODO: Determine at what order of importance this should be used, if at all, and how it is expected to be determined, if at all.
 defaultPolityLanguage :: Polity -> Language
 defaultPolityLanguage Sweden = Swedish
 defaultPolityLanguage Canada = English
@@ -33,10 +51,13 @@ preferredUserLanguages :: Effect (Array Language)
 preferredUserLanguages = do
   languageStrings <- userLanguages
   let chosenLanguages = catMaybes $ map ((bindFlipped langStringToLanguage) <<< head <<< split (Pattern "-")) languageStrings
-  pure $ snoc chosenLanguages globalFallbackLanguage
+  pure $ nub $ snoc chosenLanguages globalFallbackLanguage
 
 langStringToLanguage :: String -> Maybe Language
-langStringToLanguage _ = Just English
+langStringToLanguage "en" = Just English
+langStringToLanguage "sv" = Just Swedish
+langStringToLanguage _    = Nothing
+
 
 
 -- | Provides the universal fallback langauge when text cannot be localised for a user.

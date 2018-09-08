@@ -8,7 +8,6 @@ import Intl.Terms.Resources as Resource
 import Intl.Terms.Sessions as Sessions
 
 localise :: Term.Term -> Maybe String
-localise Term.MySelfCare = Just "My Selfcare"
 localise (Term.Intro intro) = localiseIntro intro
 localise (Term.Resource resource) = localiseResource resource
 localise (Term.Session session) = localiseSession session
@@ -32,4 +31,7 @@ localiseSession Sessions.RegisterButtonText = j "Register and Download Keys"
 localiseSession Sessions.Logout = j "Logout"
 localiseSession Sessions.LoginInstead = j "Already have an account? Login!"
 localiseSession Sessions.RegisterInstead = j "Don't have an account? Register!"
+localiseSession Sessions.CopyKey = j "Copy"
+localiseSession Sessions.DownloadKey = j "Download"
+localiseSession Sessions.KeySubtitle = j "Your Secret Keys"
 

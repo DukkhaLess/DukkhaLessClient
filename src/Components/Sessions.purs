@@ -1,17 +1,20 @@
 module Components.Sessions where
 
-import Data.Maybe (Maybe(..))
+import Control.Apply (lift2)
+import Data.Maybe (Maybe(..), fromMaybe)
+import Flags (EditLevel(..))
 import Halogen as H
 import Halogen.HTML as HH
-import Halogen.HTML.Properties as HP
 import Halogen.HTML.Events as HE
+import Halogen.HTML.Properties as HP
+import Halogen.VDom.DOM.Prop (Prop)
 import Intl (LocaliseFn)
 import Intl.Terms as Term
 import Intl.Terms.Sessions as Sessions
 import Model (Session)
 import Model.Keyring (Keyring(..))
-import Prelude (type (~>), Unit, bind, const, discard, pure, unit, not, ($), class Ord, class Eq)
-import Style.Bulogen (container, hero, heroBody, input, textarea, title, primary, button)
+import Prelude (type (~>), Unit, bind, const, discard, pure, unit, not, ($), class Ord, class Eq, (<>))
+import Style.Bulogen (block, button, container, hero, heroBody, input, link, offsetThreeQuarters, primary, pullRight, spaced, subtitle, textarea, title)
 
 data Query a
   = ToggleRegister a
@@ -67,10 +70,9 @@ component t =
               , HP.classes [input]
               , HP.placeholder $ t (Term.Session Sessions.Password)
               ]
-            , HH.textarea [HP.classes [textarea]]
-            , HH.text $ t $ Term.Session Sessions.KeyRingInstructions
+            , keyBox ReadWrite
             , HH.button
-              [ HP.classes [button, primary]
+              [ HP.classes [button, primary, block]
               , HE.onClick (HE.input_ ToggleRegister)
               ]
               [ HH.text $ t $ Term.Session Sessions.RegisterInstead
@@ -101,10 +103,21 @@ component t =
               , HP.classes [input]
               , HP.placeholder $ t (Term.Session Sessions.ConfirmPassword)
               ]
-            , HH.textarea [HP.classes [textarea]]
+            , secretKeyHeader
             , HH.text $ t $ Term.Session Sessions.KeyRingInstructions
+            , HH.a
+              [ HP.classes [link, pullRight, spaced]
+              ]
+              [ HH.text $ t $ Term.Session Sessions.CopyKey
+              ]
+            , HH.a
+              [ HP.classes [link, pullRight]
+              ]
+              [ HH.text $ t $ Term.Session Sessions.DownloadKey
+              ]
+            , keyBox ReadOnly
             , HH.button
-              [ HP.classes [button, primary]
+              [ HP.classes [button, primary, block]
               , HE.onClick (HE.input_ ToggleRegister)
               ]
               [ HH.text $ t $ Term.Session Sessions.LoginInstead
@@ -113,6 +126,24 @@ component t =
           ]
         ]
 
+  secretKeyHeader :: forall p i. HH.HTML p i
+  secretKeyHeader =
+    HH.h4
+      [ HP.classes [subtitle]
+      ]
+      [ HH.text $ t $ Term.Session Sessions.KeySubtitle
+      ]
+
+  keyBox :: forall p i. EditLevel -> HH.HTML p i
+  keyBox editLevel =
+    HH.textarea $
+      [ HP.classes [textarea]
+      , HP.placeholder "Your secret keys."
+      ] <> additionalProps
+      where
+        additionalProps = case editLevel of
+          ReadOnly -> [HP.readOnly true]
+          ReadWrite -> []
 
   eval :: Query ~> H.ComponentDSL State Query Message m
   eval (Init session next) = do

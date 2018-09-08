@@ -17,7 +17,6 @@ j :: forall a. a -> Maybe a
 j = Just
 
 data Term
-  = MySelfCare
-  | Intro Introduction
+  = Intro Introduction
   | Resource Resources
   | Session Sessions

@@ -17,15 +17,17 @@
     "purescript-spec": "^3.0.0",
     "purescript-arraybuffer-types": "^2.0.0",
     "purescript-arraybuffer": "^8.0.0",
-    "purescript-base64-codec": "^0.10.0",
+    "purescript-base64-codec": "^0.10.1",
     "purescript-text-encoding": "^0.0.8",
     "purescript-tuples": "^5.0.0",
     "purescript-generics-rep": "^6.0.0",
     "purescript-routing": "^8.0.0",
-    "purescript-tweetnacl": "^0.4.1",
+    "purescript-tweetnacl": "^0.5.0",
     "purescript-argonaut": "^4.0.1"
   },
   "devDependencies": {
+    "purescript-quickcheck": "^5.0.0",
+    "purescript-spec": "^3.0.0",
     "purescript-psci-support": "^4.0.0"
   }
 }

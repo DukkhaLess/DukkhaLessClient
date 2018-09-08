@@ -9,7 +9,8 @@
   "scripts": {
     "build": "gulp buildToProd",
     "dev": "gulp revisionRewrite && gulp dev",
-    "setup": "yarn install && bower install"
+    "setup": "yarn install && bower install",
+    "test": "pulp test"
   },
   "dependencies": {
     "global": "^4.3.2",
