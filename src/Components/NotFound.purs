@@ -22,7 +22,7 @@ import Halogen.HTML as HH
 import Halogen.HTML.Properties as HP
 import Intl (LocaliseFn)
 import Intl.Terms as Term
-import Intl.Terms.NotFound as NotFound
+import Intl.Terms.NotFound as NF
 
 data Query a = Query a
 
@@ -45,8 +45,8 @@ component localiseFn =
   render :: LocaliseFn -> H.ComponentHTML Query
   render state =
     let
-      pageTitle = state $ Term.NotFound NotFound.Title
-      pageExplanation = state $ Term.NotFound NotFound.Explanation
+      pageTitle = state $ Term.NotFound NF.Title
+      pageExplanation = state $ Term.NotFound NF.Explanation
     in
       HH.section [HP.classes [hero]]
         [ HH.div [HP.classes [heroBody]]

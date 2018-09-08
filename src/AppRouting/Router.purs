@@ -15,10 +15,11 @@ import Prelude
   , map
   , show
   )
-import AppRouting.Routes
+import AppRouting.Routes as R
 import Components.Intro as Intro
 import Components.Resources as Resources
 import Components.Sessions as Sessions
+import Components.NotFound as NotFound
 import Data.Const (Const)
 import Data.Maybe (Maybe(..))
 import Effect (Effect)
@@ -34,19 +35,21 @@ import Model (Model, Session)
 import Routing.Hash (matches)
 
 data Input a
-  = Goto Routes a
+  = Goto R.Routes a
   | UpdateSession Session a
 
 type ChildQuery
   = Intro.Query
   <\/> Resources.Query
   <\/> Sessions.Query
+  <\/> NotFound.Query
   <\/> Const Void
 
 type ChildSlot
   = Intro.Slot
   \/ Resources.Slot
   \/ Sessions.Slot
+  \/ NotFound.Slot
   \/ Void
 
 
@@ -62,7 +65,10 @@ pathToResources = cpR :> cpL
 pathToSessions :: ChildPath Sessions.Query ChildQuery Sessions.Slot ChildSlot
 pathToSessions = cpR :> cpR :> cpL
 
-component :: Model -> H.Component HH.HTML Input Unit Void Aff
+pathToNotFound :: ChildPath NotFound.Query ChildQuery NotFound.Slot ChildSlot
+pathToNotFound = cpR :> cpR :> cpR :> cpL
+
+component :: forall m. Model -> H.Component HH.HTML Input Unit Void m
 component initialModel = H.parentComponent
   { initialState: const initialModel
   , render
@@ -70,50 +76,55 @@ component initialModel = H.parentComponent
   , receiver: nada
   }
   where
-    render :: Model -> H.ParentHTML Input ChildQuery ChildSlot Aff
+    render :: Model -> H.ParentHTML Input ChildQuery ChildSlot m
     render model =
       HH.div_
-        [ HH.ul_ (map link [Intro, Resources, Sessions])
+        [ HH.ul_ (map link [R.Intro, R.Resources, R.Sessions])
         , viewPage model model.currentPage
         ]
 
-    link r = HH.li_ [ HH.a [ HP.href $ reverseRoute r ] [ HH.text $ show r ] ]
+    link r = HH.li_ [ HH.a [ HP.href $ R.reverseRoute r ] [ HH.text $ show r ] ]
 
-    viewPage :: Model -> Routes -> H.ParentHTML Input ChildQuery ChildSlot Aff
-    viewPage model Intro =
+    viewPage :: Model -> R.Routes -> H.ParentHTML Input ChildQuery ChildSlot m
+    viewPage model R.Intro =
       HH.slot'
         pathToIntro
         Intro.Slot
         (Intro.component model.localiseFn)
         unit
         nada
-    viewPage model Resources =
+    viewPage model R.Resources =
       HH.slot'
         pathToResources
         Resources.Slot
         (Resources.component model.localiseFn)
         unit
         nada
-    viewPage model Sessions =
+    viewPage model R.Sessions =
       HH.slot'
         pathToSessions
         Sessions.Slot
         (Sessions.component model.localiseFn)
         (Sessions.ExistingSession model.session)
         mapSessionMessage
+    viewPage model R.NotFound =
+      HH.slot'
+        pathToNotFound
+        NotFound.Slot
+        (NotFound.component model.localiseFn)
+        unit
+        nada
 
-    eval :: Input ~> H.ParentDSL Model Input ChildQuery ChildSlot Void Aff
+    eval :: Input ~> H.ParentDSL Model Input ChildQuery ChildSlot Void m
     eval (Goto loc next) = do
       H.modify_ (_{ currentPage = loc})
-      liftEffect $ log $ show loc
       pure next
     eval (UpdateSession sess next) = do
       H.modify_ (_{ session = Just sess })
       pure next
 
-routeSignal :: H.HalogenIO Input Void Aff -> Aff (Effect Unit)
-routeSignal driver = liftEffect do
-  matches routes hashChanged
+routeSignal :: H.HalogenIO Input Void Aff -> Effect (Effect Unit)
+routeSignal driver = matches R.routes hashChanged
   where
     hashChanged _ newRoute = do
       _ <- launchAff $ driver.query <<< H.action <<< Goto $ newRoute

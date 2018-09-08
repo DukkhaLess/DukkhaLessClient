@@ -44,4 +44,4 @@ main = HA.runHalogenAff do
     body <- HA.awaitBody
     _ <- liftEffect removeLoader
     router <- runUI (Router.component initialModel) unit body
-    forkAff $ Router.routeSignal router
+    forkAff $ liftEffect $ Router.routeSignal router

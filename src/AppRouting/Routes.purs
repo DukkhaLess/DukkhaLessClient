@@ -5,12 +5,13 @@ import Data.Generic.Rep as G
 import Data.Generic.Rep.Show as GShow
 import Data.String (toLower)
 import Control.Alternative ((<|>))
-import Routing.Match (Match, lit, end)
+import Routing.Match (Match, lit, end, root)
 
 data Routes
   = Intro
   | Resources
   | Sessions
+  | NotFound
 
 
 derive instance genericRoutes :: G.Generic Routes _
@@ -30,10 +31,11 @@ instance reverseRouteRoutes :: ReverseRoute Routes where
 
 routes :: Match Routes
 routes
-  = Intro <$ end
+  = (Intro <$ end)
   <|> route Intro
   <|> route Resources
   <|> route Sessions
+  <|> (pure NotFound)
 
   where
-    route r = r <$ (lit "" *> lit (toLower $ show $ r) <$ end)
+    route r = r <$ (lit "" *> lit (toLower $ show $ r))

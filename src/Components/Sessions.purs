@@ -45,7 +45,7 @@ data Slot = Slot
 derive instance eqSlot :: Eq Slot
 derive instance ordSlot :: Ord Slot
 
-component :: LocaliseFn -> H.Component HH.HTML Query Input Message Aff
+component :: forall m. LocaliseFn -> H.Component HH.HTML Query Input Message m
 component t =
   H.component
     { initialState: initialState
@@ -153,7 +153,7 @@ component t =
           ReadOnly -> [HP.readOnly true]
           ReadWrite -> []
 
-  eval :: Query ~> H.ComponentDSL State Query Message Aff
+  eval :: Query ~> H.ComponentDSL State Query Message m
   eval (Init session next) = do
     H.modify_ (_{ session = session })
     pure next
