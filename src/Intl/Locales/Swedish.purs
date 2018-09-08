@@ -8,7 +8,7 @@ import Intl.Terms.Resources as Resource
 import Data.Maybe (Maybe(..))
 
 localise :: Term.Term -> Maybe String
-localise Term.MySelfCare = n
+localise Term.MySelfCare = j "Mitt Självvård"
 localise (Term.Intro intro) = localiseIntro intro
 localise (Term.Resource resource) = localiseResource resource
 localise (Term.Session session) = n
