@@ -1,8 +1,5 @@
 module Components.Sessions where
 
-import Control.Apply (lift2)
-import Data.Argonaut.Core (stringify)
-import Data.Argonaut.Encode (encodeJson)
 import Data.Maybe (Maybe(..), fromMaybe)
 import Effect.Aff (Aff)
 import Effect.Clipboard as EC
@@ -11,7 +8,6 @@ import Halogen as H
 import Halogen.HTML as HH
 import Halogen.HTML.Events as HE
 import Halogen.HTML.Properties as HP
-import Halogen.VDom.DOM.Prop (Prop)
 import Intl (LocaliseFn)
 import Intl.Terms as Term
 import Intl.Terms.Sessions as Sessions
