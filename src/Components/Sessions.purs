@@ -1,6 +1,8 @@
 module Components.Sessions where
 
-import Data.Maybe (Maybe(..), fromMaybe)
+import Prelude
+
+import Data.Maybe (Maybe(..), fromMaybe, fromMaybe')
 import Effect.Aff (Aff)
 import Effect.Clipboard as EC
 import Flags (EditLevel(..))
@@ -13,14 +15,12 @@ import Intl.Terms as Term
 import Intl.Terms.Sessions as Sessions
 import Model (Session)
 import Model.Keyring (Keyring(..), generateKeyring)
-import Prelude
 import Style.Bulogen (block, button, container, hero, heroBody, input, link, offsetThreeQuarters, primary, pullRight, spaced, subtitle, textarea, title)
 
 data Query a
   = ToggleRegister a
   | Init (Maybe Session) a
   | CopyKey (Maybe Keyring) a
-  | DownloadKey (Maybe Keyring) a
 
 data Message
   = SessionCreated Session
@@ -32,8 +32,7 @@ data SessionCreationMode
   = Login
   | Register
 
-type State =
-  { session :: Maybe Session
+type State = { session :: Maybe Session
   , sessionCreationMode :: SessionCreationMode
   , preparedRing :: Maybe Keyring
   }
@@ -122,7 +121,8 @@ component t =
                     ]
                   , HH.a
                     [ HP.classes [link, pullRight]
-                    , HE.onClick (HE.input_ $ DownloadKey state.preparedRing )
+                    , HP.prop (H.PropName "download") "keyring"
+                    , HP.href ("data:text/plain;charset=utf-8," <> (fromMaybe "" $ state.preparedRing <#> show))
                     ]
                     [ HH.text $ t $ Term.Session Sessions.DownloadKey
                     ]
@@ -179,11 +179,6 @@ component t =
   eval (CopyKey mkey next) = do
     result <- H.liftEffect $ fromMaybe (pure unit) (mkey <#> (show >>> EC.copyToClipboard))
     pure next
-  eval (DownloadKey mkey next) = do
-    case mkey of
-      Just key -> pure next
-      Nothing -> pure next
-
 
 
 receive :: Input -> Maybe (Query Unit)
