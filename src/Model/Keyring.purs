@@ -9,19 +9,23 @@ module Model.Keyring
 import Crypt.NaCl (BoxKeyPair(..), SecretBoxKey, generateBoxKeyPair, generateSecretBoxKey, toUint8Array, fromUint8Array)
 import Crypt.NaCl.Types (BoxKeyPair, SecretBoxKey)
 import Data.Argonaut.Core (Json, caseJsonObject, jsonEmptyObject, stringify)
-import Data.Argonaut.Decode (class DecodeJson)
+import Data.Argonaut.Decode (class DecodeJson, decodeJson)
 import Data.Argonaut.Decode.Combinators ((.?))
 import Data.Argonaut.Encode (class EncodeJson, encodeJson)
 import Data.Argonaut.Encode.Combinators ((~>), (:=))
-import Data.ArrayBuffer.ArrayBuffer (fromString)
+import Data.Argonaut.Parser (jsonParser)
+import Data.ArrayBuffer.ArrayBuffer (decodeToString, fromString)
 import Data.ArrayBuffer.DataView (whole, buffer)
 import Data.ArrayBuffer.Typed (asUint8Array, dataView)
 import Data.ArrayBuffer.Types (Uint8Array)
 import Data.Base64 (Base64(..), decodeBase64, encodeBase64, runBase64)
+import Data.Bifunctor (lmap)
 import Data.Either (Either(..), note)
+import Data.String.Read (class Read)
 import Effect (Effect)
+import Effect.Exception (message)
 import Foreign.Object (Object)
-import Prelude (pure, bind, ($), (<<<), (>>=), (<#>), class Eq, class Show)
+import Prelude (pure, bind, ($), (<<<), (>>=), (<#>), class Eq, class Show, (>=>), (>>>))
 
 generateKeyring :: Effect Keyring
 generateKeyring = do
@@ -46,6 +50,15 @@ newtype Keyring = Keyring
 
 instance showKeyring :: Show Keyring where
   show = runBase64 <<< encodeBase64 <<< fromString <<< stringify <<< encodeJson
+
+instance readKeyring :: Read Keyring where
+  read
+    = Base64
+    >>> decodeBase64
+    >>> note "Base 64 decoding failed"
+    >=> (decodeToString >>> (lmap message))
+    >=> jsonParser
+    >=> decodeJson
 
 derive instance eqKeyring :: Eq Keyring
 

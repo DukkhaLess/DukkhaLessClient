@@ -23,7 +23,8 @@
     "purescript-generics-rep": "^6.0.0",
     "purescript-routing": "^8.0.0",
     "purescript-tweetnacl": "^0.5.0",
-    "purescript-argonaut": "^4.0.1"
+    "purescript-argonaut": "^4.0.1",
+    "purescript-bifunctors": "^4.0.0"
   },
   "devDependencies": {
     "purescript-quickcheck": "^5.0.0",

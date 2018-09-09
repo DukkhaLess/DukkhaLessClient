@@ -16,7 +16,7 @@ import Intl.Terms as Term
 import Intl.Terms.Sessions as Sessions
 import Model (Session)
 import Model.Keyring (Keyring(..), generateKeyring)
-import Prelude (type (~>), Unit, bind, const, discard, pure, unit, not, ($), class Ord, class Eq, (<>), (<$>), (<<<))
+import Prelude (type (~>), Unit, bind, const, discard, pure, unit, not, ($), class Ord, class Eq, (<>), (<$>), (<<<), show, (<#>))
 import Style.Bulogen (block, button, container, hero, heroBody, input, link, offsetThreeQuarters, primary, pullRight, spaced, subtitle, textarea, title)
 
 data Query a
@@ -154,7 +154,7 @@ component t =
         additionalProps = case editLevel of
           ReadOnly ->
             [ HP.readOnly true
-            , HP.value $ fromMaybe "" (stringify <<< encodeJson <$> keyring)
+            , HP.value $ fromMaybe "" $ (keyring <#> show)
             ]
           ReadWrite -> []
 

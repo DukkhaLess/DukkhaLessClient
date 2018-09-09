@@ -24,7 +24,6 @@ import Data.Const (Const)
 import Data.Maybe (Maybe(..))
 import Effect (Effect)
 import Effect.Aff (Aff, launchAff)
-import Effect.Class (liftEffect)
 import Halogen as H
 import Halogen.Component.ChildPath (ChildPath, cpL, cpR, (:>))
 import Halogen.Data.Prism (type (<\/>), type (\/))
