@@ -5,6 +5,7 @@ import Data.Argonaut.Core (stringify)
 import Data.Argonaut.Encode (encodeJson)
 import Data.Maybe (Maybe(..), fromMaybe)
 import Effect.Aff (Aff)
+import Effect.Clipboard as EC
 import Flags (EditLevel(..))
 import Halogen as H
 import Halogen.HTML as HH
@@ -16,12 +17,14 @@ import Intl.Terms as Term
 import Intl.Terms.Sessions as Sessions
 import Model (Session)
 import Model.Keyring (Keyring(..), generateKeyring)
-import Prelude (type (~>), Unit, bind, const, discard, pure, unit, not, ($), class Ord, class Eq, (<>), (<$>), (<<<), show, (<#>))
+import Prelude
 import Style.Bulogen (block, button, container, hero, heroBody, input, link, offsetThreeQuarters, primary, pullRight, spaced, subtitle, textarea, title)
 
 data Query a
   = ToggleRegister a
   | Init (Maybe Session) a
+  | CopyKey (Maybe Keyring) a
+  | DownloadKey (Maybe Keyring) a
 
 data Message
   = SessionCreated Session
@@ -117,11 +120,13 @@ component t =
                   , HH.text $ t $ Term.Session Sessions.KeyRingInstructions
                   , HH.a
                     [ HP.classes [link, pullRight, spaced]
+                    , HE.onClick (HE.input_ $ CopyKey state.preparedRing )
                     ]
                     [ HH.text $ t $ Term.Session Sessions.CopyKey
                     ]
                   , HH.a
                     [ HP.classes [link, pullRight]
+                    , HE.onClick (HE.input_ $ DownloadKey state.preparedRing )
                     ]
                     [ HH.text $ t $ Term.Session Sessions.DownloadKey
                     ]
@@ -175,6 +180,15 @@ component t =
                                    }
     H.put nextState
     pure next
+  eval (CopyKey mkey next) = do
+    result <- H.liftEffect $ fromMaybe (pure unit) (mkey <#> (show >>> EC.copyToClipboard))
+    pure next
+  eval (DownloadKey mkey next) = do
+    case mkey of
+      Just key -> pure next
+      Nothing -> pure next
+
+
 
 receive :: Input -> Maybe (Query Unit)
 receive (ExistingSession session) = Just $ Init session unit
