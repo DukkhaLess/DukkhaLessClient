@@ -2,9 +2,12 @@ module Components.Sessions where
 
 import Prelude
 
+import Data.Either (Either(..))
 import Data.Maybe (Maybe(..), fromMaybe, fromMaybe')
-import Effect.Aff (Aff)
+import Data.String.Read (read)
+import Effect.Aff (Aff, error)
 import Effect.Clipboard as EC
+import Effect.Console (log)
 import Flags (EditLevel(..))
 import Halogen as H
 import Halogen.HTML as HH
@@ -21,6 +24,7 @@ data Query a
   = ToggleRegister a
   | Init (Maybe Session) a
   | CopyKey (Maybe Keyring) a
+  | UpdateKey String a
 
 data Message
   = SessionCreated Session
@@ -145,19 +149,22 @@ component t =
       [ HH.text $ t $ Term.Session Sessions.KeySubtitle
       ]
 
-  keyBox :: forall p i. EditLevel -> Maybe Keyring -> HH.HTML p i
+  keyBox :: forall p. EditLevel -> Maybe Keyring -> HH.HTML p (Query Unit)
   keyBox editLevel keyring =
-    HH.textarea $
-      [ HP.classes [textarea]
-      , HP.placeholder "Your secret keys."
-      ] <> additionalProps
-      where
-        additionalProps = case editLevel of
+    case editLevel of
           ReadOnly ->
+            HH.textarea $
             [ HP.readOnly true
             , HP.value $ fromMaybe "" $ (keyring <#> show)
+            , HP.classes [textarea]
+            , HP.placeholder "Your secret keys."
             ]
-          ReadWrite -> []
+          ReadWrite ->
+            HH.textarea $
+            [ HE.onValueChange (HE.input UpdateKey)
+            , HP.classes [textarea]
+            , HP.placeholder "Your secret keys."
+            ]
 
   eval :: Query ~> H.ComponentDSL State Query Message Aff
   eval (Init session next) = do
@@ -178,6 +185,16 @@ component t =
     pure next
   eval (CopyKey mkey next) = do
     result <- H.liftEffect $ fromMaybe (pure unit) (mkey <#> (show >>> EC.copyToClipboard))
+    pure next
+  eval (UpdateKey keyStr next) = do
+    state <- H.get
+    nextState <- H.liftEffect $ case read keyStr of
+      Left err -> do
+        log err
+        pure state
+      Right keyring -> do
+        pure $ state { preparedRing = Just keyring}
+    H.put nextState
     pure next
 
 
