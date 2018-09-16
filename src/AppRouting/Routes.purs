@@ -10,14 +10,24 @@ import Routing.Match (Match, lit, end)
 data Routes
   = Intro
   | Resources
-  | Sessions
+  | Sessions Sessions
   | NotFound
 
+data Sessions
+  = Login
+  | Register
 
 derive instance genericRoutes :: G.Generic Routes _
+derive instance genericSessions :: G.Generic Sessions _
+
+instance showSessions :: Show Sessions where
+  show r = toLower $ case r of
+    otherwise -> GShow.genericShow r
 
 instance showRoutes :: Show Routes where
-  show r = GShow.genericShow r
+  show r = toLower $ case r of
+    (Sessions s) -> "sessions/" <> show s
+    otherwise -> GShow.genericShow r
 
 class ReverseRoute a where
   reverseRoute :: a -> String
@@ -27,15 +37,18 @@ leader = "#/"
 
 instance reverseRouteRoutes :: ReverseRoute Routes where
   reverseRoute route = case route of
-    r -> leader <> (toLower $ show $ r)
+    r -> leader <> (show r)
 
 routes :: Match Routes
 routes
   = (Intro <$ end)
   <|> route Intro
   <|> route Resources
-  <|> route Sessions
+  <|> route (Sessions Login)
+  <|> route (Sessions Register)
   <|> (pure NotFound)
 
   where
-    route r = r <$ (lit "" *> lit (toLower $ show $ r))
+    route r = case r of
+      (Sessions s) -> r <$ (lit "" *> lit "sessions" *> lit (show s))
+      otherwise -> r <$ (lit "" *> lit (show r))
