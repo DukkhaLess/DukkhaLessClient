@@ -1,9 +1,10 @@
 module AppRouting.Routes where
 
 import Prelude
+import Data.Foldable (foldl)
 import Data.Generic.Rep as G
 import Data.Generic.Rep.Show as GShow
-import Data.String (toLower)
+import Data.String (toLower, split, Pattern(..))
 import Control.Alternative ((<|>))
 import Routing.Match (Match, lit, end)
 
@@ -49,6 +50,7 @@ routes
   <|> (pure NotFound)
 
   where
-    route r = case r of
-      (Sessions s) -> r <$ (lit "" *> lit "sessions" *> lit (show s))
-      otherwise -> r <$ (lit "" *> lit (show r))
+    route :: Routes -> Match Routes
+    route r = r <$ (foldl concatRoutes (lit "") $ split (Pattern "/") (show r))
+    concatRoutes :: Match Unit -> String -> Match Unit
+    concatRoutes ms s = ms *> lit s
