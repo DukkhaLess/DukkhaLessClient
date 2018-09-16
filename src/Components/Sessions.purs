@@ -6,10 +6,10 @@ import Effect.Exception (message)
 import Data.Base64 (Base64(..), decodeBase64)
 import Data.Bifunctor (lmap)
 import Data.Either (Either(..), note)
-import Data.Maybe (Maybe(..), fromMaybe, fromMaybe')
-import Data.ArrayBuffer.ArrayBuffer (decodeToString, fromString)
+import Data.Maybe (Maybe(..), fromMaybe)
+import Data.ArrayBuffer.ArrayBuffer (decodeToString)
 import Data.String.Read (read)
-import Effect.Aff (Aff, error)
+import Effect.Aff (Aff)
 import Effect.Clipboard as EC
 import Effect.Console (log)
 import Flags (EditLevel(..))
@@ -21,7 +21,7 @@ import Intl (LocaliseFn)
 import Intl.Terms as Term
 import Intl.Terms.Sessions as Sessions
 import Model (Session)
-import Model.Keyring (Keyring(..), generateKeyring)
+import Model.Keyring (Keyring, generateKeyring)
 import Style.Bulogen (block, button, container, hero, heroBody, input, link, offsetThreeQuarters, primary, pullRight, spaced, subtitle, textarea, title)
 
 data Query a
@@ -46,7 +46,11 @@ type State = { session :: Maybe Session
   }
 
 initialState :: forall a. a -> State
-initialState = const { session: Nothing, sessionCreationMode: Login, preparedRing: Nothing }
+initialState = const
+                 { session: Nothing
+                 , sessionCreationMode: Login
+                 , preparedRing: Nothing
+                 }
 
 data Slot = Slot
 derive instance eqSlot :: Eq Slot
@@ -57,9 +61,7 @@ component t =
   H.component
     { initialState: initialState
     , render
-    , eval
-    , receiver: receive
-    }
+    , eval , receiver: receive}
   where
 
   render :: State -> H.ComponentHTML Query
