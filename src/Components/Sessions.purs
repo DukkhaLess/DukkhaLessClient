@@ -2,8 +2,12 @@ module Components.Sessions where
 
 import Prelude
 
-import Data.Either (Either(..))
+import Effect.Exception (message)
+import Data.Base64 (Base64(..), decodeBase64)
+import Data.Bifunctor (lmap)
+import Data.Either (Either(..), note)
 import Data.Maybe (Maybe(..), fromMaybe, fromMaybe')
+import Data.ArrayBuffer.ArrayBuffer (decodeToString, fromString)
 import Data.String.Read (read)
 import Effect.Aff (Aff, error)
 import Effect.Clipboard as EC
@@ -188,6 +192,9 @@ component t =
     pure next
   eval (UpdateKey keyStr next) = do
     state <- H.get
+    let jsonRaw = Base64 >>> decodeBase64 >>> note "Base64 decoding failed" >=> decodeToString >>> (lmap message) $ keyStr
+    H.liftEffect $ log $ show jsonRaw
+
     nextState <- H.liftEffect $ case read keyStr of
       Left err -> do
         log err
