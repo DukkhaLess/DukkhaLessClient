@@ -2,6 +2,10 @@ language: node_js
 dist: trusty
 sudo: required
 node_js: stable
+addons:
+  apt:
+    packages:
+      - docker-ce
 install:
   - npm install bower browserify -g
   - npm install
