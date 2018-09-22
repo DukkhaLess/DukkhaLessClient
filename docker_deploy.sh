@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 echo "$DOCKER_PASSWORD" | docker login --username $DOCKER_USERNAME --password-stdin
-if [ ! $TRAVIS_PULL_REQUEST]
+if [ ! $TRAVIS_PULL_REQUEST ]
 then
     export DOCKER_BRANCH_TAG=$TRAVIS_BRANCH
 else
