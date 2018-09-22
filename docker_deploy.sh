@@ -1,4 +1,10 @@
 #!/usr/bin/env bash
 echo "$DOCKER_PASSWORD" | docker login --username $DOCKER_USERNAME --password-stdin
-docker build -t $TRAVIS_COMMIT -t $DOCKER_REPOSITORY .
+if [ ! $TRAVIS_PULL_REQUEST]
+then
+    export DOCKER_BRANCH_TAG=$TRAVIS_BRANCH
+else
+    export DOCKER_BRANCH_TAG=$TRAVIS_PULL_REQUEST_BRANCH
+fi
+docker build -t $DOCKER_REPOSITORY:$TRAVIS_COMMIT -t $DOCKER_REPOSITORY:$DOCKER_BRANCH_TAG .
 docker push $DOCKER_REPOSITORY
