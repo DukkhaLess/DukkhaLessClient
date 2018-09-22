@@ -31,11 +31,11 @@ gulp.task("cleanDist", function() {
   ]);
 });
 
-gulp.task("make", ["cleanIntermediate", "sass"], function () {
+gulp.task("make", ["cleanIntermediate"], function () {
   return purescript.compile({ src: sources });
 });
 
-gulp.task("bundle", ["make"], function () {
+gulp.task("bundle", ["make", "sass"], function () {
   return purescript
     .bundle({ src: "output/**/*.js", output: "intermediate/initial/app.js", module: "Main", main: "Main" });
 });
@@ -47,7 +47,7 @@ gulp.task("runIncludes", ["bundle"], function(done) {
   });
 });
 
-gulp.task("minifyCss", function() {
+gulp.task("minifyCss", ["sass"], function() {
   return gulp.src('intermediate/styles.css')
     .pipe(cleanCss({compatibility: 'ie10'}))
     .pipe(rename("styles-min.css"))
