@@ -18,3 +18,5 @@ script:
   - npm run -s build
   - npm -s test
   - sh docker_deploy.sh
+after_script:
+  - docker logout
