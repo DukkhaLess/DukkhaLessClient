@@ -24,8 +24,6 @@ import Data.Const (Const)
 import Data.Maybe (Maybe(..))
 import Effect (Effect)
 import Effect.Aff (Aff, launchAff)
-import Effect.Class (liftEffect)
-import Effect.Console (log)
 import Halogen as H
 import Halogen.Component.ChildPath (ChildPath, cpL, cpR, (:>))
 import Halogen.Data.Prism (type (<\/>), type (\/))
@@ -79,7 +77,7 @@ component initialModel = H.parentComponent
     render :: Model -> H.ParentHTML Input ChildQuery ChildSlot Aff
     render model =
       HH.div_
-        [ HH.ul_ (map link [R.Intro, R.Resources, R.Sessions])
+        [ HH.ul_ (map link [R.Intro, R.Resources, R.Sessions R.Login])
         , viewPage model model.currentPage
         ]
 
@@ -100,7 +98,7 @@ component initialModel = H.parentComponent
         (Resources.component model.localiseFn)
         unit
         nada
-    viewPage model R.Sessions =
+    viewPage model (R.Sessions r) =
       HH.slot'
         pathToSessions
         Sessions.Slot

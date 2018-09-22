@@ -3,7 +3,7 @@ dist: trusty
 sudo: required
 node_js: stable
 install:
-  - npm install bower -g
+  - npm install bower browserify -g
   - npm install
 script:
   - bower install --production

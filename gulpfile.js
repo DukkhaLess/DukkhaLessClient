@@ -1,5 +1,6 @@
 const gulp = require("gulp");
 const purescript = require("gulp-purescript");
+const exec = require('child_process').exec;
 const run = require("gulp-run");
 const rev = require("gulp-rev");
 const filter = require('gulp-filter');
@@ -36,7 +37,14 @@ gulp.task("make", ["cleanIntermediate", "sass"], function () {
 
 gulp.task("bundle", ["make"], function () {
   return purescript
-    .bundle({ src: "output/**/*.js", output: "intermediate/app.js", module: "Main", main: "Main" });
+    .bundle({ src: "output/**/*.js", output: "intermediate/initial/app.js", module: "Main", main: "Main" });
+});
+
+gulp.task("runIncludes", ["bundle"], function(done) {
+  exec('browserify intermediate/initial/app.js -o intermediate/app.js', function(err, out, err) {
+    console.log(err);
+    done();
+  });
 });
 
 gulp.task("minifyCss", function() {
@@ -46,7 +54,7 @@ gulp.task("minifyCss", function() {
     .pipe(gulp.dest('intermediate'));
 });
 
-gulp.task("minify", ["bundle"], function() {
+gulp.task("minify", ["runIncludes"], function() {
   return gulp.src('intermediate/app.js')
     .pipe(closureCompiler({
       compilation_level: 'SIMPLE',
@@ -83,7 +91,7 @@ gulp.task("sass", function(){
 });
 
 gulp.task("revisionProd", ["minify", "cleanDist", "minifyCss"], revisionFn(true));
-gulp.task("revision", ["bundle", "cleanDist"], revisionFn(false));
+gulp.task("revision", ["runIncludes", "cleanDist"], revisionFn(false));
 
 function revisionRewriteFn() {
   const manifest = gulp.src('intermediate/rev-manifest.json');
@@ -122,13 +130,6 @@ gulp.task('devServer', function() {
   gulp.watch("dist/**/*").on("change", reload);
 });
 
-gulp.task("docs", function () {
-  return purescript.docs({
-    src: sources,
-    docgen: {
-    }
-  });
-});
 gulp.task("dotpsci", function () {
   return purescript.psci({ src: sources })
     .pipe(gulp.dest("."));
@@ -148,5 +149,3 @@ gulp.task("dev", ['devServer'], function() {
   gulp.watch('./styles/**/*.html', DEV_TASK);
   gulp.watch('dist/**/*').on("change", reload);
 });
-
-gulp.task("default", ["bundle", "docs", "test"]);
