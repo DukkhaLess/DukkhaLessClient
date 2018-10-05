@@ -71,7 +71,7 @@ component initialModel = H.parentComponent
   { initialState: const initialModel
   , render
   , eval
-  , receiver: nada
+  , receiver: const Nothing
   }
   where
     render :: Model -> H.ParentHTML Input ChildQuery ChildSlot Aff
@@ -102,7 +102,7 @@ component initialModel = H.parentComponent
       HH.slot'
         pathToSessions
         Sessions.Slot
-        (Sessions.component model.localiseFn)
+        (Sessions.component model.localiseFn r)
         (Sessions.ExistingSession model.session)
         mapSessionMessage
     viewPage model R.NotFound =

@@ -52,7 +52,9 @@ component t =
   H.component
     { initialState: initialState
     , render
-    , eval , receiver: receive}
+    , eval
+    , receiver: receive
+    }
   where
 
   render :: State -> H.ComponentHTML Query

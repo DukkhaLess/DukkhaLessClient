@@ -1,4 +1,4 @@
-module Components.Session.Register where
+module Components.Sessions.Register where
 
 import Prelude
 
