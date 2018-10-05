@@ -5,9 +5,13 @@ import Data.Maybe (Maybe(..))
 import Intl.Terms (Term)
 import Model.Keyring (Keyring)
 
+data KeyringUsage
+  = None
+  | Enabled Keyring
+
 type Session =
   { userName :: String
-  , keyChains :: Keyring
+  , accountForm :: KeyringUsage
   , sessionToken :: String
   }
 
