@@ -89,7 +89,7 @@ component initialModel = H.parentComponent
       HH.slot'
         pathToSessions
         Sessions.Slot
-        (Sessions.component model.localiseFn r)
+        (Sessions.component model.localiseFn)
         (Sessions.RouteContext r)
         mapSessionMessage
     viewPage model R.NotFound =

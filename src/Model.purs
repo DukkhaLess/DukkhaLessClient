@@ -2,7 +2,7 @@ module Model where
 
 import AppRouting.Routes as Routes
 import Data.Maybe (Maybe(..))
-import Intl.Terms (Term)
+import Intl (LocaliseFn)
 import Model.Keyring (Keyring)
 
 data KeyringUsage
@@ -16,12 +16,12 @@ type Session =
   }
 
 type Model =
-  { localiseFn :: Term -> String
+  { localiseFn :: LocaliseFn
   , currentPage :: Routes.Routes
   , session :: Maybe Session
   }
 
-initial :: (Term -> String) -> Model
+initial :: LocaliseFn -> Model
 initial f =
   { localiseFn: f
   , currentPage: Routes.Intro

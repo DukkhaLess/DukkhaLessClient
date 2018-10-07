@@ -36,8 +36,6 @@ type State =
   , preparedRing :: Maybe Keyring
   }
 
-type Input = String
-
 initialState :: forall a. a -> State
 initialState = const
                  { username: Nothing
@@ -48,13 +46,13 @@ data Slot = Slot
 derive instance eqSlot :: Eq Slot
 derive instance ordSlot :: Ord Slot
 
-component :: LocaliseFn -> H.Component HH.HTML Query Input Message Aff
+component :: forall a. LocaliseFn -> H.Component HH.HTML Query a Message Aff
 component t =
   H.component
     { initialState: initialState
     , render
     , eval
-    , receiver: receive
+    , receiver: const Nothing
     }
   where
 
@@ -124,7 +122,3 @@ component t =
         pure $ state { preparedRing = Just keyring}
     H.put nextState
     pure next
-
-receive :: Input -> Maybe (Query Unit)
-receive _ = Just $ NoOp unit
-

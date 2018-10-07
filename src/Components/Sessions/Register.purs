@@ -6,6 +6,7 @@ import AppRouting.Routes as R
 import Data.Maybe (Maybe(..), fromMaybe)
 import Effect.Aff (Aff)
 import Effect.Clipboard as EC
+import Effect.Console (log)
 import Halogen as H
 import Halogen.HTML as HH
 import Halogen.HTML.Events as HE
@@ -18,14 +19,11 @@ import Model.Keyring (Keyring, generateKeyring)
 import Style.Bulogen (block, button, container, hero, heroBody, input, link, offsetThreeQuarters, primary, pullRight, spaced, subtitle, textarea, title)
 
 data Query a
-  = ToggleRegister a
+  = GenerateKeyring a
   | CopyKey (Maybe Keyring) a
-  | NoOp a
 
 data Message
   = SessionCreated Session
-
-type Input = String
 
 type State =
   { session :: Maybe Session
@@ -42,12 +40,16 @@ data Slot = Slot
 derive instance eqSlot :: Eq Slot
 derive instance ordSlot :: Ord Slot
 
-component :: LocaliseFn -> H.Component HH.HTML Query Input Message Aff
+component :: forall a. LocaliseFn -> H.Component HH.HTML Query a Message Aff
 component t =
-  H.component
-    { initialState: initialState
+  H.lifecycleComponent
+    { initialState
     , render
-    , eval , receiver: receive}
+    , eval
+    , receiver: const Nothing
+    , initializer: Just $ GenerateKeyring unit
+    , finalizer: Nothing
+    }
   where
 
   render :: State -> H.ComponentHTML Query
@@ -114,8 +116,9 @@ component t =
             ]
 
   eval :: Query ~> H.ComponentDSL State Query Message Aff
-  eval (ToggleRegister next) = do
+  eval (GenerateKeyring next) = do
     state <- H.get
+    H.liftEffect $ log "Wat"
     nextState <- do
             keyring <- H.liftEffect $ generateKeyring
             pure $ state { preparedRing = Just keyring
@@ -125,8 +128,3 @@ component t =
   eval (CopyKey mkey next) = do
     result <- H.liftEffect $ fromMaybe (pure unit) (mkey <#> (show >>> EC.copyToClipboard))
     pure next
-  eval (NoOp next) = pure next
-
-
-receive :: Input -> Maybe (Query Unit)
-receive _ = Just $ NoOp unit

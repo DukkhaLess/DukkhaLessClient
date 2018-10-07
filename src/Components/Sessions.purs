@@ -2,6 +2,7 @@ module Components.Sessions where
 
 import Prelude
 
+import AppRouting.Routes (Sessions(..))
 import AppRouting.Routes as R
 import Components.Sessions.Login as Login
 import Components.Sessions.Register as Register
@@ -48,8 +49,8 @@ pathToLogin = cpL
 pathToRegister :: ChildPath Register.Query ChildQuery Register.Slot ChildSlot
 pathToRegister = cpR :> cpL
 
-initialState :: forall a. R.Sessions -> a -> State
-initialState landing = const
+initialState :: Input -> State
+initialState (RouteContext landing) =
                  { session: Nothing
                  , routeContext: landing
                  }
@@ -58,10 +59,10 @@ data Slot = Slot
 derive instance eqSlot :: Eq Slot
 derive instance ordSlot :: Ord Slot
 
-component :: LocaliseFn -> R.Sessions -> H.Component HH.HTML Query Input Message Aff
-component t landing =
+component :: LocaliseFn -> H.Component HH.HTML Query Input Message Aff
+component t =
   H.parentComponent
-    { initialState: (initialState landing)
+    { initialState
     , render
     , eval
     , receiver: receive
@@ -74,14 +75,14 @@ component t landing =
             pathToLogin
             Login.Slot
             (Login.component t)
-            "Hi"
+            unit
             (const Nothing)
         R.Register ->
           HH.slot'
             pathToRegister
             Register.Slot
             (Register.component t)
-            "Bye"
+            unit
             (const Nothing)
 
       eval :: Query ~> H.ParentDSL State Query ChildQuery ChildSlot Message Aff
