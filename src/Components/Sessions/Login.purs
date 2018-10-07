@@ -2,15 +2,16 @@ module Components.Sessions.Login where
 
 import Prelude
 
-import Effect.Exception (message)
+import AppRouting.Routes as R
+import Data.ArrayBuffer.ArrayBuffer (decodeToString)
 import Data.Base64 (Base64(..), decodeBase64)
 import Data.Bifunctor (lmap)
 import Data.Either (Either(..), note)
 import Data.Maybe (Maybe(..))
-import Data.ArrayBuffer.ArrayBuffer (decodeToString)
 import Data.String.Read (read)
 import Effect.Aff (Aff)
 import Effect.Console (log)
+import Effect.Exception (message)
 import Halogen as H
 import Halogen.HTML as HH
 import Halogen.HTML.Events as HE
@@ -73,9 +74,9 @@ component t =
                     , HP.placeholder $ t (Term.Session Sessions.Password)
                     ]
                   , keyBox state.preparedRing
-                  , HH.button
+                  , HH.a
                     [ HP.classes [button, primary, block]
-                    , HE.onClick (HE.input_ ToggleRegister)
+                    , HP.href $ R.reverseRoute $ R.Sessions R.Register
                     ]
                     [ HH.text $ t $ Term.Session Sessions.RegisterInstead
                     ]

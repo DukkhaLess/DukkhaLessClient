@@ -2,6 +2,7 @@ module Components.Sessions.Register where
 
 import Prelude
 
+import AppRouting.Routes as R
 import Data.Maybe (Maybe(..), fromMaybe)
 import Effect.Aff (Aff)
 import Effect.Clipboard as EC
@@ -85,9 +86,9 @@ component t =
                 [ HH.text $ t $ Term.Session Sessions.DownloadKey
                 ]
               , keyBox state.preparedRing
-              , HH.button
+              , HH.a
                 [ HP.classes [button, primary, block]
-                , HE.onClick (HE.input_ ToggleRegister)
+                , HP.href $ R.reverseRoute $ R.Sessions R.Login
                 ]
                 [ HH.text $ t $ Term.Session Sessions.LoginInstead
                 ]
