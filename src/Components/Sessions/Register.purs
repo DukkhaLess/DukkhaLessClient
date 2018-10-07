@@ -4,6 +4,8 @@ import Prelude
 
 import AppRouting.Routes as R
 import Data.Maybe (Maybe(..), fromMaybe)
+import Data.Either (Either(..))
+import Data.Newtype (class Newtype)
 import Effect.Aff (Aff)
 import Effect.Clipboard as EC
 import Effect.Console (log)
@@ -14,26 +16,39 @@ import Halogen.HTML.Properties as HP
 import Intl (LocaliseFn)
 import Intl.Terms as Term
 import Intl.Terms.Sessions as Sessions
-import Model (Session)
+import Model (Session, Username(..))
 import Model.Keyring (Keyring, generateKeyring)
 import Style.Bulogen (block, button, container, hero, heroBody, input, link, offsetThreeQuarters, primary, pullRight, spaced, subtitle, textarea, title)
 
 data Query a
   = GenerateKeyring a
+  | UpdateUsername String a
+  | UpdatePassword String a
+  | UpdatePasswordConfirmation String a
   | CopyKey (Maybe Keyring) a
 
 data Message
   = SessionCreated Session
 
+newtype Password = Password String
+derive instance newtypePassword :: Newtype Password _
+derive instance eqPassword :: Eq Password
+
 type State =
   { session :: Maybe Session
   , preparedRing :: Maybe Keyring
+  , usernameInput :: Maybe Username
+  , passwordInput :: Maybe Password
+  , passwordConfirmationInput :: Maybe Password
   }
 
 initialState :: forall a. a -> State
 initialState = const
                  { session: Nothing
                  , preparedRing: Nothing
+                 , usernameInput: Nothing
+                 , passwordInput: Nothing
+                 , passwordConfirmationInput: Nothing
                  }
 
 data Slot = Slot
@@ -61,16 +76,19 @@ component t =
               , HH.input
                 [ HP.classes [input]
                 , HP.placeholder $ t $ Term.Session Sessions.Username
+                , HE.onValueChange (HE.input UpdateUsername)
                 ]
               , HH.input
                 [ HP.type_ HP.InputPassword
                 , HP.classes [input]
                 , HP.placeholder $ t (Term.Session Sessions.Password)
+                , HE.onValueChange (HE.input UpdatePassword)
                 ]
               , HH.input
                 [ HP.type_ HP.InputPassword
                 , HP.classes [input]
                 , HP.placeholder $ t (Term.Session Sessions.ConfirmPassword)
+                , HE.onValueChange (HE.input UpdatePasswordConfirmation)
                 ]
               , secretKeyHeader
               , HH.text $ t $ Term.Session Sessions.KeyRingInstructions
@@ -128,3 +146,6 @@ component t =
   eval (CopyKey mkey next) = do
     result <- H.liftEffect $ fromMaybe (pure unit) (mkey <#> (show >>> EC.copyToClipboard))
     pure next
+  eval (UpdateUsername username next) = pure next
+  eval (UpdatePassword pass next) = pure next
+  eval (UpdatePasswordConfirmation pass next) = pure next
