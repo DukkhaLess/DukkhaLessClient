@@ -29,6 +29,7 @@ import Intl.Terms.Sessions as Sessions
 import Model (Session)
 import Model.Keyring (Keyring, generateKeyring)
 import Style.Bulogen (block, button, container, hero, heroBody, input, link, offsetThreeQuarters, primary, pullRight, spaced, subtitle, textarea, title)
+import Web.HTML.Event.EventTypes (offline)
 
 data Query a
   = NoOp a
@@ -80,8 +81,21 @@ component t sessionContext =
     }
     where
       render :: State -> H.ParentHTML Query ChildQuery ChildSlot Aff
-      render s =
-        HH.div_[]
+      render s = case sessionContext of
+        R.Login ->
+          HH.slot'
+            pathToLogin
+            Login.Slot
+            (Login.component t)
+            "Hi"
+            (const Nothing)
+        R.Register ->
+          HH.slot'
+            pathToRegister
+            Register.Slot
+            (Register.component t)
+            "Bye"
+            (const Nothing)
 
       eval :: Query ~> H.ParentDSL State Query ChildQuery ChildSlot Message Aff
       eval (NoOp next) = pure next
