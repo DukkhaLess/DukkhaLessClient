@@ -13,7 +13,7 @@ cache:
 install:
   - npm install bower browserify -g
   - npm install
-  - bower install --production
+  - bower install
 script:
   - npm run -s build
   - npm run -s test
