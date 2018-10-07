@@ -1,14 +1,10 @@
 module Test.Model.Keyring where
 
-import Effect (Effect)
 import Effect.Class (liftEffect)
-import Effect.Console (log)
 import Data.Either (Either(..))
 import Data.String.Read (read)
 import Model.Keyring (generateKeyring)
 import Prelude
-import Test.QuickCheck (quickCheck', (<?>), quickCheck)
-import Test.QuickCheck.Arbitrary (class Arbitrary, arbitrary)
 import Test.Spec (Spec, it, describe)
 import Test.Spec.Assertions (fail, shouldEqual)
 import Data.Argonaut.Decode (decodeJson)
