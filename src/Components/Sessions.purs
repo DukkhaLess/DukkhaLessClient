@@ -39,7 +39,6 @@ data Input
 
 type State =
   { session :: Maybe Session
-  , preparedRing :: Maybe Keyring
   , routeContext :: R.Sessions
   }
 
@@ -52,7 +51,6 @@ pathToRegister = cpR :> cpL
 initialState :: forall a. R.Sessions -> a -> State
 initialState landing = const
                  { session: Nothing
-                 , preparedRing: Nothing
                  , routeContext: landing
                  }
 
