@@ -5,18 +5,9 @@ import Prelude
 import AppRouting.Routes as R
 import Components.Sessions.Login as Login
 import Components.Sessions.Register as Register
-import Data.ArrayBuffer.ArrayBuffer (decodeToString)
-import Data.Base64 (Base64(..), decodeBase64)
-import Data.Bifunctor (lmap)
 import Data.Const (Const)
-import Data.Either (Either(..), note)
-import Data.Maybe (Maybe(..), fromMaybe)
-import Data.String.Read (read)
+import Data.Maybe (Maybe(..))
 import Effect.Aff (Aff)
-import Effect.Clipboard as EC
-import Effect.Console (log)
-import Effect.Exception (message)
-import Flags (EditLevel(..))
 import Halogen as H
 import Halogen.Component.ChildPath (ChildPath, cpL, cpR, (:>))
 import Halogen.Data.Prism (type (<\/>), type (\/))
@@ -24,15 +15,11 @@ import Halogen.HTML as HH
 import Halogen.HTML.Events as HE
 import Halogen.HTML.Properties as HP
 import Intl (LocaliseFn)
-import Intl.Terms as Term
-import Intl.Terms.Sessions as Sessions
 import Model (Session)
-import Model.Keyring (Keyring, generateKeyring)
-import Style.Bulogen (block, button, container, hero, heroBody, input, link, offsetThreeQuarters, primary, pullRight, spaced, subtitle, textarea, title)
-import Web.HTML.Event.EventTypes (offline)
+import Model.Keyring (Keyring)
 
 data Query a
-  = NoOp a
+  = UpdateRoute R.Sessions a
 
 data Message
   = SessionCreated Session
@@ -48,11 +35,12 @@ type ChildSlot
   \/ Void
 
 data Input
-  = ExistingSession (Maybe Session)
+  = RouteContext R.Sessions
 
 type State =
   { session :: Maybe Session
   , preparedRing :: Maybe Keyring
+  , routeContext :: R.Sessions
   }
 
 pathToLogin :: ChildPath Login.Query ChildQuery Login.Slot ChildSlot
@@ -61,10 +49,11 @@ pathToLogin = cpL
 pathToRegister :: ChildPath Register.Query ChildQuery Register.Slot ChildSlot
 pathToRegister = cpR :> cpL
 
-initialState :: forall a. a -> State
-initialState = const
+initialState :: forall a. R.Sessions -> a -> State
+initialState landing = const
                  { session: Nothing
                  , preparedRing: Nothing
+                 , routeContext: landing
                  }
 
 data Slot = Slot
@@ -72,16 +61,16 @@ derive instance eqSlot :: Eq Slot
 derive instance ordSlot :: Ord Slot
 
 component :: LocaliseFn -> R.Sessions -> H.Component HH.HTML Query Input Message Aff
-component t sessionContext =
+component t landing =
   H.parentComponent
-    { initialState: initialState
+    { initialState: (initialState landing)
     , render
     , eval
     , receiver: receive
     }
     where
       render :: State -> H.ParentHTML Query ChildQuery ChildSlot Aff
-      render s = case sessionContext of
+      render s = case s.routeContext of
         R.Login ->
           HH.slot'
             pathToLogin
@@ -98,7 +87,9 @@ component t sessionContext =
             (const Nothing)
 
       eval :: Query ~> H.ParentDSL State Query ChildQuery ChildSlot Message Aff
-      eval (NoOp next) = pure next
+      eval (UpdateRoute route next) = do
+        H.modify_ (_{ routeContext = route })
+        pure next
 
       receive :: Input -> Maybe (Query Unit)
-      receive _ = Just $ NoOp unit
+      receive (RouteContext route) = Just $ UpdateRoute route unit
