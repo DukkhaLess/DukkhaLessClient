@@ -15,7 +15,7 @@ localise (Term.Session session) = localiseSession session
 localise (Term.NotFound notFound) = localiseNotFound notFound
 
 localiseIntro :: Intro.Introduction -> Maybe String
-localiseIntro Intro.Title = j "My Selfcare"
+localiseIntro Intro.Title = j "Dukkhaless Self-Care"
 localiseIntro Intro.Explanation = j "A Selfcare application with encryption to help work on your mental health"
 
 localiseResource :: Resource.Resources -> Maybe String
