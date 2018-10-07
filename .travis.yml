@@ -16,7 +16,7 @@ install:
   - bower install --production
 script:
   - npm run -s build
-  - npm -s test
+  - npm run -s test
   - sh docker_deploy.sh
 after_script:
   - docker logout
