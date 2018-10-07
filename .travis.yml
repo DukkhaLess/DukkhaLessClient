@@ -13,8 +13,8 @@ cache:
 install:
   - npm install bower browserify -g
   - npm install
-script:
   - bower install --production
+script:
   - npm run -s build
   - npm -s test
   - sh docker_deploy.sh

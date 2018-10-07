@@ -1,4 +1,4 @@
-[![Build Status](https://travis-ci.org/MySelfCare/MySelfcareClient.svg?branch=master)](https://travis-ci.org/MySelfCare/MySelfcareClient)
+[![Build Status](https://travis-ci.org/DukkhaLess/DukkhaLessClient.svg?branch=master)](https://travis-ci.org/DukkhaLess/DukkhaLessClient)
 [![Known Vulnerabilities](https://snyk.io/test/github/MySelfCare/MySelfcareClient/badge.svg?targetFile=package.json)](https://snyk.io/test/github/MySelfCare/MySelfcareClient?targetFile=package.json)
 
 # Dukkhaless Self-Care Client
