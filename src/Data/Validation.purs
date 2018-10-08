@@ -2,9 +2,9 @@ module Data.Validation where
 
 import Data.Bifunctor (lmap)
 import Data.Either (Either(..), either)
-import Data.Functor ((<#>))
+import Data.Functor ((<#>), class Functor)
 import Data.Newtype (class Newtype, wrap, unwrap)
-import Data.Semigroup (append)
+import Data.Semigroup (append, class Semigroup)
 import Data.Tuple (Tuple(..))
 import Prelude (pure, const, (<<<), map, ($))
 
@@ -15,6 +15,17 @@ type ValidationErrors = Array ValidationError
 
 newtype ValidatorG e a r = ValidatorG (a -> Either e r)
 derive instance newtypeValidatorG :: Newtype (ValidatorG e a r) _
+instance functorValidatorG :: Functor (ValidatorG e a) where
+  map f g = wrap $ map (map f) (unwrap g)
+
+instance semigroupValidatorG :: Semigroup (ValidatorG (Array ValidationError) a r) where
+  append (ValidatorG f) (ValidatorG g) = ValidatorG h where
+    h :: a -> Either ValidationErrors r
+    h a = case f a of
+      Left errs ->
+        Left $ either (append errs) (const errs) (g a)
+      Right rs ->
+        g a
 
 type Validator a r = ValidatorG ValidationErrors a r
 

@@ -4,8 +4,9 @@ import Prelude
 
 import AppRouting.Routes as R
 import Data.Maybe (Maybe(..), fromMaybe)
-import Data.Either (Either(..))
-import Data.Newtype (class Newtype)
+import Data.Either (Either(..), hush)
+import Data.Newtype (class Newtype, unwrap)
+import Data.Tuple (Tuple(..))
 import Data.Validation
 import Effect.Aff (Aff)
 import Effect.Clipboard as EC
@@ -38,18 +39,27 @@ derive instance eqPassword :: Eq Password
 type State =
   { session :: Maybe Session
   , preparedRing :: Maybe Keyring
-  , usernameInput :: Maybe Username
-  , passwordInput :: Maybe Password
-  , passwordConfirmationInput :: Maybe Password
+  , username :: Validation String Username
+  , password :: Validation String Password
+  , passwordConfirmation :: Validation (Tuple (Maybe String) String) Password
   }
+
+validateUsername :: String -> Either String Username
+validateUsername un = Left "Hi"
+
+validatePassword :: String -> Either String Password
+validatePassword p = Left "Hi"
+
+validatePasswordConfirmation :: Tuple (Maybe String) String -> Either String Password
+validatePasswordConfirmation p = Left "Hi"
 
 initialState :: forall a. a -> State
 initialState = const
                  { session: Nothing
                  , preparedRing: Nothing
-                 , usernameInput: Nothing
-                 , passwordInput: Nothing
-                 , passwordConfirmationInput: Nothing
+                 , username: validation (validator validateUsername) ""
+                 , password: validation (validator validatePassword) ""
+                 , passwordConfirmation:validation (validator validatePasswordConfirmation) (Tuple Nothing "")
                  }
 
 data Slot = Slot
@@ -147,6 +157,24 @@ component t =
   eval (CopyKey mkey next) = do
     result <- H.liftEffect $ fromMaybe (pure unit) (mkey <#> (show >>> EC.copyToClipboard))
     pure next
-  eval (UpdateUsername username next) = pure next
-  eval (UpdatePassword pass next) = pure next
-  eval (UpdatePasswordConfirmation pass next) = pure next
+  eval (UpdateUsername username next) = do
+    state <- H.get
+    let usernameValidation = updateValidation state.username username
+    H.put state { username = usernameValidation }
+    pure next
+  eval (UpdatePassword pass next) = do
+    state <- H.get
+    let passwordValidation = updateValidation state.password pass
+    H.put state { password = passwordValidation }
+    pure next
+  eval (UpdatePasswordConfirmation pass next) = do
+    state <- H.get
+    let passState = hush $ validate state.password
+    let firstPass = map unwrap passState
+    let passwordConfValidation = updateValidation state.passwordConfirmation (Tuple firstPass pass)
+    H.put state { passwordConfirmation = passwordConfValidation }
+    pure next
+ 
+
+
+
