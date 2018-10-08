@@ -6,9 +6,10 @@ import Data.Functor ((<#>), class Functor)
 import Data.Newtype (class Newtype, wrap, unwrap)
 import Data.Semigroup (append, class Semigroup)
 import Data.Tuple (Tuple(..))
+import Intl.Terms (Term)
 import Prelude (pure, const, (<<<), map, ($))
 
-newtype ValidationError = ValidationError String
+newtype ValidationError = ValidationError Term
 derive instance newtypeValidationError :: Newtype ValidationError _
 
 type ValidationErrors = Array ValidationError
@@ -29,19 +30,19 @@ instance semigroupValidatorG :: Semigroup (ValidatorG (Array ValidationError) a 
 
 type Validator a r = ValidatorG ValidationErrors a r
 
-validator' :: forall a. (a -> Boolean) -> String -> Validator a a
+validator' :: forall a. (a -> Boolean) -> Term -> Validator a a
 validator' p e = validator f where
-  f :: a -> Either String a
+  f :: a -> Either Term a
   f i =
    case p i of
       true -> Right i
       false -> Left e
 
-validator :: forall a r. (a -> Either String r) -> Validator a r
+validator :: forall a r. (a -> Either Term r) -> Validator a r
 validator f = ValidatorG f' where
   f' = f <#> lmap (pure <<< wrap)
 
-validator_ :: forall a r. (Newtype r a) => (a -> Boolean) -> String -> Validator a r
+validator_ :: forall a r. (Newtype r a) => (a -> Boolean) -> Term -> Validator a r
 validator_ p e = validator' p e <#> wrap
 
 data InputState

@@ -44,15 +44,6 @@ type State =
   , passwordConfirmation :: Validation (Tuple (Maybe String) String) Password
   }
 
-validateUsername :: String -> Either String Username
-validateUsername un = Left "Hi"
-
-validatePassword :: String -> Either String Password
-validatePassword p = Left "Hi"
-
-validatePasswordConfirmation :: Tuple (Maybe String) String -> Either String Password
-validatePasswordConfirmation p = Left "Hi"
-
 initialState :: forall a. a -> State
 initialState = const
                  { session: Nothing
@@ -175,6 +166,3 @@ component t =
     H.put state { passwordConfirmation = passwordConfValidation }
     pure next
  
-
-
-
