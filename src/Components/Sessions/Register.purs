@@ -6,6 +6,7 @@ import AppRouting.Routes as R
 import Data.Maybe (Maybe(..), fromMaybe)
 import Data.Either (Either(..))
 import Data.Newtype (class Newtype)
+import Data.Validation
 import Effect.Aff (Aff)
 import Effect.Clipboard as EC
 import Effect.Console (log)
