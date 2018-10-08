@@ -4,9 +4,9 @@ import Data.Validation
 
 import Data.Ord (greaterThanOrEq)
 import Data.String (length)
+import Intl.Terms (Term(Validation))
+import Intl.Terms.Validation (FieldName(..), ValidationMsg(..))
 import Prelude ((<<<), flip, ($))
-import Intl.Terms.Sessions
-import Intl.Terms
 
 minimumLength :: Int -> Validator String String
-minimumLength n = validator' ((flip greaterThanOrEq $ n) <<< length) $ Session Login
+minimumLength n = validator' ((flip greaterThanOrEq $ n) <<< length) $ Validation (InsufficientLength n)

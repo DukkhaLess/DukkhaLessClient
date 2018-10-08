@@ -1,22 +1,23 @@
 module Intl.Locales.Swedish where
 
+import Data.Maybe (Maybe)
 import Intl.Terms (j, n)
 import Intl.Terms as Term
 import Intl.Terms.Introduction as Intro
-import Intl.Terms.Resources as Resource
 import Intl.Terms.NotFound as NotFound
-
-import Data.Maybe (Maybe)
+import Intl.Terms.Resources as Resource
 
 localise :: Term.Term -> Maybe String
-localise (Term.Intro intro) = localiseIntro intro
-localise (Term.Resource resource) = localiseResource resource
-localise (Term.Session session) = n
-localise (Term.NotFound notFound) = n
+localise term = case term of
+  Term.Intro intro -> localiseIntro intro
+  Term.Resource resource -> localiseResource resource
+  _ -> n
 
 localiseIntro :: Intro.Introduction -> Maybe String
-localiseIntro Intro.Title = j "Dukkhaless Sjävvård"
-localiseIntro Intro.Explanation = n
+localiseIntro intro = case intro of
+  Intro.Title -> j "Dukkhaless Självvård"
+  _           -> n
 
 localiseResource :: Resource.Resources -> Maybe String
-localiseResource Resource.Title = n
+localiseResource title = case title of
+  _ -> n

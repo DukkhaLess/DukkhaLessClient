@@ -4,12 +4,12 @@ module Intl.Terms
   , Term(..)
   ) where
 
+import Data.Maybe (Maybe(..))
 import Intl.Terms.Introduction (Introduction)
+import Intl.Terms.NotFound (NotFound)
 import Intl.Terms.Resources (Resources)
 import Intl.Terms.Sessions (Sessions)
-import Intl.Terms.NotFound (NotFound)
-
-import Data.Maybe (Maybe(..))
+import Intl.Terms.Validation (ValidationMsg)
 
 n :: forall a. Maybe a
 n = Nothing
@@ -22,3 +22,4 @@ data Term
   | Resource Resources
   | Session Sessions
   | NotFound NotFound
+  | Validation ValidationMsg

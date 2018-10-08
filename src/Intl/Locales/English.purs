@@ -1,18 +1,22 @@
 module Intl.Locales.English where
 
 import Data.Maybe (Maybe(..))
+import Data.Validation (Validation)
 import Intl.Terms (j, n)
 import Intl.Terms as Term
 import Intl.Terms.Introduction as Intro
+import Intl.Terms.NotFound as NotFound
 import Intl.Terms.Resources as Resource
 import Intl.Terms.Sessions as Sessions
-import Intl.Terms.NotFound as NotFound
+import Intl.Terms.Validation as Validation
 
 localise :: Term.Term -> Maybe String
-localise (Term.Intro intro) = localiseIntro intro
-localise (Term.Resource resource) = localiseResource resource
-localise (Term.Session session) = localiseSession session
-localise (Term.NotFound notFound) = localiseNotFound notFound
+localise term = case term of
+  Term.Intro intro -> localiseIntro intro
+  Term.Resource resource -> localiseResource resource
+  Term.Session session -> localiseSession session
+  Term.NotFound notFound -> localiseNotFound notFound
+  Term.Validation validation -> localiseValidation validation
 
 localiseIntro :: Intro.Introduction -> Maybe String
 localiseIntro Intro.Title = j "Dukkhaless Self-Care"
@@ -41,3 +45,7 @@ localiseNotFound :: NotFound.NotFound -> Maybe String
 localiseNotFound t = j case t of
   NotFound.Title -> "Not Found"
   NotFound.Explanation -> "The desired page could not be located"
+
+localiseValidation :: Validation.ValidationMsg -> Maybe String
+localiseValidation msg = case msg of
+  _ -> n
