@@ -1,8 +1,9 @@
 module Data.Validation where
 
-import Prelude (pure)
-import Data.Either (Either)
+import Data.Either (Either, either)
+import Data.Function ((<#>))
 import Data.Newtype (class Newtype, wrap)
+import Prelude (pure, const)
 
 newtype ValidationError = ValidationError String
 derive instance newtypeValidationError :: Newtype ValidationError _
@@ -35,4 +36,6 @@ updateValidation (ValidationG _ validator _) = ValidationG Dirty validator
 combine :: forall a1 r1 a2 r2. Validation a1 r1 -> Validation a2 r2 -> Validation (a1, a2) (r1, r2)
 combine (ValidationG _ v1 i1) (ValidationG _ v2 i2) = ValidationG Dirty combined (i1, i2) where
   -- combined :: (a1, a2) -> Either ValidationErrors (r1, r2)
-  combined = map v1 ()
+  combined = v1 <#> bimap
+   (\es -> v2 <#> either (es <>) (const es))
+   (\rs -> map (rs,) v2)
