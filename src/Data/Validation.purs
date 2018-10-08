@@ -29,9 +29,20 @@ instance semigroupValidatorG :: Semigroup (ValidatorG (Array ValidationError) a 
 
 type Validator a r = ValidatorG ValidationErrors a r
 
+validator' :: forall a. (a -> Boolean) -> String -> Validator a a
+validator' p e = validator f where
+  f :: a -> Either String a
+  f i =
+   case p i of
+      true -> Right i
+      false -> Left e
+
 validator :: forall a r. (a -> Either String r) -> Validator a r
 validator f = ValidatorG f' where
   f' = f <#> lmap (pure <<< wrap)
+
+validator_ :: forall a r. (Newtype r a) => (a -> Boolean) -> String -> Validator a r
+validator_ p e = validator' p e <#> wrap
 
 data InputState
   = Initial
