@@ -3,11 +3,12 @@ module Components.Sessions.Register where
 import Prelude
 
 import AppRouting.Routes as R
-import Data.Maybe (Maybe(..), fromMaybe)
 import Data.Either (Either(..), hush)
-import Data.Newtype (class Newtype, unwrap)
+import Data.Maybe (Maybe(..), fromMaybe)
+import Data.Newtype (class Newtype, unwrap, wrap)
 import Data.Tuple (Tuple(..))
-import Data.Validation
+import Data.Validation as V
+import Data.Validation.Rules as VR
 import Effect.Aff (Aff)
 import Effect.Clipboard as EC
 import Effect.Console (log)
@@ -18,6 +19,7 @@ import Halogen.HTML.Properties as HP
 import Intl (LocaliseFn)
 import Intl.Terms as Term
 import Intl.Terms.Sessions as Sessions
+import Intl.Terms.Validation as TV
 import Model (Session, Username(..))
 import Model.Keyring (Keyring, generateKeyring)
 import Style.Bulogen (block, button, container, hero, heroBody, input, link, offsetThreeQuarters, primary, pullRight, spaced, subtitle, textarea, title)
@@ -39,18 +41,18 @@ derive instance eqPassword :: Eq Password
 type State =
   { session :: Maybe Session
   , preparedRing :: Maybe Keyring
-  , username :: Validation String Username
-  , password :: Validation String Password
-  , passwordConfirmation :: Validation (Tuple (Maybe String) String) Password
+  , username :: V.Validation String Username
+  , password :: V.Validation String Password
+  , passwordConfirmation :: V.Validation (Tuple (Maybe String) String) Password
   }
 
 initialState :: forall a. a -> State
 initialState = const
                  { session: Nothing
                  , preparedRing: Nothing
-                 , username: validation (validator validateUsername) ""
-                 , password: validation (validator validatePassword) ""
-                 , passwordConfirmation:validation (validator validatePasswordConfirmation) (Tuple Nothing "")
+                 , username: V.validation (VR.minimumLength 8 <#> wrap) ""
+                 , password: V.validation (VR.minimumLength 10 <#> wrap) ""
+                 , passwordConfirmation: V.validation (VR.matchingField TV.Password <#> wrap) (Tuple Nothing "")
                  }
 
 data Slot = Slot
@@ -150,19 +152,19 @@ component t =
     pure next
   eval (UpdateUsername username next) = do
     state <- H.get
-    let usernameValidation = updateValidation state.username username
+    let usernameValidation = V.updateValidation state.username username
     H.put state { username = usernameValidation }
     pure next
   eval (UpdatePassword pass next) = do
     state <- H.get
-    let passwordValidation = updateValidation state.password pass
+    let passwordValidation = V.updateValidation state.password pass
     H.put state { password = passwordValidation }
     pure next
   eval (UpdatePasswordConfirmation pass next) = do
     state <- H.get
-    let passState = hush $ validate state.password
+    let passState = hush $ V.validate state.password
     let firstPass = map unwrap passState
-    let passwordConfValidation = updateValidation state.passwordConfirmation (Tuple firstPass pass)
+    let passwordConfValidation = V.updateValidation state.passwordConfirmation (Tuple firstPass pass)
     H.put state { passwordConfirmation = passwordConfValidation }
     pure next
  
