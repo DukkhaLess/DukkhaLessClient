@@ -3,7 +3,8 @@ module Components.Sessions.Register where
 import Prelude
 
 import AppRouting.Routes as R
-import Data.Either (Either(..), hush)
+import Components.Helpers.Forms as HF
+import Data.Either (hush)
 import Data.Maybe (Maybe(..), fromMaybe)
 import Data.Newtype (class Newtype, unwrap, wrap)
 import Data.Tuple (Tuple(..))
@@ -77,23 +78,23 @@ component t =
           [ HH.div [HP.classes [heroBody]]
             [ HH.div [HP.classes [container]]
               [ HH.h1 [ HP.classes [title]] [ HH.text $ t $ Term.Session Sessions.Register ]
-              , HH.input
+              , HF.validated' state.username t (HH.input
                 [ HP.classes [input]
                 , HP.placeholder $ t $ Term.Session Sessions.Username
                 , HE.onValueChange (HE.input UpdateUsername)
-                ]
-              , HH.input
+                ])
+              , HF.validated' state.password t (HH.input
                 [ HP.type_ HP.InputPassword
                 , HP.classes [input]
                 , HP.placeholder $ t (Term.Session Sessions.Password)
                 , HE.onValueChange (HE.input UpdatePassword)
-                ]
-              , HH.input
+                ])
+              , HF.validated' state.passwordConfirmation t (HH.input
                 [ HP.type_ HP.InputPassword
                 , HP.classes [input]
                 , HP.placeholder $ t (Term.Session Sessions.ConfirmPassword)
                 , HE.onValueChange (HE.input UpdatePasswordConfirmation)
-                ]
+                ])
               , secretKeyHeader
               , HH.text $ t $ Term.Session Sessions.KeyRingInstructions
               , HH.a
