@@ -44,7 +44,7 @@ type State =
   , preparedRing :: Maybe Keyring
   , username :: V.Validation String Username
   , password :: V.Validation String Password
-  , passwordConfirmation :: V.Validation (Tuple (Maybe String) String) Password
+  , passwordConfirmation :: V.Validation (Tuple String String) Password
   }
 
 initialState :: forall a. a -> State
@@ -53,7 +53,7 @@ initialState = const
                  , preparedRing: Nothing
                  , username: V.validation (VR.minimumLength 8 <#> wrap) ""
                  , password: V.validation (VR.minimumLength 10 <#> wrap) ""
-                 , passwordConfirmation: V.validation (VR.matchingField TV.Password <#> wrap) (Tuple Nothing "")
+                 , passwordConfirmation: V.validation (VR.matchingField TV.Password <#> wrap) (Tuple "" "")
                  }
 
 data Slot = Slot
@@ -163,8 +163,7 @@ component t =
     pure next
   eval (UpdatePasswordConfirmation pass next) = do
     state <- H.get
-    let passState = hush $ V.validate state.password
-    let firstPass = map unwrap passState
+    let firstPass = V.inputValue $ state.password
     let passwordConfValidation = V.updateValidation state.passwordConfirmation (Tuple firstPass pass)
     H.put state { passwordConfirmation = passwordConfValidation }
     pure next

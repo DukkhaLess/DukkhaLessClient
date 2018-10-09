@@ -59,6 +59,9 @@ validation = ValidationG Initial
 inputState :: forall e a r. ValidationG e a r -> InputState
 inputState (ValidationG i _ _) = i
 
+inputValue :: forall e a r. ValidationG e a r -> a
+inputValue (ValidationG _ _ a) = a
+
 validate :: forall e a r. ValidationG e a r -> Either e r
 validate (ValidationG _ (ValidatorG p) a) = p a
 
