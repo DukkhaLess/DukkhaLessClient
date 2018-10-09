@@ -1,6 +1,7 @@
 module Intl.Locales.English where
 
 import Data.Maybe (Maybe(..))
+import Data.Semigroup ((<>))
 import Data.Validation (Validation)
 import Intl.Terms (j, n)
 import Intl.Terms as Term
@@ -8,7 +9,9 @@ import Intl.Terms.Introduction as Intro
 import Intl.Terms.NotFound as NotFound
 import Intl.Terms.Resources as Resource
 import Intl.Terms.Sessions as Sessions
+import Intl.Terms.Validation (ValidationMsg(..))
 import Intl.Terms.Validation as Validation
+import Prelude (show, ($))
 
 localise :: Term.Term -> Maybe String
 localise term = case term of
@@ -48,4 +51,6 @@ localiseNotFound t = j case t of
 
 localiseValidation :: Validation.ValidationMsg -> Maybe String
 localiseValidation msg = case msg of
-  _ -> n
+  (InsufficientLength rl) -> j $ "Must be at least " <> show rl <> " characters long."
+  (RequiredCharacters cts) -> j $ "Must contain: "
+  (MustMatchOtherField field) -> j $ "Does not match"
