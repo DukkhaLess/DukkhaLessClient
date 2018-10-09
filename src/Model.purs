@@ -1,15 +1,16 @@
 module Model where
 
 import AppRouting.Routes as Routes
-import Data.Argonaut.Core (fromString, toString)
+import Data.Argonaut ((.?))
+import Data.Argonaut.Core (fromString, jsonEmptyObject)
+import Data.Argonaut.Decode.Class (class DecodeJson, decodeJson)
 import Data.Argonaut.Encode.Class (class EncodeJson)
-import Data.Argonaut.Decode.Class (class DecodeJson)
-import Data.Either (note)
+import Data.Argonaut.Encode.Combinators ((~>), (:=))
 import Data.Maybe (Maybe(..))
 import Data.Newtype (class Newtype, unwrap, wrap)
 import Intl (LocaliseFn)
 import Model.Keyring (Keyring)
-import Prelude ((<<<), ($), map, class Eq)
+import Prelude ((<<<), ($), class Eq, bind, pure)
 
 newtype Username = Username String
 derive instance newtypeUsername :: Newtype Username _
@@ -25,9 +26,15 @@ instance encodeJsonPassword :: EncodeJson Password where
 newtype SessionToken = SessionToken String
 derive instance newtypeSessionToken :: Newtype SessionToken _
 instance encodeJsonSessionToken :: EncodeJson SessionToken where
-  encodeJson = fromString <<< unwrap
+  encodeJson t = 
+    "sessionToken" := fromString (unwrap t)
+    ~> jsonEmptyObject
+
 instance decodeJsonSessionToken :: DecodeJson SessionToken where
-  decodeJson json = map wrap $ note "SessionToken string could not be decoded" $ toString json
+  decodeJson json = do
+    obj <- decodeJson json
+    sessionToken <- obj .? "sessionToken"
+    pure $ wrap sessionToken
 
 data KeyringUsage
   = None
