@@ -6,9 +6,10 @@ module Model.Keyring
   , Keyring(..)
   ) where
 
-import Crypt.NaCl (BoxKeyPair(..), SecretBoxKey, generateBoxKeyPair, generateSecretBoxKey, toUint8Array, fromUint8Array)
+import Crypt.NaCl (BoxKeyPair(..), BoxPublicKey, SecretBoxKey, fromUint8Array, generateBoxKeyPair, generateSecretBoxKey, toUint8Array)
 import Crypt.NaCl.Types (BoxKeyPair, SecretBoxKey)
 import Data.Argonaut.Core (Json, caseJsonObject, jsonEmptyObject, stringify)
+import Data.Argonaut.Core as AC
 import Data.Argonaut.Decode (class DecodeJson, decodeJson)
 import Data.Argonaut.Decode.Combinators ((.?))
 import Data.Argonaut.Encode (class EncodeJson, encodeJson)
@@ -21,6 +22,7 @@ import Data.ArrayBuffer.Types (Uint8Array)
 import Data.Base64 (Base64(..), decodeBase64, encodeBase64, runBase64)
 import Data.Bifunctor (lmap)
 import Data.Either (Either(..), note)
+import Data.Newtype (class Newtype)
 import Data.String.Read (class Read)
 import Effect (Effect)
 import Effect.Exception (message)
@@ -37,6 +39,9 @@ generateKeyring = do
 encodeKey :: Uint8Array -> String
 encodeKey = runBase64 <<< encodeBase64 <<< buffer <<< dataView
 
+encodeKeyJson :: Uint8Array -> Json
+encodeKeyJson = AC.fromString <<< encodeKey
+
 decodeKey :: String -> Either String Uint8Array
 decodeKey rawStr = dv <#> asUint8Array where
   decoded = decodeBase64 (Base64 rawStr)
@@ -47,6 +52,7 @@ newtype Keyring = Keyring
   { secretBoxKey :: SecretBoxKey
   , boxKeyPair :: BoxKeyPair
   }
+derive instance newtypeKeyring :: Newtype Keyring _
 
 instance showKeyring :: Show Keyring where
   show = runBase64 <<< encodeBase64 <<< fromString <<< stringify <<< encodeJson

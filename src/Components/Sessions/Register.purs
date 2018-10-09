@@ -4,8 +4,10 @@ import Prelude
 
 import AppRouting.Routes as R
 import Components.Helpers.Forms as HF
+import Crypt.NaCl.Types (BoxPublicKey, BoxKeyPair(..))
+import Data.HTTP.Payloads (SubmitRegister(..))
 import Data.Maybe (Maybe(..), fromMaybe)
-import Data.Newtype (class Newtype, wrap)
+import Data.Newtype (class Newtype, wrap, unwrap)
 import Data.Tuple (Tuple(..))
 import Data.Validation as V
 import Data.Validation.Rules as VR
@@ -40,13 +42,6 @@ type State =
   , username :: V.Validation String Username
   , password :: V.Validation String Password
   , passwordConfirmation :: V.Validation (Tuple String String) Password
-  }
-
-type SubmissionPayload =
-  { keyring :: Keyring
-  , username :: Username
-  , password :: Password
-  , passwordConfirmation :: Password
   }
 
 initialState :: forall a. a -> State
@@ -179,15 +174,16 @@ component t =
     let payload = preparePayload state
     pure next
  
-preparePayload :: State -> Maybe SubmissionPayload
+preparePayload :: State -> Maybe SubmitRegister
 preparePayload state = do
   username <- V.validate_ state.username
   password <- V.validate_ state.password
   passwordConfirmation <- V.validate_ state.passwordConfirmation
-  keyring <- state.preparedRing
+  keyring <- map unwrap state.preparedRing
+  let publicKey = case keyring.boxKeyPair of BoxKeyPair r -> r.publicKey
   pure $
     { username
     , password
     , passwordConfirmation
-    , keyring
+    , publicKey
     }
