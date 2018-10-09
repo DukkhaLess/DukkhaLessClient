@@ -2,12 +2,13 @@ module Components.Sessions.Register where
 
 import Prelude
 
-import Affjax (Request, request)
+import Affjax (Request)
 import AppRouting.Routes as R
 import Components.Helpers.Forms as HF
 import Control.Monad.Error.Class (throwError)
 import Crypt.NaCl.Types (BoxPublicKey, BoxKeyPair(..))
-import Data.HTTP.Helpers (ApiPath(..), post)
+import Data.Argonaut.Decode (decodeJson)
+import Data.HTTP.Helpers (ApiPath(..), post, request)
 import Data.HTTP.Payloads (SubmitRegister(..))
 import Data.Maybe (Maybe(..), fromMaybe, maybe)
 import Data.Newtype (class Newtype, wrap, unwrap)
@@ -26,7 +27,7 @@ import Intl (LocaliseFn)
 import Intl.Terms as Term
 import Intl.Terms.Sessions as Sessions
 import Intl.Terms.Validation as TV
-import Model (Session, Username(..), Password(..))
+import Model (Password(..), Session, SessionToken(..), Username(..))
 import Model.Keyring (Keyring, generateKeyring)
 import Style.Bulogen (block, button, container, hero, heroBody, input, link, offsetThreeQuarters, primary, pullRight, spaced, subtitle, textarea, title, textCentered)
 
@@ -178,6 +179,7 @@ component t =
     state <- H.get
     payload <- H.liftAff $ maybe (throwError $ error "Form results invalid for submission") pure (preparePayload state)
     response <- H.liftAff $ request (post (ApiPath "/register") payload)
+    let token = response.body <#> SessionToken
     pure next
  
 preparePayload :: State -> Maybe SubmitRegister
