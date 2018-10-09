@@ -1,17 +1,21 @@
 module Data.HTTP.Helpers where
 
 import Affjax (defaultRequest, Request)
-import Affjax.RequestBody (RequestBody(..))
+import Affjax.RequestBody as RB
 import Affjax.RequestHeader (RequestHeader(..))
+import Affjax.ResponseFormat (json)
+import Affjax.ResponseFormat as RF
+import Data.Argonaut.Core (Json)
+import Data.Argonaut.Decode (class DecodeJson, decodeJson)
 import Data.Argonaut.Encode (class EncodeJson, encodeJson)
-import Data.Either (Either(Left))
+import Data.Either (Either(Left), hush)
 import Data.HTTP.Method (Method(..))
 import Data.Maybe (Maybe(..))
 import Data.Newtype (class Newtype)
 import Data.Semigroup ((<>))
 import Data.String.CodeUnits (charAt)
 import Model (SessionToken(..))
-import Prelude (Unit, ($))
+import Prelude (Unit, ($), map)
 
 newtype ApiPath = ApiPath String
 derive instance newtypeApiPath :: Newtype ApiPath _
@@ -23,7 +27,7 @@ post :: forall a. EncodeJson a => ApiPath -> a -> Request Unit
 post (ApiPath path) payload
  = defaultRequest
   { url = path'
-  , content = Just $ Json (encodeJson payload)
+  , content = Just $ RB.Json (encodeJson payload)
   , method = Left POST
   } where
     payload' = encodeJson payload
@@ -35,6 +39,9 @@ post' a p (SessionToken t)
     { headers = [RequestHeader "Authorization" t]
     , withCredentials = true
     }
+
+post_ :: forall a. EncodeJson a => ApiPath -> a -> SessionToken-> Request Json
+post_ a p t = (post' a p t) { responseFormat = json }
 
 withLeadingSlash :: String -> String
 withLeadingSlash s = case charAt 0 s of

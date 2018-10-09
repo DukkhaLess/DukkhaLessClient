@@ -5,6 +5,7 @@ import Prelude
 import Affjax (Request, request)
 import AppRouting.Routes as R
 import Components.Helpers.Forms as HF
+import Control.Monad.Error.Class (throwError)
 import Crypt.NaCl.Types (BoxPublicKey, BoxKeyPair(..))
 import Data.HTTP.Helpers (ApiPath(..), post)
 import Data.HTTP.Payloads (SubmitRegister(..))
@@ -16,6 +17,7 @@ import Data.Validation as V
 import Data.Validation.Rules as VR
 import Effect.Aff (Aff)
 import Effect.Clipboard as EC
+import Effect.Exception (error)
 import Halogen as H
 import Halogen.HTML as HH
 import Halogen.HTML.Events as HE
@@ -174,8 +176,8 @@ component t =
     pure next
   eval (AttemptSubmit next) = do
     state <- H.get
-    let payload = preparePayload state
-    response <- sequence $ map (\payload' -> H.liftAff $ request (post (ApiPath "/register") payload')) payload
+    payload <- H.liftAff $ maybe (throwError $ error "Form results invalid for submission") pure (preparePayload state)
+    response <- H.liftAff $ request (post (ApiPath "/register") payload)
     pure next
  
 preparePayload :: State -> Maybe SubmitRegister
