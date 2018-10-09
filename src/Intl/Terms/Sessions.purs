@@ -16,3 +16,4 @@ data Sessions
   | CopyKey
   | DownloadKey
   | KeySubtitle
+  | Submit

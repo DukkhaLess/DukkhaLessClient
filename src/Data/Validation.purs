@@ -1,8 +1,9 @@
 module Data.Validation where
 
 import Data.Bifunctor (lmap)
-import Data.Either (Either(..), either)
+import Data.Either (Either(..), either, hush)
 import Data.Functor ((<#>), class Functor)
+import Data.Maybe (Maybe)
 import Data.Newtype (class Newtype, wrap, unwrap)
 import Data.Semigroup (append, class Semigroup)
 import Data.Tuple (Tuple(..))
@@ -64,6 +65,9 @@ inputValue (ValidationG _ _ a) = a
 
 validate :: forall e a r. ValidationG e a r -> Either e r
 validate (ValidationG _ (ValidatorG p) a) = p a
+
+validate_ :: forall e a r. ValidationG e a r -> Maybe r
+validate_ (ValidationG _ (ValidatorG p) a) = hush $ p a
 
 updateValidation :: forall e a r. ValidationG e a r -> a -> ValidationG e a r
 updateValidation (ValidationG _ v _) = ValidationG Dirty v

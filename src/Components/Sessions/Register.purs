@@ -19,23 +19,20 @@ import Intl (LocaliseFn)
 import Intl.Terms as Term
 import Intl.Terms.Sessions as Sessions
 import Intl.Terms.Validation as TV
-import Model (Session, Username(..))
+import Model (Session, Username(..), Password(..))
 import Model.Keyring (Keyring, generateKeyring)
-import Style.Bulogen (block, button, container, hero, heroBody, input, link, offsetThreeQuarters, primary, pullRight, spaced, subtitle, textarea, title)
+import Style.Bulogen (block, button, container, hero, heroBody, input, link, offsetThreeQuarters, primary, pullRight, spaced, subtitle, textarea, title, textCentered)
 
 data Query a
   = GenerateKeyring a
   | UpdateUsername String a
   | UpdatePassword String a
   | UpdatePasswordConfirmation String a
+  | Submit a
   | CopyKey (Maybe Keyring) a
 
 data Message
   = SessionCreated Session
-
-newtype Password = Password String
-derive instance newtypePassword :: Newtype Password _
-derive instance eqPassword :: Eq Password
 
 type State =
   { session :: Maybe Session
@@ -43,6 +40,13 @@ type State =
   , username :: V.Validation String Username
   , password :: V.Validation String Password
   , passwordConfirmation :: V.Validation (Tuple String String) Password
+  }
+
+type SubmissionPayload =
+  { keyring :: Keyring
+  , username :: Username
+  , password :: Password
+  , passwordConfirmation :: Password
   }
 
 initialState :: forall a. a -> State
@@ -111,6 +115,12 @@ component t =
               , keyBox state.preparedRing
               , HH.a
                 [ HP.classes [button, primary, block]
+                , HE.onClick (HE.input_ Submit)
+                ]
+                [ HH.text $ t $ Term.Session Sessions.Submit
+                ]
+              , HH.a
+                [ HP.classes [block, textCentered]
                 , HP.href $ R.reverseRoute $ R.Sessions R.Login
                 ]
                 [ HH.text $ t $ Term.Session Sessions.LoginInstead
@@ -164,4 +174,20 @@ component t =
     let passwordConfValidation = V.updateValidation state.passwordConfirmation (Tuple firstPass pass)
     H.put state { passwordConfirmation = passwordConfValidation }
     pure next
+  eval (Submit next) = do
+    state <- H.get
+    let payload = preparePayload state
+    pure next
  
+preparePayload :: State -> Maybe SubmissionPayload
+preparePayload state = do
+  username <- V.validate_ state.username
+  password <- V.validate_ state.password
+  passwordConfirmation <- V.validate_ state.passwordConfirmation
+  keyring <- state.preparedRing
+  pure $
+    { username
+    , password
+    , passwordConfirmation
+    , keyring
+    }
