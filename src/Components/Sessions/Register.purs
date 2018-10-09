@@ -4,9 +4,8 @@ import Prelude
 
 import AppRouting.Routes as R
 import Components.Helpers.Forms as HF
-import Data.Either (hush)
 import Data.Maybe (Maybe(..), fromMaybe)
-import Data.Newtype (class Newtype, unwrap, wrap)
+import Data.Newtype (class Newtype, wrap)
 import Data.Tuple (Tuple(..))
 import Data.Validation as V
 import Data.Validation.Rules as VR
