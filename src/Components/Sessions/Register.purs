@@ -11,7 +11,6 @@ import Data.Validation as V
 import Data.Validation.Rules as VR
 import Effect.Aff (Aff)
 import Effect.Clipboard as EC
-import Effect.Console (log)
 import Halogen as H
 import Halogen.HTML as HH
 import Halogen.HTML.Events as HE
@@ -140,7 +139,6 @@ component t =
   eval :: Query ~> H.ComponentDSL State Query Message Aff
   eval (GenerateKeyring next) = do
     state <- H.get
-    H.liftEffect $ log "Wat"
     nextState <- do
             keyring <- H.liftEffect $ generateKeyring
             pure $ state { preparedRing = Just keyring
