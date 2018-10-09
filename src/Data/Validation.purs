@@ -56,6 +56,9 @@ type Validation a r = ValidationG ValidationErrors a r
 validation :: forall e a r. ValidatorG e a r -> a -> ValidationG e a r
 validation = ValidationG Initial
 
+inputState :: forall e a r. ValidationG e a r -> InputState
+inputState (ValidationG i _ _) = i
+
 validate :: forall e a r. ValidationG e a r -> Either e r
 validate (ValidationG _ (ValidatorG p) a) = p a
 
