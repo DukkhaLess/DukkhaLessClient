@@ -181,7 +181,7 @@ preparePayload state = do
   passwordConfirmation <- V.validate_ state.passwordConfirmation
   keyring <- map unwrap state.preparedRing
   let publicKey = case keyring.boxKeyPair of BoxKeyPair r -> r.publicKey
-  pure $
+  pure $ wrap
     { username
     , password
     , passwordConfirmation
