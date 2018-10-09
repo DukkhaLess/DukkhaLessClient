@@ -2,12 +2,15 @@ module Components.Sessions.Register where
 
 import Prelude
 
+import Affjax (Request, request)
 import AppRouting.Routes as R
 import Components.Helpers.Forms as HF
 import Crypt.NaCl.Types (BoxPublicKey, BoxKeyPair(..))
+import Data.HTTP.Helpers (ApiPath(..), post)
 import Data.HTTP.Payloads (SubmitRegister(..))
-import Data.Maybe (Maybe(..), fromMaybe)
+import Data.Maybe (Maybe(..), fromMaybe, maybe)
 import Data.Newtype (class Newtype, wrap, unwrap)
+import Data.Traversable (sequence)
 import Data.Tuple (Tuple(..))
 import Data.Validation as V
 import Data.Validation.Rules as VR
@@ -30,7 +33,7 @@ data Query a
   | UpdateUsername String a
   | UpdatePassword String a
   | UpdatePasswordConfirmation String a
-  | Submit a
+  | AttemptSubmit a
   | CopyKey (Maybe Keyring) a
 
 data Message
@@ -110,7 +113,7 @@ component t =
               , keyBox state.preparedRing
               , HH.a
                 [ HP.classes [button, primary, block]
-                , HE.onClick (HE.input_ Submit)
+                , HE.onClick (HE.input_ AttemptSubmit)
                 ]
                 [ HH.text $ t $ Term.Session Sessions.Submit
                 ]
@@ -169,9 +172,10 @@ component t =
     let passwordConfValidation = V.updateValidation state.passwordConfirmation (Tuple firstPass pass)
     H.put state { passwordConfirmation = passwordConfValidation }
     pure next
-  eval (Submit next) = do
+  eval (AttemptSubmit next) = do
     state <- H.get
     let payload = preparePayload state
+    response <- sequence $ map (\payload' -> H.liftAff $ request (post (ApiPath "/register") payload')) payload
     pure next
  
 preparePayload :: State -> Maybe SubmitRegister
