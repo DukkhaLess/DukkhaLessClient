@@ -1,7 +1,7 @@
-[![Build Status](https://travis-ci.org/MySelfCare/MySelfcareClient.svg?branch=master)](https://travis-ci.org/MySelfCare/MySelfcareClient)
+[![Build Status](https://travis-ci.org/DukkhaLess/DukkhaLessClient.svg?branch=master)](https://travis-ci.org/DukkhaLess/DukkhaLessClient)
 [![Known Vulnerabilities](https://snyk.io/test/github/MySelfCare/MySelfcareClient/badge.svg?targetFile=package.json)](https://snyk.io/test/github/MySelfCare/MySelfcareClient?targetFile=package.json)
 
-# My SelfCare Client
+# Dukkhaless Self-Care Client
 
 A safe place to write your thoughts, and track the progress of mental health recovery.
 
@@ -17,7 +17,7 @@ A safe place to write your thoughts, and track the progress of mental health rec
 
 ## Privacy System
 
-#### The MySelfCare platform identifies three key security concerns.
+#### The Dukkhaless Self-Care platform identifies three key security concerns.
 
 1. The user must be able to encrypt data for themselves and only themselves to read.
   - `Secretbox` algorithm is used to secure user data for their own viewing
@@ -35,7 +35,7 @@ A safe place to write your thoughts, and track the progress of mental health rec
 - The program uses the `tweetnacl-js` library to handle client-side encryption
 - The program introduces a concept of a `keyring`, a block of text which the user must keep private and secure
   - The `keyring` is what is used to send data privately to specific individuals (like your physician) AND to encrypt your data so that ONLY you can read it.
-  - Even the My SelfCare servers cannot read the contents of your data except for the minimum metadata to make sure it only gets sent to you. (Ie the username that goes with a diary entry, and the info needed to sort them by most recent.)
+  - Even the Dukkhaless Self-Care servers cannot read the contents of your data except for the minimum metadata to make sure it only gets sent to you. (Ie the username that goes with a diary entry, and the info needed to sort them by most recent.)
 - The `keyring` has three keys within it.
   - A public key which the server keeps a copy of so that people can encrypt their data for only you to read it. A `public key` is safe to share without reducing privacy.
   - The `private key` that is paired to the public key. This is used to read messages that are sent to you.

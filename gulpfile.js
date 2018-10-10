@@ -123,9 +123,22 @@ gulp.task("buildToProd", ['revisionRewriteProd'], function() {
 gulp.task('devServer', function() {
   // Serve files from the root of this project
   browserSync.init({
-    server: {
-      baseDir: "./dist"
-    }
+    startPath: '/index.html',
+    proxy: 'localhost:4000',
+    serveStatic:  [
+      {
+        route: '/index.html',
+        dir: ['./dist/index.html']
+      },
+      {
+        route: '/designPage.html',
+        dir: ['./dist/designPage.html']
+      },
+      {
+        route: '/static',
+        dir: ['./dist/static']
+      },
+    ],
   });
   gulp.watch("dist/**/*").on("change", reload);
 });

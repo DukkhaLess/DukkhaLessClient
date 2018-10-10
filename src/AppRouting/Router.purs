@@ -1,25 +1,11 @@
 module AppRouting.Router where
 
 
-import Prelude
-  ( type (~>)
-  , Unit
-  , Void
-  , const
-  , pure
-  , unit
-  , (<<<)
-  , bind
-  , ($)
-  , discard
-  , map
-  , show
-  )
 import AppRouting.Routes as R
 import Components.Intro as Intro
+import Components.NotFound as NotFound
 import Components.Resources as Resources
 import Components.Sessions as Sessions
-import Components.NotFound as NotFound
 import Data.Const (Const)
 import Data.Maybe (Maybe(..))
 import Effect (Effect)
@@ -30,6 +16,7 @@ import Halogen.Data.Prism (type (<\/>), type (\/))
 import Halogen.HTML as HH
 import Halogen.HTML.Properties as HP
 import Model (Model, Session)
+import Prelude (type (~>), Unit, Void, const, pure, unit, (<<<), bind, ($), discard, map, show)
 import Routing.Hash (matches)
 
 data Input a
@@ -71,7 +58,7 @@ component initialModel = H.parentComponent
   { initialState: const initialModel
   , render
   , eval
-  , receiver: nada
+  , receiver: const Nothing
   }
   where
     render :: Model -> H.ParentHTML Input ChildQuery ChildSlot Aff
@@ -103,7 +90,7 @@ component initialModel = H.parentComponent
         pathToSessions
         Sessions.Slot
         (Sessions.component model.localiseFn)
-        (Sessions.ExistingSession model.session)
+        (Sessions.RouteContext r)
         mapSessionMessage
     viewPage model R.NotFound =
       HH.slot'
