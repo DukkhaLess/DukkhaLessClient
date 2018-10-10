@@ -2,8 +2,10 @@
 echo "$DOCKER_PASSWORD" | docker login --username $DOCKER_USERNAME --password-stdin
 if [ "$TRAVIS_PULL_REQUEST" = false]
 then
+    echo "Not a pr build"
     export DOCKER_BRANCH_TAG=$TRAVIS_BRANCH
 else
+    echo "PR Build"
     export DOCKER_BRANCH_TAG=$TRAVIS_PULL_REQUEST_BRANCH
 fi
 
