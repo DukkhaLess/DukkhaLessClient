@@ -1,7 +1,6 @@
 #!/usr/bin/env bash
 echo "$DOCKER_PASSWORD" | docker login --username $DOCKER_USERNAME --password-stdin
-echo "$TRAVIS_PULL_REQUEST"
-if [ "$TRAVIS_PULL_REQUEST" = false]
+if [ "$TRAVIS_PULL_REQUEST" == "false" ]
 then
     echo "Not a pr build"
     export DOCKER_BRANCH_TAG=$TRAVIS_BRANCH
