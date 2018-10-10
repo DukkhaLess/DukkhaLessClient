@@ -123,9 +123,17 @@ gulp.task("buildToProd", ['revisionRewriteProd'], function() {
 gulp.task('devServer', function() {
   // Serve files from the root of this project
   browserSync.init({
-    server: {
-      baseDir: "./dist"
-    }
+    proxy: 'localhost:8080',
+    serveStatic:  [
+      {
+        route: '/',
+        dir: ['./dist']
+      },
+      {
+        route: '/static',
+        dir: ['./dist/static']
+      },
+    ],
   });
   gulp.watch("dist/**/*").on("change", reload);
 });
