@@ -123,6 +123,7 @@ gulp.task("buildToProd", ['revisionRewriteProd'], function() {
 gulp.task('devServer', function() {
   // Serve files from the root of this project
   browserSync.init({
+    startPath: '/index.html',
     proxy: 'localhost:8080',
     serveStatic:  [
       {
