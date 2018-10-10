@@ -7,9 +7,12 @@ import Data.ArrayBuffer.ArrayBuffer (decodeToString)
 import Data.Base64 (Base64(..), decodeBase64)
 import Data.Bifunctor (lmap)
 import Data.Either (Either(..), note)
+import Data.HTTP.Helpers (ApiPath(..), post, request)
+import Data.HTTP.Payloads (SubmitLogin(SubmitLogin))
 import Data.Maybe (Maybe(..))
 import Data.Newtype (wrap)
 import Data.String.Read (read)
+import Data.Tuple (Tuple(..))
 import Effect.Aff (Aff)
 import Effect.Console (log)
 import Effect.Exception (message)
@@ -20,14 +23,15 @@ import Halogen.HTML.Properties as HP
 import Intl (LocaliseFn)
 import Intl.Terms as Term
 import Intl.Terms.Sessions as Sessions
-import Model (Session, Username, Password)
-import Model.Keyring (Keyring, generateKeyring)
-import Style.Bulogen (block, button, container, hero, heroBody, input, link, offsetThreeQuarters, primary, pullRight, spaced, subtitle, textarea, title)
+import Model (Session, Username, Password, SessionToken(SessionToken), KeyringUsage(Enabled))
+import Model.Keyring (Keyring)
+import Style.Bulogen (block, button, container, hero, heroBody, input, link, offsetThreeQuarters, primary, pullRight, spaced, subtitle, textCentered, textarea, title)
 
 data Query a
   = UpdateKey String a
   | UpdateUsername String a
   | UpdatePassword String a
+  | Submit a
 
 data Message
   = SessionCreated Session
@@ -35,14 +39,14 @@ data Message
 type State =
   { username :: Username
   , password :: Password
-  , preparedRing :: Maybe Keyring
+  , keyring :: Maybe Keyring
   }
 
 initialState :: forall a. a -> State
 initialState = const
                  { username: (wrap "")
                  , password: (wrap "")
-                 , preparedRing: Nothing
+                 , keyring: Nothing
                  }
 
 data Slot = Slot
@@ -74,9 +78,15 @@ component t =
                     , HP.classes [input]
                     , HP.placeholder $ t (Term.Session Sessions.Password)
                     ]
-                  , keyBox state.preparedRing
+                  , keyBox state.keyring
                   , HH.a
                     [ HP.classes [button, primary, block]
+                    , HE.onClick (HE.input_ Submit)
+                    ]
+                    [ HH.text $ t $ Term.Session Sessions.Submit
+                    ]
+                  , HH.a
+                    [ HP.classes [block, textCentered]
                     , HP.href $ R.reverseRoute $ R.Sessions R.Register
                     ]
                     [ HH.text $ t $ Term.Session Sessions.RegisterInstead
@@ -118,6 +128,15 @@ component t =
         log err
         pure state
       Right keyring -> do
-        pure $ state { preparedRing = Just keyring}
+        pure $ state { keyring = Just keyring}
     H.put nextState
     pure next
+  eval (Submit next) = do
+    state <- H.get
+    let payload = SubmitLogin { username: state.username, password: state.password }
+    response <- H.liftAff $ request (post (ApiPath "/login") payload)
+    case Tuple (response.body <#> SessionToken) (state.keyring) of
+      Tuple (Right t) (Just keyring) -> do
+        H.raise $ SessionCreated $ wrap { username: state.username, keyringUsage: Enabled keyring, sessionToken: t }
+        pure next
+      _    -> pure next
