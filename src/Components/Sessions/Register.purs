@@ -2,23 +2,21 @@ module Components.Sessions.Register where
 
 import Prelude
 
-import Affjax (Request)
 import AppRouting.Routes as R
 import Components.Helpers.Forms as HF
 import Control.Monad.Error.Class (throwError)
-import Crypt.NaCl.Types (BoxPublicKey, BoxKeyPair(..))
-import Data.Argonaut.Decode (decodeJson)
+import Crypt.NaCl.Types (BoxKeyPair(..))
+import Data.Either (Either, either, note)
 import Data.HTTP.Helpers (ApiPath(..), post, request)
-import Data.HTTP.Payloads (SubmitRegister(..))
-import Data.Maybe (Maybe(..), fromMaybe, maybe)
-import Data.Newtype (class Newtype, wrap, unwrap)
-import Data.Traversable (sequence)
+import Data.HTTP.Payloads (SubmitRegister)
+import Data.Maybe (Maybe(..), fromMaybe, fromJust)
+import Data.Newtype (wrap, unwrap)
 import Data.Tuple (Tuple(..))
 import Data.Validation as V
 import Data.Validation.Rules as VR
 import Effect.Aff (Aff)
 import Effect.Clipboard as EC
-import Effect.Exception (error)
+import Effect.Exception (error, Error)
 import Halogen as H
 import Halogen.HTML as HH
 import Halogen.HTML.Events as HE
@@ -27,9 +25,10 @@ import Intl (LocaliseFn)
 import Intl.Terms as Term
 import Intl.Terms.Sessions as Sessions
 import Intl.Terms.Validation as TV
-import Model (Password(..), Session, SessionToken(..), Username(..))
+import Model (Password, SessionToken(..), Username(..), KeyringUsage(Enabled), Session)
 import Model.Keyring (Keyring, generateKeyring)
-import Style.Bulogen (block, button, container, hero, heroBody, input, link, offsetThreeQuarters, primary, pullRight, spaced, subtitle, textarea, title, textCentered)
+import Partial.Unsafe (unsafePartial)
+import Style.Bulogen (block, button, container, hero, heroBody, input, link, primary, pullRight, spaced, subtitle, textarea, title, textCentered)
 
 data Query a
   = GenerateKeyring a
@@ -177,13 +176,22 @@ component t =
     pure next
   eval (AttemptSubmit next) = do
     state <- H.get
-    payload <- H.liftAff $ maybe (throwError $ error "Form results invalid for submission") pure (preparePayload state)
+    payload <- H.liftAff $ either throwError pure (preparePayload state)
     response <- H.liftAff $ request (post (ApiPath "/register") payload)
-    let token = response.body <#> SessionToken
+    let keyringUsage = Enabled $ unsafePartial $ fromJust state.preparedRing
+    let username = Username $ V.inputValue state.username
+    sessionToken <- H.liftAff $ either (throwError <<< error) pure (response.body <#> SessionToken)
+    let session =
+          wrap
+          { username
+          , keyringUsage
+          , sessionToken
+          }
+    H.raise (SessionCreated session)
     pure next
  
-preparePayload :: State -> Maybe SubmitRegister
-preparePayload state = do
+preparePayload :: State -> Either Error SubmitRegister
+preparePayload state = note (error "Form results invalid for submission") do
   username <- V.validate_ state.username
   password <- V.validate_ state.password
   passwordConfirmation <- V.validate_ state.passwordConfirmation

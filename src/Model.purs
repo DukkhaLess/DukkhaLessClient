@@ -40,11 +40,13 @@ data KeyringUsage
   = None
   | Enabled Keyring
 
-type Session =
-  { userName :: Username
-  , accountForm :: KeyringUsage
+newtype Session = Session
+  { username :: Username
+  , keyringUsage :: KeyringUsage
   , sessionToken :: SessionToken
   }
+
+derive instance newtypeSession :: Newtype Session _
 
 type Model =
   { localiseFn :: LocaliseFn
