@@ -27,3 +27,16 @@ instance encodeJsonSubmitRegister :: EncodeJson SubmitRegister where
     ~> "password" := unwrap r.password
     ~> "passwordConfirmation" := unwrap r.passwordConfirmation
     ~> jsonEmptyObject
+
+newtype SubmitLogin = SubmitLogin
+  { username :: Username
+  , password :: Password
+  }
+
+derive instance newtypeSubmitLogin :: Newtype SubmitLogin _
+
+instance encodeJsonSubmitLogin :: EncodeJson SubmitLogin where
+  encodeJson (SubmitLogin l)
+    = "username" := unwrap l.username
+    ~> "password" := unwrap l.password
+    ~> jsonEmptyObject
