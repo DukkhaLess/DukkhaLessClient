@@ -8,6 +8,7 @@ import Data.Base64 (Base64(..), decodeBase64)
 import Data.Bifunctor (lmap)
 import Data.Either (Either(..), note)
 import Data.Maybe (Maybe(..))
+import Data.Newtype (wrap)
 import Data.String.Read (read)
 import Effect.Aff (Aff)
 import Effect.Console (log)
@@ -19,26 +20,28 @@ import Halogen.HTML.Properties as HP
 import Intl (LocaliseFn)
 import Intl.Terms as Term
 import Intl.Terms.Sessions as Sessions
-import Model (Session)
+import Model (Session, Username, Password)
 import Model.Keyring (Keyring, generateKeyring)
 import Style.Bulogen (block, button, container, hero, heroBody, input, link, offsetThreeQuarters, primary, pullRight, spaced, subtitle, textarea, title)
 
 data Query a
-  = ToggleRegister a
-  | UpdateKey String a
-  | NoOp a
+  = UpdateKey String a
+  | UpdateUsername String a
+  | UpdatePassword String a
 
 data Message
   = SessionCreated Session
 
 type State =
-  {  username :: Maybe String
+  { username :: Username
+  , password :: Password
   , preparedRing :: Maybe Keyring
   }
 
 initialState :: forall a. a -> State
 initialState = const
-                 { username: Nothing
+                 { username: (wrap "")
+                 , password: (wrap "")
                  , preparedRing: Nothing
                  }
 
@@ -99,21 +102,17 @@ component t =
       ]
 
   eval :: Query ~> H.ComponentDSL State Query Message Aff
-  eval (ToggleRegister next) = do
+  eval (UpdateUsername username next) = do
     state <- H.get
-    nextState <- do
-            keyring <- H.liftEffect $ generateKeyring
-            pure $ state { preparedRing = Just keyring
-                         }
-
-    H.put nextState
+    H.put state { username = wrap username }
     pure next
-  eval (NoOp next) = pure next
+  eval (UpdatePassword password next) = do
+    state <- H.get
+    H.put state { password = wrap password }
+    pure next
   eval (UpdateKey keyStr next) = do
     state <- H.get
     let jsonRaw = Base64 >>> decodeBase64 >>> note "Base64 decoding failed" >=> decodeToString >>> (lmap message) $ keyStr
-    H.liftEffect $ log $ show jsonRaw
-
     nextState <- H.liftEffect $ case read keyStr of
       Left err -> do
         log err

@@ -78,7 +78,7 @@ component t =
             Login.Slot
             (Login.component t)
             unit
-            (const Nothing)
+            mapLoginMessage
         R.Register ->
           HH.slot'
             pathToRegister
@@ -87,7 +87,6 @@ component t =
             unit
             mapRegisterMessage
       
-
       eval :: Query ~> H.ParentDSL State Query ChildQuery ChildSlot Message Aff
       eval (UpdateRoute route next) = do
         H.modify_ (_{ routeContext = route })
@@ -102,3 +101,6 @@ component t =
 
 mapRegisterMessage :: Register.Message -> Maybe (Query Unit)
 mapRegisterMessage (Register.SessionCreated s) = Just (ReceivedSession s unit)
+
+mapLoginMessage :: Login.Message -> Maybe (Query Unit)
+mapLoginMessage (Login.SessionCreated s) = Just (ReceivedSession s unit)
