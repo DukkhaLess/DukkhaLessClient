@@ -17,6 +17,7 @@ import Model (Session)
 
 data Query a
   = UpdateRoute R.Sessions a
+  | ReceivedSession Session a
 
 data Message
   = SessionCreated Session
@@ -65,7 +66,12 @@ component t =
     }
     where
       render :: State -> H.ParentHTML Query ChildQuery ChildSlot Aff
-      render s = case s.routeContext of
+      render s = case s.session of
+        Nothing -> renderUnAuthed s
+        Just session -> HH.text "Authenticated!"
+      
+      renderUnAuthed :: State -> H.ParentHTML Query ChildQuery ChildSlot Aff
+      renderUnAuthed s = case s.routeContext of
         R.Login ->
           HH.slot'
             pathToLogin
@@ -79,12 +85,20 @@ component t =
             Register.Slot
             (Register.component t)
             unit
-            (const Nothing)
+            mapRegisterMessage
+      
 
       eval :: Query ~> H.ParentDSL State Query ChildQuery ChildSlot Message Aff
       eval (UpdateRoute route next) = do
         H.modify_ (_{ routeContext = route })
         pure next
+      eval (ReceivedSession s next) = do
+        H.modify_ (_{ session = Just s })
+        H.raise $ SessionCreated s
+        pure next
 
       receive :: Input -> Maybe (Query Unit)
       receive (RouteContext route) = Just $ UpdateRoute route unit
+
+mapRegisterMessage :: Register.Message -> Maybe (Query Unit)
+mapRegisterMessage (Register.SessionCreated s) = Just (ReceivedSession s unit)
