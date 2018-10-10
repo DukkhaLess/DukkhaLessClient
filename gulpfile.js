@@ -126,8 +126,12 @@ gulp.task('devServer', function() {
     proxy: 'localhost:8080',
     serveStatic:  [
       {
-        route: '/',
-        dir: ['./dist']
+        route: '/index.html',
+        dir: ['./dist/index.html']
+      },
+      {
+        route: '/designPage.html',
+        dir: ['./dist/designPage.html']
       },
       {
         route: '/static',
