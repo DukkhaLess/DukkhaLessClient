@@ -13,6 +13,8 @@ import Data.Maybe (Maybe(..))
 import Data.Newtype (wrap)
 import Data.String.Read (read)
 import Data.Tuple (Tuple(..))
+import Data.Validation as V
+import Data.Validation.Rules as VR
 import Effect.Aff (Aff)
 import Effect.Console (log)
 import Effect.Exception (message)
@@ -39,14 +41,14 @@ data Message
 type State =
   { username :: Username
   , password :: Password
-  , keyring :: Maybe Keyring
+  , keyring :: V.Validation String Keyring
   }
 
 initialState :: forall a. a -> State
 initialState = const
                  { username: (wrap "")
                  , password: (wrap "")
-                 , keyring: Nothing
+                 , keyring: V.validation (VR.parsableKeyring) ""
                  }
 
 data Slot = Slot
@@ -80,7 +82,11 @@ component t =
                     , HP.placeholder $ t (Term.Session Sessions.Password)
                     , HE.onValueChange (HE.input UpdatePassword)
                     ]
-                  , keyBox state.keyring
+                  , HH.textarea
+                        [ HE.onValueChange (HE.input UpdateKey)
+                        , HP.classes [textarea]
+                        , HP.placeholder "Your secret keys."
+                        ]
                   , HH.a
                     [ HP.classes [button, primary, block]
                     , HE.onClick (HE.input_ Submit)
@@ -105,13 +111,6 @@ component t =
       [ HH.text $ t $ Term.Session Sessions.KeySubtitle
       ]
 
-  keyBox :: forall p. Maybe Keyring -> HH.HTML p (Query Unit)
-  keyBox keyring =
-    HH.textarea $
-      [ HE.onValueChange (HE.input UpdateKey)
-      , HP.classes [textarea]
-      , HP.placeholder "Your secret keys."
-      ]
 
   eval :: Query ~> H.ComponentDSL State Query Message Aff
   eval (UpdateUsername username next) = do
@@ -124,14 +123,8 @@ component t =
     pure next
   eval (UpdateKey keyStr next) = do
     state <- H.get
-    let jsonRaw = Base64 >>> decodeBase64 >>> note "Base64 decoding failed" >=> decodeToString >>> (lmap message) $ keyStr
-    nextState <- H.liftEffect $ case read keyStr of
-      Left err -> do
-        log err
-        pure state
-      Right keyring -> do
-        pure $ state { keyring = Just keyring}
-    H.put nextState
+    let keyringValidation = V.updateValidation state.keyring keyStr
+    H.put state { keyring = keyringValidation }
     pure next
   eval (Submit next) = do
     state <- H.get
