@@ -4,20 +4,23 @@ import Prelude
 
 import AppRouting.Routes as R
 import Data.ArrayBuffer.ArrayBuffer (decodeToString)
+import Control.Monad.Error.Class (throwError)
 import Data.Base64 (Base64(..), decodeBase64)
+import Components.Helpers.Forms as HF
 import Data.Bifunctor (lmap)
-import Data.Either (Either(..), note)
+import Data.Either (Either(..), note, either)
 import Data.HTTP.Helpers (ApiPath(..), post, request)
 import Data.HTTP.Payloads (SubmitLogin(SubmitLogin))
 import Data.Maybe (Maybe(..))
 import Data.Newtype (wrap)
 import Data.String.Read (read)
-import Data.Tuple (Tuple(..))
+import Data.Tuple (Tuple(..), fst, snd)
+import Data.Validation (ValidationError(..))
 import Data.Validation as V
 import Data.Validation.Rules as VR
 import Effect.Aff (Aff)
 import Effect.Console (log)
-import Effect.Exception (message)
+import Effect.Exception (message, error, Error)
 import Halogen as H
 import Halogen.HTML as HH
 import Halogen.HTML.Events as HE
@@ -82,7 +85,7 @@ component t =
                     , HP.placeholder $ t (Term.Session Sessions.Password)
                     , HE.onValueChange (HE.input UpdatePassword)
                     ]
-                  , HH.textarea
+                  , HF.validated' state.keyring t $ HH.textarea
                         [ HE.onValueChange (HE.input UpdateKey)
                         , HP.classes [textarea]
                         , HP.placeholder "Your secret keys."
@@ -128,10 +131,21 @@ component t =
     pure next
   eval (Submit next) = do
     state <- H.get
-    let payload = SubmitLogin { username: state.username, password: state.password }
+    payloadAndKeyring <- H.liftAff $ either throwError pure (prepareLoginPayload state)
+    let payload = fst payloadAndKeyring
+    let keyring = snd payloadAndKeyring
     response <- H.liftAff $ request (post (ApiPath "/login") payload)
-    case Tuple (response.body <#> SessionToken) (state.keyring) of
-      Tuple (Right t) (Just keyring) -> do
+    case response.body <#> SessionToken of
+      Right t -> do
         H.raise $ SessionCreated $ wrap { username: state.username, keyringUsage: Enabled keyring, sessionToken: t }
         pure next
       _    -> pure next
+
+  prepareLoginPayload :: State -> Either Error (Tuple SubmitLogin Keyring)
+  prepareLoginPayload state = note (error "Validation failed for login payload") result where
+    keyring :: Maybe Keyring
+    keyring = V.validate_ state.keyring
+    payload :: SubmitLogin
+    payload = SubmitLogin { username: state.username, password: state.password }
+    result = map (Tuple payload) keyring
+    
