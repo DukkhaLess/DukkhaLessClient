@@ -12,3 +12,4 @@ data ValidationMsg
   = InsufficientLength Int
   | RequiredCharacters (Array CharacterType)
   | MustMatchOtherField FieldName
+  | ParserFailed String
