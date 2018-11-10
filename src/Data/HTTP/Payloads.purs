@@ -1,6 +1,7 @@
 module Data.HTTP.Payloads where
 
 import Model
+import Prelude
 
 import Crypt.NaCl.Class (toUint8Array)
 import Crypt.NaCl.Types (BoxPublicKey(..))
@@ -8,6 +9,8 @@ import Data.Argonaut (jsonEmptyObject)
 import Data.Argonaut.Decode.Class (class DecodeJson)
 import Data.Argonaut.Encode.Class (class EncodeJson)
 import Data.Argonaut.Encode.Combinators ((~>), (:=))
+import Data.Generic.Rep (class Generic)
+import Data.Generic.Rep.Show (genericShow)
 import Data.Newtype (class Newtype, unwrap)
 import Model.Keyring (encodeKey)
 
@@ -34,6 +37,9 @@ newtype SubmitLogin = SubmitLogin
   }
 
 derive instance newtypeSubmitLogin :: Newtype SubmitLogin _
+derive instance genericSubmitLogin :: Generic SubmitLogin _
+instance showSubmitLogin :: Show SubmitLogin where
+  show = genericShow
 
 instance encodeJsonSubmitLogin :: EncodeJson SubmitLogin where
   encodeJson (SubmitLogin l)

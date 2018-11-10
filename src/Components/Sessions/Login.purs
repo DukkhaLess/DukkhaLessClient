@@ -72,11 +72,13 @@ component t =
                   , HH.input
                     [ HP.classes [input]
                     , HP.placeholder $ t $ Term.Session Sessions.Username
+                    , HE.onValueChange (HE.input UpdateUsername)
                     ]
                   , HH.input
                     [ HP.type_ HP.InputPassword
                     , HP.classes [input]
                     , HP.placeholder $ t (Term.Session Sessions.Password)
+                    , HE.onValueChange (HE.input UpdatePassword)
                     ]
                   , keyBox state.keyring
                   , HH.a
