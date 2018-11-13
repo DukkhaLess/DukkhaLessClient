@@ -131,6 +131,7 @@ component t =
     pure next
   eval (Submit next) = do
     state <- H.get
+    H.modify_ (_{ keyring = V.touch state.keyring })
     payloadAndKeyring <- H.liftAff $ either throwError pure (prepareLoginPayload state)
     let payload = fst payloadAndKeyring
     let keyring = snd payloadAndKeyring
