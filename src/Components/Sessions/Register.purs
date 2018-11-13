@@ -185,7 +185,7 @@ component t =
     response <- H.liftAff $ request (post (ApiPath "/register") payload)
     let keyringUsage = Enabled $ unsafePartial $ fromJust state.preparedRing
     let username = Username $ V.inputValue state.username
-    sessionToken <- H.liftAff $ either (throwError <<< error) pure (response.body <#> SessionToken)
+    sessionToken <- H.liftAff $ either (throwError <<< error) pure response.body
     let session =
           wrap
           { username
