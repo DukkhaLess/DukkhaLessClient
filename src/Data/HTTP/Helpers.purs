@@ -17,8 +17,11 @@ import Data.Newtype (class Newtype)
 import Data.Semigroup ((<>))
 import Data.String.CodeUnits (charAt)
 import Effect.Aff (Aff)
+import Effect.Class (liftEffect)
+import Effect.Console (log)
 import Model (SessionToken(..))
-import Prelude (Unit, ($), map, bind, pure, (>>=))
+import Prelude
+import Unsafe.Coerce (unsafeCoerce)
 
 newtype ApiPath = ApiPath String
 derive instance newtypeApiPath :: Newtype ApiPath _
@@ -53,6 +56,8 @@ withLeadingSlash s = case charAt 0 s of
 request :: forall a. DecodeJson a => Request Json -> Aff (Response (Either String a))
 request req = do
   resp <- AJ.request req
+  liftEffect $ log $ unsafeCoerce resp
+  let body = lmap printResponseFormatError resp.body >>= decodeJson
   pure $ resp
-    { body = lmap printResponseFormatError resp.body >>= decodeJson
+    { body = body
     }

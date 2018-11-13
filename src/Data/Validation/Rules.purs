@@ -26,6 +26,4 @@ matchingField name = val <#> snd where
   val = validator' (\t -> eq (fst t) (snd t)) $ Validation (MustMatchOtherField Password)
 
 parsableKeyring :: Validator String Keyring
-parsableKeyring = validator (parser <#> (lmap (Validation <<< ParserFailed))) where
-  parser :: String -> Either String Keyring
-  parser = Base64 >>> decodeBase64 >>> (note "Could not decode base64 content") >=> (decodeToString <#> (lmap message)) >=> read
+parsableKeyring = validator (read <#> (lmap (Validation <<< ParserFailed)))

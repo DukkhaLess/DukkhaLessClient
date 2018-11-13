@@ -3,10 +3,10 @@ module Components.Sessions.Login where
 import Prelude
 
 import AppRouting.Routes as R
-import Data.ArrayBuffer.ArrayBuffer (decodeToString)
-import Control.Monad.Error.Class (throwError)
-import Data.Base64 (Base64(..), decodeBase64)
 import Components.Helpers.Forms as HF
+import Control.Monad.Error.Class (throwError)
+import Data.ArrayBuffer.ArrayBuffer (decodeToString)
+import Data.Base64 (Base64(..), decodeBase64)
 import Data.Bifunctor (lmap)
 import Data.Either (Either(..), note, either)
 import Data.HTTP.Helpers (ApiPath(..), post, request)
@@ -31,6 +31,7 @@ import Intl.Terms.Sessions as Sessions
 import Model (Session, Username, Password, SessionToken(SessionToken), KeyringUsage(Enabled))
 import Model.Keyring (Keyring)
 import Style.Bulogen (block, button, container, hero, heroBody, input, link, offsetThreeQuarters, primary, pullRight, spaced, subtitle, textCentered, textarea, title)
+import Unsafe.Coerce (unsafeCoerce)
 
 data Query a
   = UpdateKey String a
@@ -136,11 +137,14 @@ component t =
     let payload = fst payloadAndKeyring
     let keyring = snd payloadAndKeyring
     response <- H.liftAff $ request (post (ApiPath "/login") payload)
-    case response.body <#> SessionToken of
-      Right t -> do
-        H.raise $ SessionCreated $ wrap { username: state.username, keyringUsage: Enabled keyring, sessionToken: t }
+    case response.body of
+      Right token -> do
+        H.liftEffect $ log "received token"
+        H.raise $ SessionCreated $ wrap { username: state.username, keyringUsage: Enabled keyring, sessionToken: token }
         pure next
-      _    -> pure next
+      Left err   -> do
+        H.liftEffect $ log err
+        pure next
 
   prepareLoginPayload :: State -> Either Error (Tuple SubmitLogin Keyring)
   prepareLoginPayload state = note (error "Validation failed for login payload") result where
