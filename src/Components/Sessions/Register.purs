@@ -176,6 +176,11 @@ component t =
     pure next
   eval (AttemptSubmit next) = do
     state <- H.get
+    H.modify_ (_{
+      username = V.touch state.username,
+      password = V.touch state.password,
+      passwordConfirmation = V.touch state.passwordConfirmation
+    })
     payload <- H.liftAff $ either throwError pure (preparePayload state)
     response <- H.liftAff $ request (post (ApiPath "/register") payload)
     let keyringUsage = Enabled $ unsafePartial $ fromJust state.preparedRing
