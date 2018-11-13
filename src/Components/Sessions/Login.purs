@@ -5,22 +5,16 @@ import Prelude
 import AppRouting.Routes as R
 import Components.Helpers.Forms as HF
 import Control.Monad.Error.Class (throwError)
-import Data.ArrayBuffer.ArrayBuffer (decodeToString)
-import Data.Base64 (Base64(..), decodeBase64)
-import Data.Bifunctor (lmap)
 import Data.Either (Either(..), note, either)
 import Data.HTTP.Helpers (ApiPath(..), post, request)
 import Data.HTTP.Payloads (SubmitLogin(SubmitLogin))
 import Data.Maybe (Maybe(..))
 import Data.Newtype (wrap)
-import Data.String.Read (read)
 import Data.Tuple (Tuple(..), fst, snd)
-import Data.Validation (ValidationError(..))
 import Data.Validation as V
 import Data.Validation.Rules as VR
 import Effect.Aff (Aff)
-import Effect.Console (log)
-import Effect.Exception (message, error, Error)
+import Effect.Exception (error, Error)
 import Halogen as H
 import Halogen.HTML as HH
 import Halogen.HTML.Events as HE
@@ -31,7 +25,6 @@ import Intl.Terms.Sessions as Sessions
 import Model (Session, Username, Password, SessionToken(SessionToken), KeyringUsage(Enabled))
 import Model.Keyring (Keyring)
 import Style.Bulogen (block, button, container, hero, heroBody, input, link, offsetThreeQuarters, primary, pullRight, spaced, subtitle, textCentered, textarea, title)
-import Unsafe.Coerce (unsafeCoerce)
 
 data Query a
   = UpdateKey String a
@@ -139,11 +132,9 @@ component t =
     response <- H.liftAff $ request (post (ApiPath "/login") payload)
     case response.body of
       Right token -> do
-        H.liftEffect $ log "received token"
         H.raise $ SessionCreated $ wrap { username: state.username, keyringUsage: Enabled keyring, sessionToken: token }
         pure next
-      Left err   -> do
-        H.liftEffect $ log err
+      Left _ -> do
         pure next
 
   prepareLoginPayload :: State -> Either Error (Tuple SubmitLogin Keyring)
