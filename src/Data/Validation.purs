@@ -46,6 +46,9 @@ validator f = ValidatorG f' where
 validator_ :: forall a r. (Newtype r a) => (a -> Boolean) -> Term -> Validator a r
 validator_ p e = validator' p e <#> wrap
 
+touch :: forall a e r. ValidationG e a r -> ValidationG e a r
+touch (ValidationG _ v a) = ValidationG Dirty v a
+
 data InputState
   = Initial
   | Dirty

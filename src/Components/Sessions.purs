@@ -8,6 +8,7 @@ import Components.Sessions.Register as Register
 import Data.Const (Const)
 import Data.Maybe (Maybe(..))
 import Effect.Aff (Aff)
+import Effect.Console (log)
 import Halogen as H
 import Halogen.Component.ChildPath (ChildPath, cpL, cpR, (:>))
 import Halogen.Data.Prism (type (<\/>), type (\/))
@@ -93,6 +94,7 @@ component t =
         pure next
       eval (ReceivedSession s next) = do
         H.modify_ (_{ session = Just s })
+        H.liftEffect $ log "Session received"
         H.raise $ SessionCreated s
         pure next
 

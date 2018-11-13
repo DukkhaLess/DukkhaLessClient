@@ -62,10 +62,22 @@ component initialModel = H.parentComponent
   }
   where
     render :: Model -> H.ParentHTML Input ChildQuery ChildSlot Aff
-    render model =
-      HH.div_
+    render model = HH.div_ [navMenu, viewPage model model.currentPage] where
+      navMenu = case model.session of
+        Just session -> sessionedMenu session
+        Nothing      -> sessionlessMenu
+
+
+    sessionlessMenu :: H.ParentHTML Input ChildQuery ChildSlot Aff
+    sessionlessMenu =
+      HH.nav_
         [ HH.ul_ (map link [R.Intro, R.Resources, R.Sessions R.Login])
-        , viewPage model model.currentPage
+        ]
+
+    sessionedMenu :: Session -> H.ParentHTML Input ChildQuery ChildSlot Aff
+    sessionedMenu session =
+      HH.nav_
+        [ HH.ul_ (map link [R.Intro, R.Resources])
         ]
 
     link r = HH.li_ [ HH.a [ HP.href $ R.reverseRoute r ] [ HH.text $ show r ] ]

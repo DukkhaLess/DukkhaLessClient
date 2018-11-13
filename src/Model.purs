@@ -6,20 +6,29 @@ import Data.Argonaut.Core (fromString, jsonEmptyObject)
 import Data.Argonaut.Decode.Class (class DecodeJson, decodeJson)
 import Data.Argonaut.Encode.Class (class EncodeJson)
 import Data.Argonaut.Encode.Combinators ((~>), (:=))
+import Data.Generic.Rep (class Generic)
+import Data.Generic.Rep.Show (genericShow)
 import Data.Maybe (Maybe(..))
 import Data.Newtype (class Newtype, unwrap, wrap)
 import Intl (LocaliseFn)
 import Model.Keyring (Keyring)
-import Prelude ((<<<), ($), class Eq, bind, pure)
+import Prelude
 
 newtype Username = Username String
 derive instance newtypeUsername :: Newtype Username _
+derive instance genericUsername :: Generic Username _
 instance encodeJsonUsername :: EncodeJson Username where
   encodeJson = fromString <<< unwrap
+instance showUsername :: Show Username where
+  show = genericShow
+
 
 newtype Password = Password String
 derive instance newtypePassword :: Newtype Password _
 derive instance eqPassword :: Eq Password
+derive instance genericPassword :: Generic Password _
+instance showPassword :: Show Password where
+  show = genericShow
 instance encodeJsonPassword :: EncodeJson Password where
   encodeJson = fromString <<< unwrap
 

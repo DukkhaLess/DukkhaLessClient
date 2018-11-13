@@ -56,3 +56,4 @@ localiseValidation msg = case msg of
   (InsufficientLength rl) -> j $ "Must be at least " <> show rl <> " characters long."
   (RequiredCharacters cts) -> j $ "Must contain: "
   (MustMatchOtherField field) -> j $ "Does not match"
+  (ParserFailed reason) -> j $ "Parsing failed. Reason given was: " <> reason
