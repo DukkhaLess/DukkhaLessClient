@@ -12,7 +12,7 @@ A safe place to write your thoughts, and track the progress of mental health rec
 3. Secure Tagging of items for searching/filtering. The tags will be stored in a hashed format so they can be queried and searched without recording their text.
 4. Secure sharing of diaries/calendars with explicitly whitelisted parties.
 5. Support for creating and visualising timelines of events.
-6. CBT Pros and Cons template with saving
+6. DBT Template for analysing pros/cons of a possible decision
 7. CBT ABCD template with saving
 X. More to come, this is just the initial steps. User feedback and information will play a major role in where we go in the future.
 
