@@ -6,7 +6,7 @@ import AppRouting.Routes as R
 import Components.Helpers.Forms as HF
 import Control.Monad.Error.Class (throwError)
 import Data.Either (Either(..), note, either)
-import Data.HTTP.Helpers (ApiPath(..), post, request)
+import Data.HTTP.Helpers (ApiPath(..), unsafePostCleartext, request)
 import Data.HTTP.Payloads (SubmitLogin(SubmitLogin))
 import Data.Maybe (Maybe(..))
 import Data.Newtype (wrap)
@@ -129,7 +129,7 @@ component t =
     payloadAndKeyring <- H.liftAff $ either throwError pure (prepareLoginPayload state)
     let payload = fst payloadAndKeyring
     let keyring = snd payloadAndKeyring
-    response <- H.liftAff $ request (post (ApiPath "/login") payload)
+    response <- H.liftAff $ request (unsafePostCleartext (ApiPath "/login") payload)
     case response.body of
       Right token -> do
         H.raise $ SessionCreated $ wrap { username: state.username, keyringUsage: Enabled keyring, sessionToken: token }

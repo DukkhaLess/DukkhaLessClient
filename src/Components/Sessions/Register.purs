@@ -7,7 +7,7 @@ import Components.Helpers.Forms as HF
 import Control.Monad.Error.Class (throwError)
 import Crypt.NaCl.Types (BoxKeyPair(..))
 import Data.Either (Either, either, note)
-import Data.HTTP.Helpers (ApiPath(..), post, request)
+import Data.HTTP.Helpers (ApiPath(..), unsafePostCleartext, request)
 import Data.HTTP.Payloads (SubmitRegister)
 import Data.Maybe (Maybe(..), fromMaybe, fromJust)
 import Data.Newtype (wrap, unwrap)
@@ -182,7 +182,7 @@ component t =
       passwordConfirmation = V.touch state.passwordConfirmation
     })
     payload <- H.liftAff $ either throwError pure (preparePayload state)
-    response <- H.liftAff $ request (post (ApiPath "/register") payload)
+    response <- H.liftAff $ request (unsafePostCleartext (ApiPath "/register") payload)
     let keyringUsage = Enabled $ unsafePartial $ fromJust state.preparedRing
     let username = Username $ V.inputValue state.username
     sessionToken <- H.liftAff $ either (throwError <<< error) pure response.body
