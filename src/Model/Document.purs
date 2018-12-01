@@ -3,7 +3,7 @@ module Model.Document where
 import Affjax.ResponseFormat (ResponseFormat(..))
 import CSS (Abs)
 import Class (class CipherText, class Encrypt, decrypt, encrypt)
-import Crypt.NaCl (Box, SecretBox)
+import Crypt.NaCl (Box, SecretBox, Nonce)
 import Data.Argonaut.Encode (class EncodeJson, encodeJson)
 import Data.Base64 (Base64(..))
 import Data.DateTime (DateTime(..))
@@ -18,7 +18,7 @@ data MessageContents
 
 newtype EncryptedMessage
   = EncryptedMessage
-  { nonce :: Base64
+  { nonce :: Nonce
   , contents :: MessageContents
   }
 
