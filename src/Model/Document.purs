@@ -1,22 +1,45 @@
 module Model.Document where
 
+import Model.Crypto
 import Prelude
+
 import Class (class CipherText, class Encrypt, decrypt, encrypt)
-import Crypt.NaCl (Box, SecretBox, Nonce)
-import Data.Argonaut.Encode (class EncodeJson, encodeJson)
+import Crypt.NaCl (Box, Nonce, SecretBox, toUint8Array)
+import Data.Argonaut (jsonEmptyObject)
+import Data.Argonaut.Core as AC
 import Data.Argonaut.Decode (class DecodeJson, decodeJson)
+import Data.Argonaut.Encode (class EncodeJson, encodeJson)
+import Data.Argonaut.Encode.Combinators ((~>), (:=))
 import Data.Base64 (Base64(..))
 import Data.DateTime (DateTime(..))
+import Data.Generic.Rep.Show (genericShow)
+import Data.Generic.Rep (class Generic)
+import Effect.Exception (message)
 
 data DocumentCategory
   = Journal
+
+derive instance genericDocumentCategory :: Generic DocumentCategory _
+
+instance showDocumentCategory :: Show DocumentCategory where
+  show = genericShow
+
+instance encodeJsonDocumentCategory :: EncodeJson DocumentCategory where
+  encodeJson = show >>> AC.fromString
 
 data MessageContents
   = Boxed Box
   | SecretBoxed SecretBox
 
 instance encodeJsonMessageContents :: EncodeJson MessageContents where
-  encodeJson = foo
+  encodeJson (Boxed box)
+    = "type" := "boxed"
+    ~> "data" := (encodeBytes $ toUint8Array box)
+    ~> jsonEmptyObject
+  encodeJson (SecretBoxed box)
+    = "type" := "secretBoxed"
+    ~> "data" := (encodeBytes $ toUint8Array box)
+    ~> jsonEmptyObject
 
 instance decodeJsonMessageContents :: DecodeJson MessageContents where
   decodeJson = foo
@@ -28,7 +51,10 @@ newtype EncryptedMessage
   }
 
 instance encodeJsonEncryptedMessage :: EncodeJson EncryptedMessage where
-  encodeJson = foo
+  encodeJson (EncryptedMessage message)
+    = "nonce" := (encodeBytes $ toUint8Array message.nonce)
+    ~> "contents" := (encodeJson message.contents)
+    ~> jsonEmptyObject
 
 instance decodeJsonEncryptedMessage :: DecodeJson EncryptedMessage where
   decodeJson = foo
@@ -60,10 +86,17 @@ newtype DocumentMetaData
     }
 
 instance encodeJsonDocumentMetaData :: EncodeJson DocumentMetaData where
-  encodeJson = foo
+  encodeJson (DocumentMetaData metaData)
+    = "title" := (encodeJson metaData.title)
+    ~> "category" := (encodeJson metaData.category)
+    ~> "createdAt" := (encodeJson metaData.createdAt)
+    ~> "lastUpdated" := (encodeJson metaData.lastUpdated)
+    ~> jsonEmptyObject
 
 instance decodeJsonDocumentMetaData :: DecodeJson DocumentMetaData where
   decodeJson = foo
+
+instance cipherTextDocumentMetaData :: CipherText DocumentMetaData
 
 newtype Document
   = Document
@@ -72,11 +105,12 @@ newtype Document
     }
 
 instance encodeJsonDocument :: EncodeJson Document where
-  encodeJson = foo
+  encodeJson (Document document)
+    = "metaData" := (encodeJson document.metaData)
+    ~> "content" := (encodeJson document.content)
+    ~> jsonEmptyObject
 
 instance decodeJsonDocument :: DecodeJson Document where
   decodeJson = foo
 
-instance cipherTextDocumentMetaData :: CipherText DocumentMetaData
-
-instance cipherTextDocument :: CiphetText Document
+instance cipherTextDocument :: CipherText Document
