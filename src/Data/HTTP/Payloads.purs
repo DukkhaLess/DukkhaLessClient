@@ -12,7 +12,7 @@ import Data.Argonaut.Encode.Combinators ((~>), (:=))
 import Data.Generic.Rep (class Generic)
 import Data.Generic.Rep.Show (genericShow)
 import Data.Newtype (class Newtype, unwrap)
-import Model.Keyring (encodeKey)
+import Model.Crypto (encodeBytes)
 
 newtype SubmitRegister = SubmitRegister
   { publicKey :: BoxPublicKey
@@ -25,7 +25,7 @@ derive instance newtypeSubmitRegister :: Newtype SubmitRegister _
 
 instance encodeJsonSubmitRegister :: EncodeJson SubmitRegister where
   encodeJson (SubmitRegister r)
-    = "publicKey" := encodeKey (toUint8Array r.publicKey)
+    = "publicKey" := encodeBytes (toUint8Array r.publicKey)
     ~> "username" := unwrap r.username
     ~> "password" := unwrap r.password
     ~> "passwordConfirmation" := unwrap r.passwordConfirmation

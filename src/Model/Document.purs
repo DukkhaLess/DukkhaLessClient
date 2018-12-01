@@ -4,28 +4,26 @@ import Model.Crypto
 import Prelude
 
 import Class (class CipherText, class Encrypt, decrypt, encrypt)
-import Crypt.NaCl (Box, Nonce, SecretBox, toUint8Array)
+import Crypt.NaCl (Box, Nonce, SecretBox, fromUint8Array, toUint8Array)
 import Data.Argonaut (jsonEmptyObject)
 import Data.Argonaut.Core as AC
 import Data.Argonaut.Decode (class DecodeJson, decodeJson)
+import Data.Argonaut.Decode.Combinators ((.?))
 import Data.Argonaut.Encode (class EncodeJson, encodeJson)
 import Data.Argonaut.Encode.Combinators ((~>), (:=))
 import Data.Base64 (Base64(..))
 import Data.DateTime (DateTime(..))
-import Data.Generic.Rep.Show (genericShow)
 import Data.Generic.Rep (class Generic)
+import Data.Generic.Rep.Show (genericShow)
+import Data.JsonDecode.Helpers (decodeJObject)
 import Effect.Exception (message)
+import Style.Bulogen (content)
 
 data DocumentCategory
   = Journal
 
-derive instance genericDocumentCategory :: Generic DocumentCategory _
-
-instance showDocumentCategory :: Show DocumentCategory where
-  show = genericShow
-
 instance encodeJsonDocumentCategory :: EncodeJson DocumentCategory where
-  encodeJson = show >>> AC.fromString
+  encodeJson Journal = AC.fromString "journal"
 
 data MessageContents
   = Boxed Box
@@ -42,7 +40,14 @@ instance encodeJsonMessageContents :: EncodeJson MessageContents where
     ~> jsonEmptyObject
 
 instance decodeJsonMessageContents :: DecodeJson MessageContents where
-  decodeJson = foo
+  decodeJson json = do
+    obj <- decodeJObject json
+    bytes <- obj .? "data"
+    dataBytes <- decodeBytes bytes
+    discriminator <- obj .? "type"
+    pure $ case discriminator of
+        "boxed" -> Boxed (fromUint8Array dataBytes)
+        "secretBoxed" -> SecretBoxed (fromUint8Array dataBytes)
 
 newtype EncryptedMessage
   = EncryptedMessage
@@ -57,16 +62,24 @@ instance encodeJsonEncryptedMessage :: EncodeJson EncryptedMessage where
     ~> jsonEmptyObject
 
 instance decodeJsonEncryptedMessage :: DecodeJson EncryptedMessage where
-  decodeJson = foo
+  decodeJson json = do
+    obj <- decodeJObject json
+    nonce <- obj .? "nonce" >>= decodeBytes <#> fromUint8Array
+    contents <- obj .? "contents" >>= decodeJson
+    pure $ EncryptedMessage
+      { nonce: nonce
+      , contents: contents
+      }
+
 
 
 newtype Title = Title EncryptedMessage
 
 instance encodeJsonTitle :: EncodeJson Title where
-  encodeJson = encodeJson <#> Title
+  encodeJson (Title msg) = encodeJson msg
 
 instance decodeJsonTitle :: DecodeJson Title where
-  decodeJson (Title message) = decodeJson message
+  decodeJson = decodeJson <#> Title
 
 
 newtype DocumentContent = DocumentContent EncryptedMessage
@@ -94,7 +107,18 @@ instance encodeJsonDocumentMetaData :: EncodeJson DocumentMetaData where
     ~> jsonEmptyObject
 
 instance decodeJsonDocumentMetaData :: DecodeJson DocumentMetaData where
-  decodeJson = foo
+  decodeJson json = do 
+    obj <- decodeJObject json
+    title <- obj .? "title" >>= decodeJson
+    category <- obj .? "category" >>= decodeJson
+    createdAt <- obj .? "createdAt" >>= decodeJson
+    lastUpdated <- obj .? "lastUpdated" >>= decodeJson
+    pure $ DocumentMetaData
+     { title: title
+     , category: category
+     , createdAt: createdAt
+     , lastUpdated: lastUpdated
+     }
 
 instance cipherTextDocumentMetaData :: CipherText DocumentMetaData
 
@@ -111,6 +135,13 @@ instance encodeJsonDocument :: EncodeJson Document where
     ~> jsonEmptyObject
 
 instance decodeJsonDocument :: DecodeJson Document where
-  decodeJson = foo
+  decodeJson json = do
+    obj <- decodeJObject json
+    metaData <- obj .? "metaData" >>= decodeJson
+    content <- obj .? "content" >>= decodeJson
+    pure $ Document
+      { metaData: metaData
+      , content: content
+      }
 
 instance cipherTextDocument :: CipherText Document
