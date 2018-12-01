@@ -1,32 +1,37 @@
 module Model.Document where
 
 import Affjax.ResponseFormat (ResponseFormat(..))
+import CSS (Abs)
 import Class (class CipherText, class Encrypt, decrypt, encrypt)
+import Crypt.NaCl (Box, SecretBox)
 import Data.Argonaut.Encode (class EncodeJson, encodeJson)
 import Data.Base64 (Base64(..))
 import Data.DateTime (DateTime(..))
+import Web.HTML.History (DocumentTitle(..))
 
 data DocumentCategory
   = Journal
 
-data DocumentOwnership
-  = Shared
-  | Own
+data MessageContents
+  = Boxed Box
+  | SecretBoxed SecretBox
+
+newtype EncryptedMessage
+  = EncryptedMessage
+  { nonce :: Base64
+  , contents :: MessageContents
+  }
+
+newtype Title = Title EncryptedMessage
+
+newtype DocumentContent = DocumentContent EncryptedMessage
 
 newtype DocumentMetaData
   = DocumentMetaData
-    { titleNonce :: Base64
-    , titleCipherText :: Base64
+    { title :: Title
     , createdAt :: DateTime
     , lastUpdated :: DateTime
-    , document :: DocumentCategory
-    , ownership :: DocumentOwnership
-    }
-
-newtype DocumentContent
-  = DocumentContent
-    { nonce :: Base64
-    , cipherText :: Base64
+    , category :: DocumentCategory
     }
 
 newtype Document
