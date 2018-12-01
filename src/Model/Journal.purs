@@ -7,7 +7,10 @@ import Data.Argonaut.Decode.Combinators ((.?))
 import Data.Argonaut.Encode.Combinators ((~>), (:=))
 import Model.Document (Document, DocumentCategory(..))
 
-newtype JournalEntry = JournalEntry {}
+newtype JournalEntry
+  = JournalEntry
+    {
+    }
 
 instance encryptJournalEntry :: Encrypt JournalEntry Document where
   encrypt = foo
