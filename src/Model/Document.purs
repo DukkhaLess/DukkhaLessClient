@@ -1,14 +1,12 @@
 module Model.Document where
 
-import Affjax.ResponseFormat (ResponseFormat(..))
-import CSS (Abs)
+import Prelude
 import Class (class CipherText, class Encrypt, decrypt, encrypt)
 import Crypt.NaCl (Box, SecretBox, Nonce)
 import Data.Argonaut.Encode (class EncodeJson, encodeJson)
 import Data.Argonaut.Decode (class DecodeJson, decodeJson)
 import Data.Base64 (Base64(..))
 import Data.DateTime (DateTime(..))
-import Web.HTML.History (DocumentTitle(..))
 
 data DocumentCategory
   = Journal
@@ -39,19 +37,19 @@ instance decodeJsonEncryptedMessage :: DecodeJson EncryptedMessage where
 newtype Title = Title EncryptedMessage
 
 instance encodeJsonTitle :: EncodeJson Title where
-  encodeJson = foo
+  encodeJson = encodeJson <#> Title
 
 instance decodeJsonTitle :: DecodeJson Title where
-  decodeJson = foo
+  decodeJson (Title message) = decodeJson message
 
 
 newtype DocumentContent = DocumentContent EncryptedMessage
 
 instance encodeJsonDocumentContent :: EncodeJson DocumentContent where
-  encodeJson = foo
+  encodeJson = encodeJson <#> DocumentContent
 
 instance decodeJsonDocumentContent :: DecodeJson DocumentContent where
-  decodeJson = foo
+  decodeJson (DocumentContent message) = decodeJson message
 
 newtype DocumentMetaData
   = DocumentMetaData
