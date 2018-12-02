@@ -752,79 +752,129 @@ iconsRight = HH.ClassName "has-icons-right"
 
 -- Breadcrumb
 
+breadcrumb :: HH.ClassName
 breadcrumb = HH.ClassName "breadcrumb"
+arrowSeperator :: HH.ClassName
 arrowSeperator = HH.ClassName "has-arrow-separator"
+bulletSeparator :: HH.ClassName
 bulletSeparator = HH.ClassName "has-bullet-separator"
+dotSeparator :: HH.ClassName
 dotSeparator = HH.ClassName "has-dot-separator"
+succeedsSeparator :: HH.ClassName
 succeedsSeparator = HH.ClassName "has-succeeds-separator"
 
 -- Card
 
+card :: HH.ClassName
 card = HH.ClassName "card"
+cardHeader :: HH.ClassName
 cardHeader = HH.ClassName "card-header"
+cardHeaderTitle :: HH.ClassName
 cardHeaderTitle = HH.ClassName "card-header-title"
+cardHeaderIcon :: HH.ClassName
 cardHeaderIcon = HH.ClassName "card-header-icon"
+cardImage :: HH.ClassName
 cardImage = HH.ClassName "card-image"
+cardContent :: HH.ClassName
 cardContent = HH.ClassName "card-content"
+cardFooter :: HH.ClassName
 cardFooter = HH.ClassName "card-footer"
+cardFooterItem :: HH.ClassName
 cardFooterItem = HH.ClassName "card-footer-item"
 
 -- Dropdown
 
+dropdown :: HH.ClassName
 dropdown = HH.ClassName "dropdown"
+dropdownTrigger :: HH.ClassName
 dropdownTrigger = HH.ClassName "dropdown-trigger"
+dropdownMenu :: HH.ClassName
 dropdownMenu = HH.ClassName "dropdown-menu"
+dropdownContent :: HH.ClassName
 dropdownContent = HH.ClassName "dropdown-content"
+dropdownItem :: HH.ClassName
 dropdownItem = HH.ClassName "dropdown-item"
+dropdownDivider :: HH.ClassName
 dropdownDivider = HH.ClassName "dropdown-divider"
 
 -- Menu
 
+menu :: HH.ClassName
 menu = HH.ClassName "menu"
+menuLabel :: HH.ClassName
 menuLabel = HH.ClassName "menu-label"
+menuList :: HH.ClassName
 menuList = HH.ClassName "menu-list"
 
 -- Message
 
+message :: HH.ClassName
 message = HH.ClassName "message"
+messageHeader :: HH.ClassName
 messageHeader = HH.ClassName "message-header"
+messageBody :: HH.ClassName
 messageBody = HH.ClassName "message-body"
 
 -- Modal
 
+modal :: HH.ClassName
 modal = HH.ClassName "modal"
+modalBackground :: HH.ClassName
 modalBackground = HH.ClassName "modal-background"
+modalContent :: HH.ClassName
 modalContent = HH.ClassName "modal-content"
+modalClose :: HH.ClassName
 modalClose = HH.ClassName "modal-close"
 
 -- Navbar
 
+navbar :: HH.ClassName
 navbar = HH.ClassName "navbar"
+navbarBrand :: HH.ClassName
 navbarBrand = HH.ClassName "navbar-brand"
+navbarBurger :: HH.ClassName
 navbarBurger = HH.ClassName "navbar-burger"
+navbarMenu :: HH.ClassName
 navbarMenu = HH.ClassName "navbar-menu"
+navbarStart :: HH.ClassName
 navbarStart = HH.ClassName "navbar-start"
+navbarEnd :: HH.ClassName
 navbarEnd = HH.ClassName "navbar-end"
+navbarItem :: HH.ClassName
 navbarItem = HH.ClassName "navbar-item"
+navbarLink :: HH.ClassName
 navbarLink = HH.ClassName "navbar-link"
+navbarDropdown :: HH.ClassName
 navbarDropdown = HH.ClassName "navbar-dropdown"
+navbarDivider :: HH.ClassName
 navbarDivider = HH.ClassName "navbar-divider"
 
 -- for html tag
+navbarFixedTop :: HH.ClassName
 navbarFixedTop = HH.ClassName "has-navbar-fixed-top"
+navbarFixedBottom :: HH.ClassName
 navbarFixedBottom = HH.ClassName "has-navbar-fixed-bottom"
 -- for navbar (ewww has)
+hasDropdown :: HH.ClassName
 hasDropdown = HH.ClassName "has-dropdown"
+hasDropup :: HH.ClassName
 hasDropup = HH.ClassName "has-dropdown-up"
+fixedTop :: HH.ClassName
 fixedTop = HH.ClassName "is-fixed-top"
+fixedBottom :: HH.ClassName
 fixedBottom = HH.ClassName "is-fixed-bottom"
 
 -- Pagination
 
+paginationPrevious :: HH.ClassName
 paginationPrevious = HH.ClassName "pagination-previous"
+paginationNext :: HH.ClassName
 paginationNext = HH.ClassName "pagination-next"
+paginationList :: HH.ClassName
 paginationList = HH.ClassName "pagination-list"
+paginationLink :: HH.ClassName
 paginationLink = HH.ClassName "pagination-link"
+paginationEllipsis :: HH.ClassName
 paginationEllipsis = HH.ClassName "pagination-ellipsis"
 
 -- Panel
