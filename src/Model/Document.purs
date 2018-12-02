@@ -11,20 +11,23 @@ import Data.Argonaut.Decode (class DecodeJson, decodeJson)
 import Data.Argonaut.Decode.Combinators ((.?))
 import Data.Argonaut.Encode (class EncodeJson, encodeJson)
 import Data.Argonaut.Encode.Combinators ((~>), (:=))
-import Data.Base64 (Base64(..))
-import Data.DateTime (DateTime(..))
+import Data.DateTime (DateTime)
 import Data.DateTime.ISO (ISO(..), unwrapISO)
-import Data.Generic.Rep (class Generic)
-import Data.Generic.Rep.Show (genericShow)
-import Data.JsonDecode.Helpers (decodeJObject)
-import Effect.Exception (message)
-import Style.Bulogen (content)
+import Data.Either (Either(..))
+import Data.JsonDecode.Helpers (decodeJObject, decodeJString)
 
 data DocumentCategory
   = Journal
 
 instance encodeJsonDocumentCategory :: EncodeJson DocumentCategory where
   encodeJson Journal = AC.fromString "journal"
+
+instance decodeJsonDocumentCategory :: DecodeJson DocumentCategory where
+  decodeJson json = do
+    str <- decodeJString json 
+    case str of
+      "journal" -> Right Journal
+      other -> Left $ other <> " is not a valid document category."
 
 data MessageContents
   = Boxed Box
@@ -46,9 +49,10 @@ instance decodeJsonMessageContents :: DecodeJson MessageContents where
     bytes <- obj .? "data"
     dataBytes <- decodeBytes bytes
     discriminator <- obj .? "type"
-    pure $ case discriminator of
-        "boxed" -> Boxed (fromUint8Array dataBytes)
-        "secretBoxed" -> SecretBoxed (fromUint8Array dataBytes)
+    case discriminator of
+      "boxed" -> Right $ Boxed (fromUint8Array dataBytes)
+      "secretBoxed" -> Right $ SecretBoxed (fromUint8Array dataBytes)
+      other -> Left $ other <> " is not a valid type discriminator."
 
 newtype EncryptedMessage
   = EncryptedMessage
@@ -71,8 +75,6 @@ instance decodeJsonEncryptedMessage :: DecodeJson EncryptedMessage where
       { nonce: nonce
       , contents: contents
       }
-
-
 
 newtype Title = Title EncryptedMessage
 
