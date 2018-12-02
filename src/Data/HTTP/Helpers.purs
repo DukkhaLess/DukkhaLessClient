@@ -8,7 +8,7 @@ import Affjax.RequestBody as RB
 import Affjax.RequestHeader (RequestHeader(..))
 import Affjax.ResponseFormat (json)
 import Affjax.ResponseFormat as RF
-import Class (class CipherText)
+import Data.Crypto.Class (class CipherText)
 import Data.Argonaut.Core (Json)
 import Data.Argonaut.Decode (class DecodeJson, decodeJson)
 import Data.Argonaut.Encode (class EncodeJson, encodeJson)

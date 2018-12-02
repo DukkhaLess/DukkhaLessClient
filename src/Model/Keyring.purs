@@ -5,6 +5,8 @@ module Model.Keyring
   , Keyring(..)
   ) where
 
+import Prelude
+
 import Crypt.NaCl (BoxKeyPair(..), fromUint8Array, generateBoxKeyPair, generateSecretBoxKey, toUint8Array)
 import Crypt.NaCl.Types (BoxKeyPair, SecretBoxKey)
 import Data.Argonaut.Core (Json, caseJsonObject, jsonEmptyObject, stringify)
@@ -16,14 +18,13 @@ import Data.Argonaut.Parser (jsonParser)
 import Data.ArrayBuffer.ArrayBuffer (decodeToString, fromString)
 import Data.Base64 (Base64(..), decodeBase64, encodeBase64, runBase64)
 import Data.Bifunctor (lmap)
+import Data.Crypto.Codec (decodeBytes, encodeBytes)
 import Data.Either (Either(..), note)
 import Data.Newtype (class Newtype)
 import Data.String.Read (class Read)
 import Effect (Effect)
 import Effect.Exception (message)
 import Foreign.Object (Object)
-import Model.Crypto
-import Prelude
 
 generateKeyring :: Effect Keyring
 generateKeyring = do

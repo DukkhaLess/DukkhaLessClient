@@ -1,4 +1,4 @@
-module Model.Crypto where
+module Data.Crypto.Codec where
 
 import Prelude
 import Data.ArrayBuffer.Types (Uint8Array)

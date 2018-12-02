@@ -1,9 +1,7 @@
-module Model.Document where
+module Data.Crypto.Types where
 
-import Model.Crypto
 import Prelude
 
-import Class (class CipherText, class Encrypt, decrypt, encrypt)
 import Crypt.NaCl (Box, Nonce, SecretBox, fromUint8Array, toUint8Array)
 import Data.Argonaut (jsonEmptyObject)
 import Data.Argonaut.Core as AC
@@ -11,6 +9,7 @@ import Data.Argonaut.Decode (class DecodeJson, decodeJson)
 import Data.Argonaut.Decode.Combinators ((.?))
 import Data.Argonaut.Encode (class EncodeJson, encodeJson)
 import Data.Argonaut.Encode.Combinators ((~>), (:=))
+import Data.Crypto.Codec (decodeBytes, encodeBytes)
 import Data.DateTime (DateTime)
 import Data.DateTime.ISO (ISO(..), unwrapISO)
 import Data.Either (Either(..))
@@ -40,6 +39,7 @@ instance encodeJsonMessageContents :: EncodeJson MessageContents where
     ~> "data" := (encodeBytes $ toUint8Array box)
     ~> jsonEmptyObject
 
+
 instance decodeJsonMessageContents :: DecodeJson MessageContents where
   decodeJson json = do
     obj <- decodeJObject json
@@ -50,6 +50,16 @@ instance decodeJsonMessageContents :: DecodeJson MessageContents where
       "boxed" -> Right $ Boxed (fromUint8Array dataBytes)
       "secretBoxed" -> Right $ SecretBoxed (fromUint8Array dataBytes)
       other -> Left $ other <> " is not a valid type discriminator."
+
+newtype Title = Title EncryptedMessage
+
+instance encodeJsonTitle :: EncodeJson Title where
+  encodeJson (Title msg) = encodeJson msg
+
+instance decodeJsonTitle :: DecodeJson Title where
+  decodeJson str = decodeJson str <#> Title
+
+newtype DocumentContent = DocumentContent EncryptedMessage
 
 newtype EncryptedMessage
   = EncryptedMessage
@@ -73,15 +83,6 @@ instance decodeJsonEncryptedMessage :: DecodeJson EncryptedMessage where
       , contents: contents
       }
 
-newtype Title = Title EncryptedMessage
-
-instance encodeJsonTitle :: EncodeJson Title where
-  encodeJson (Title msg) = encodeJson msg
-
-instance decodeJsonTitle :: DecodeJson Title where
-  decodeJson str = decodeJson str <#> Title
-
-newtype DocumentContent = DocumentContent EncryptedMessage
 
 instance encodeJsonDocumentContent :: EncodeJson DocumentContent where
   encodeJson (DocumentContent message) = encodeJson message
@@ -119,8 +120,6 @@ instance decodeJsonDocumentMetaData :: DecodeJson DocumentMetaData where
      , id: id
      }
 
-instance cipherTextDocumentMetaData :: CipherText DocumentMetaData
-
 newtype Document
   = Document
     { metaData :: DocumentMetaData
@@ -142,5 +141,3 @@ instance decodeJsonDocument :: DecodeJson Document where
       { metaData: metaData
       , content: content
       }
-
-instance cipherTextDocument :: CipherText Document
