@@ -12,7 +12,3 @@ newtype JournalEntry
     { title :: String
     , content :: String
     }
-
-instance encryptJournalEntry :: Encrypt JournalEntry Document where
-  encrypt = foo
-  decrypt = foo
