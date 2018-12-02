@@ -15,23 +15,20 @@ import Data.DateTime (DateTime)
 import Data.DateTime.ISO (ISO(..), unwrapISO)
 import Data.Either (Either(..))
 import Data.JsonDecode.Helpers (decodeJObject, decodeJString)
-
-data DocumentCategory
-  = Journal
-
-instance encodeJsonDocumentCategory :: EncodeJson DocumentCategory where
-  encodeJson Journal = AC.fromString "journal"
-
-instance decodeJsonDocumentCategory :: DecodeJson DocumentCategory where
-  decodeJson json = do
-    str <- decodeJString json 
-    case str of
-      "journal" -> Right Journal
-      other -> Left $ other <> " is not a valid document category."
+import Data.Maybe (Maybe)
 
 data MessageContents
   = Boxed Box
   | SecretBoxed SecretBox
+
+data DocumentId
+  = UUID String
+
+instance encodeDocumentId :: EncodeJson DocumentId where
+  encodeJson (UUID id) = encodeJson id
+
+instance decodeDocumentId :: DecodeJson DocumentId where
+  decodeJson json = decodeJString json <#> UUID
 
 instance encodeJsonMessageContents :: EncodeJson MessageContents where
   encodeJson (Boxed box)
@@ -70,7 +67,7 @@ instance decodeJsonEncryptedMessage :: DecodeJson EncryptedMessage where
   decodeJson json = do
     obj <- decodeJObject json
     nonce <- obj .? "nonce" >>= decodeBytes <#> fromUint8Array
-    contents <- obj .? "contents" >>= decodeJson
+    contents <- obj .? "contents"
     pure $ EncryptedMessage
       { nonce: nonce
       , contents: contents
@@ -97,29 +94,29 @@ newtype DocumentMetaData
     { title :: Title
     , createdAt :: DateTime
     , lastUpdated :: DateTime
-    , category :: DocumentCategory
+    , id :: Maybe DocumentId
     }
 
 instance encodeJsonDocumentMetaData :: EncodeJson DocumentMetaData where
   encodeJson (DocumentMetaData metaData)
-    = "title" := (encodeJson metaData.title)
-    ~> "category" := (encodeJson metaData.category)
-    ~> "createdAt" := (encodeJson $ ISO metaData.createdAt)
-    ~> "lastUpdated" := (encodeJson $ ISO metaData.lastUpdated)
+    = "title" := metaData.title
+    ~> "id" := metaData.id
+    ~> "createdAt" := ISO metaData.createdAt
+    ~> "lastUpdated" := ISO metaData.lastUpdated
     ~> jsonEmptyObject
 
 instance decodeJsonDocumentMetaData :: DecodeJson DocumentMetaData where
   decodeJson json = do 
     obj <- decodeJObject json
     title <- obj .? "title"
-    category <- obj .? "category"
+    id <- obj .? "id"
     createdAt <- obj .? "createdAt" <#> unwrapISO
     lastUpdated <- obj .? "lastUpdated" <#> unwrapISO
     pure $ DocumentMetaData
      { title: title
-     , category: category
      , createdAt: createdAt
      , lastUpdated: lastUpdated
+     , id: id
      }
 
 instance cipherTextDocumentMetaData :: CipherText DocumentMetaData
@@ -132,15 +129,15 @@ newtype Document
 
 instance encodeJsonDocument :: EncodeJson Document where
   encodeJson (Document document)
-    = "metaData" := (encodeJson document.metaData)
-    ~> "content" := (encodeJson document.content)
+    = "metaData" := document.metaData
+    ~> "content" := document.content
     ~> jsonEmptyObject
 
 instance decodeJsonDocument :: DecodeJson Document where
   decodeJson json = do
     obj <- decodeJObject json
-    metaData <- obj .? "metaData" >>= decodeJson
-    content <- obj .? "content" >>= decodeJson
+    metaData <- obj .? "metaData"
+    content <- obj .? "content"
     pure $ Document
       { metaData: metaData
       , content: content

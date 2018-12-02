@@ -1,10 +1,13 @@
 module Class where
 
-import Effect (Effect)
+import Data.Either (Either)
 import Data.Argonaut.Encode (class EncodeJson)
 
 class EncodeJson a <= CipherText a
 
+data DecryptionError
+  = Description String
+
 class CipherText b <= Encrypt a b where
-  encrypt :: a -> Effect b
-  decrypt :: b -> Effect a
+  encrypt :: a -> b
+  decrypt :: b -> Either DecryptionError a
