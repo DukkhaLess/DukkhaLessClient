@@ -13,6 +13,7 @@ import Data.Argonaut.Encode (class EncodeJson, encodeJson)
 import Data.Argonaut.Encode.Combinators ((~>), (:=))
 import Data.Base64 (Base64(..))
 import Data.DateTime (DateTime(..))
+import Data.DateTime.ISO (ISO(..), unwrapISO)
 import Data.Generic.Rep (class Generic)
 import Data.Generic.Rep.Show (genericShow)
 import Data.JsonDecode.Helpers (decodeJObject)
@@ -79,16 +80,15 @@ instance encodeJsonTitle :: EncodeJson Title where
   encodeJson (Title msg) = encodeJson msg
 
 instance decodeJsonTitle :: DecodeJson Title where
-  decodeJson = decodeJson <#> Title
-
+  decodeJson str = decodeJson str <#> Title
 
 newtype DocumentContent = DocumentContent EncryptedMessage
 
 instance encodeJsonDocumentContent :: EncodeJson DocumentContent where
-  encodeJson = encodeJson <#> DocumentContent
+  encodeJson (DocumentContent message) = encodeJson message
 
 instance decodeJsonDocumentContent :: DecodeJson DocumentContent where
-  decodeJson (DocumentContent message) = decodeJson message
+  decodeJson str = decodeJson str <#> DocumentContent
 
 newtype DocumentMetaData
   = DocumentMetaData
@@ -102,17 +102,17 @@ instance encodeJsonDocumentMetaData :: EncodeJson DocumentMetaData where
   encodeJson (DocumentMetaData metaData)
     = "title" := (encodeJson metaData.title)
     ~> "category" := (encodeJson metaData.category)
-    ~> "createdAt" := (encodeJson metaData.createdAt)
-    ~> "lastUpdated" := (encodeJson metaData.lastUpdated)
+    ~> "createdAt" := (encodeJson $ ISO metaData.createdAt)
+    ~> "lastUpdated" := (encodeJson $ ISO metaData.lastUpdated)
     ~> jsonEmptyObject
 
 instance decodeJsonDocumentMetaData :: DecodeJson DocumentMetaData where
   decodeJson json = do 
     obj <- decodeJObject json
-    title <- obj .? "title" >>= decodeJson
-    category <- obj .? "category" >>= decodeJson
-    createdAt <- obj .? "createdAt" >>= decodeJson
-    lastUpdated <- obj .? "lastUpdated" >>= decodeJson
+    title <- obj .? "title"
+    category <- obj .? "category"
+    createdAt <- obj .? "createdAt" <#> unwrapISO
+    lastUpdated <- obj .? "lastUpdated" <#> unwrapISO
     pure $ DocumentMetaData
      { title: title
      , category: category
