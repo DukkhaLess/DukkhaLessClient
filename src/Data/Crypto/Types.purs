@@ -4,7 +4,6 @@ import Prelude
 
 import Crypt.NaCl (Box, Nonce, SecretBox, fromUint8Array, toUint8Array)
 import Data.Argonaut (jsonEmptyObject)
-import Data.Argonaut.Core as AC
 import Data.Argonaut.Decode (class DecodeJson, decodeJson)
 import Data.Argonaut.Decode.Combinators ((.?))
 import Data.Argonaut.Encode (class EncodeJson, encodeJson)

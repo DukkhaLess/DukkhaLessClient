@@ -1,17 +1,16 @@
 module Components.Resources where
 
-import Prelude
-import Style.Bulogen
+import Prelude (class Eq, class Ord, type (~>), Unit, const, pure, ($))
+import Style.Bulogen (container, hero, heroBody, title)
 
 import Data.Maybe (Maybe(..))
 import Halogen as H
 import Halogen.HTML as HH
-import Halogen.HTML.Events as HE
 import Halogen.HTML.Properties as HP
-import Intl (LocaliseFn, localiseString)
+import Intl (LocaliseFn)
 import Intl.Terms as Term
 import Intl.Terms.Resources as Resource
-import Model (Session(..))
+import Model (Session)
 
 data Query a = Query a
 

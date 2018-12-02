@@ -1,9 +1,8 @@
 module Intl.Locales.English where
 
-import Data.Maybe (Maybe(..))
+import Data.Maybe (Maybe)
 import Data.Semigroup ((<>))
-import Data.Validation (Validation)
-import Intl.Terms (j, n)
+import Intl.Terms (j)
 import Intl.Terms as Term
 import Intl.Terms.Introduction as Intro
 import Intl.Terms.NotFound as NotFound

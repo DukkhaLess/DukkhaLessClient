@@ -22,9 +22,9 @@ import Halogen.HTML.Properties as HP
 import Intl (LocaliseFn)
 import Intl.Terms as Term
 import Intl.Terms.Sessions as Sessions
-import Model (Session, Username, Password, SessionToken(SessionToken), KeyringUsage(Enabled))
+import Model (KeyringUsage(Enabled), Password, Session, Username)
 import Model.Keyring (Keyring)
-import Style.Bulogen (block, button, container, hero, heroBody, input, link, offsetThreeQuarters, primary, pullRight, spaced, subtitle, textCentered, textarea, title)
+import Style.Bulogen (block, button, container, hero, heroBody, input, primary, subtitle, textCentered, textarea, title)
 
 data Query a
   = UpdateKey String a

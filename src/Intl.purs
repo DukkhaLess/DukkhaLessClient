@@ -4,7 +4,7 @@ module Intl
   ) where
 
 import Data.Array (catMaybes, head)
-import Data.Maybe (Maybe(..), fromMaybe)
+import Data.Maybe (Maybe, fromMaybe)
 import Intl.Locales (Language(..))
 import Intl.Locales.English as ENG
 import Intl.Locales.Swedish as SWE

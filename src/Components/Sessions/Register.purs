@@ -25,7 +25,7 @@ import Intl (LocaliseFn)
 import Intl.Terms as Term
 import Intl.Terms.Sessions as Sessions
 import Intl.Terms.Validation as TV
-import Model (Password, SessionToken(..), Username(..), KeyringUsage(Enabled), Session)
+import Model (KeyringUsage(Enabled), Password, Session, Username(..))
 import Model.Keyring (Keyring, generateKeyring)
 import Partial.Unsafe (unsafePartial)
 import Style.Bulogen (block, button, container, hero, heroBody, input, link, primary, pullRight, spaced, subtitle, textarea, title, textCentered)

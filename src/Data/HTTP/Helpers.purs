@@ -2,25 +2,22 @@ module Data.HTTP.Helpers where
 
 import Prelude
 
-import Affjax (defaultRequest, Request, Response, ResponseFormatError, printResponseFormatError)
+import Affjax (defaultRequest, Request, Response, printResponseFormatError)
 import Affjax as AJ
 import Affjax.RequestBody as RB
 import Affjax.RequestHeader (RequestHeader(..))
 import Affjax.ResponseFormat (json)
-import Affjax.ResponseFormat as RF
 import Data.Crypto.Class (class CipherText)
 import Data.Argonaut.Core (Json)
 import Data.Argonaut.Decode (class DecodeJson, decodeJson)
 import Data.Argonaut.Encode (class EncodeJson, encodeJson)
 import Data.Bifunctor (lmap)
-import Data.Either (Either(Left), hush)
+import Data.Either (Either(Left))
 import Data.HTTP.Method (Method(..))
 import Data.Maybe (Maybe(..))
 import Data.Newtype (class Newtype)
-import Data.Semigroup ((<>))
 import Data.String.CodeUnits (charAt)
 import Effect.Aff (Aff)
-import Effect.Class (liftEffect)
 import Model (SessionToken(..))
 
 newtype ApiPath = ApiPath String

@@ -4,7 +4,6 @@ import Data.Maybe (Maybe)
 import Intl.Terms (j, n)
 import Intl.Terms as Term
 import Intl.Terms.Introduction as Intro
-import Intl.Terms.NotFound as NotFound
 import Intl.Terms.Resources as Resource
 
 localise :: Term.Term -> Maybe String
