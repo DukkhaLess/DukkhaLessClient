@@ -2,7 +2,7 @@ module Data.Crypto.Types where
 
 import Prelude
 
-import Crypt.NaCl (Box, Nonce, SecretBox, fromUint8Array, toUint8Array)
+import Crypt.NaCl (Box, BoxPublicKey, BoxSharedKey, Nonce, SecretBox, SecretBoxKey, fromUint8Array, toUint8Array)
 import Data.Argonaut (jsonEmptyObject)
 import Data.Argonaut.Decode (class DecodeJson, decodeJson)
 import Data.Argonaut.Decode.Combinators ((.?))
@@ -15,8 +15,10 @@ import Data.Either (Either(..))
 import Data.JsonDecode.Helpers (decodeJObject, decodeJString)
 import Data.Maybe (Maybe)
 
+newtype SenderPublicKey = SenderPublicKey BoxPublicKey
+
 data MessageContents
-  = Boxed Box
+  = Boxed Box SenderPublicKey
   | SecretBoxed SecretBox
 
 data DocumentId
@@ -29,9 +31,13 @@ instance decodeDocumentId :: DecodeJson DocumentId where
   decodeJson json = decodeJString json <#> UUID
 
 instance encodeJsonMessageContents :: EncodeJson MessageContents where
-  encodeJson (Boxed box)
+  encodeJson (Boxed box (SenderPublicKey senderKey))
     = "type" := "boxed"
-    ~> "data" := (encodeBytes $ toUint8Array box)
+    ~> "data" :=
+      ( "box" := (encodeBytes $ toUint8Array box)
+      ~> "senderPublicKey" := (encodeBytes $ toUint8Array senderKey)
+      ~> jsonEmptyObject
+      )
     ~> jsonEmptyObject
   encodeJson (SecretBoxed box)
     = "type" := "secretBoxed"
@@ -42,12 +48,14 @@ instance encodeJsonMessageContents :: EncodeJson MessageContents where
 instance decodeJsonMessageContents :: DecodeJson MessageContents where
   decodeJson json = do
     obj <- decodeJObject json
-    bytes <- obj .? "data"
-    dataBytes <- decodeBytes bytes
+    dataComponent <- obj .? "data"
     discriminator <- obj .? "type"
     case discriminator of
-      "boxed" -> Right $ Boxed (fromUint8Array dataBytes)
-      "secretBoxed" -> Right $ SecretBoxed (fromUint8Array dataBytes)
+      "boxed" -> do
+        box <- obj .? "box" >>= decodeBytes <#> fromUint8Array
+        senderPublicKey <- obj .? "senderPublicKey" >>= decodeBytes <#> fromUint8Array
+        pure $ Boxed box (SenderPublicKey senderPublicKey)
+      "secretBoxed" -> decodeBytes dataComponent <#> fromUint8Array <#> SecretBoxed
       other -> Left $ other <> " is not a valid type discriminator."
 
 newtype Title = Title EncryptedMessage
