@@ -3,12 +3,14 @@ module Model.Keyring
   , runSecretBoxKey
   , runBoxKeyPair
   , Keyring(..)
+  , boxPrivateKey
+  , boxPublicKey
   ) where
 
 import Prelude
 
 import Crypt.NaCl (BoxKeyPair(..), fromUint8Array, generateBoxKeyPair, generateSecretBoxKey, toUint8Array)
-import Crypt.NaCl.Types (BoxKeyPair, SecretBoxKey)
+import Crypt.NaCl.Types (BoxKeyPair, SecretBoxKey, BoxSecretKey, BoxPublicKey)
 import Data.Argonaut.Core (Json, caseJsonObject, jsonEmptyObject, stringify)
 import Data.Argonaut.Decode (class DecodeJson, decodeJson)
 import Data.Argonaut.Decode.Combinators ((.?))
@@ -38,6 +40,14 @@ newtype Keyring = Keyring
   , boxKeyPair :: BoxKeyPair
   }
 derive instance newtypeKeyring :: Newtype Keyring _
+
+boxPrivateKey :: Keyring -> BoxSecretKey
+boxPrivateKey (Keyring keyring) = privKey keyring.boxKeyPair where
+  privKey (BoxKeyPair pair) = pair.secretKey
+
+boxPublicKey :: Keyring -> BoxPublicKey
+boxPublicKey (Keyring keyring) = pubKey keyring.boxKeyPair where
+  pubKey (BoxKeyPair pair) = pair.publicKey
 
 instance showKeyring :: Show Keyring where
   show = runBase64 <<< encodeBase64 <<< fromString <<< stringify <<< encodeJson
