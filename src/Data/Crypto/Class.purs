@@ -27,17 +27,7 @@ data CryptoKey
   = BoxPair BoxPublicKey BoxSecretKey
   | SecretBox SecretBoxKey
 
-class FindKey a where
-  findKey :: a -> Keyring -> CryptoKey
-
-instance findkeyEncryptedMessage :: FindKey EncryptedMessage where
-  findKey (EncryptedMessage message) (Keyring keyring) = 
-    case message.contents of
-      (Boxed _ (SenderPublicKey senderPublicKey)) -> BoxPair senderPublicKey (boxPrivateKey $ Keyring keyring)
-      (SecretBoxed _) -> SecretBox keyring.secretBoxKey
-
-
-class (CipherText b, FindKey b, EncodeJson a, DecodeJson a) <= Encrypt a b where
+class (CipherText b, EncodeJson a, DecodeJson a) <= Encrypt a b where
   encrypt :: a -> (Keyring -> CryptoKey) -> Keyring -> Effect b
   decrypt :: b -> Keyring -> Either DecryptionError a
 
