@@ -13,7 +13,9 @@ import Data.DateTime (DateTime)
 import Data.DateTime.ISO (ISO(..), unwrapISO)
 import Data.Either (Either(..))
 import Data.JsonDecode.Helpers (decodeJObject, decodeJString)
+import Data.Lens (_1)
 import Data.Maybe (Maybe)
+import Data.Newtype (class Newtype)
 
 newtype SenderPublicKey = SenderPublicKey BoxPublicKey
 
@@ -73,6 +75,8 @@ newtype EncryptedMessage
   { nonce :: Nonce
   , contents :: MessageContents
   }
+
+derive instance newtypeEncryptedMessage :: Newtype EncryptedMessage _
 
 instance encodeJsonEncryptedMessage :: EncodeJson EncryptedMessage where
   encodeJson (EncryptedMessage message)
