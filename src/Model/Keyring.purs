@@ -18,7 +18,8 @@ import Data.Argonaut.Encode (class EncodeJson, encodeJson)
 import Data.Argonaut.Encode.Combinators ((~>), (:=))
 import Data.Argonaut.Parser (jsonParser)
 import Data.ArrayBuffer.ArrayBuffer (decodeToString, fromString)
-import Data.Base64 (Base64(..), decodeBase64, encodeBase64, runBase64)
+import Data.Base64 (decodeBase64, encodeBase64, runBase64)
+import Data.Base64 as B64
 import Data.Bifunctor (lmap)
 import Data.Crypto.Codec (decodeBytes, encodeBytes)
 import Data.Either (Either(..), note)
@@ -54,8 +55,8 @@ instance showKeyring :: Show Keyring where
 
 instance readKeyring :: Read Keyring where
   read
-    = Base64
-    >>> decodeBase64
+    = B64.fromString
+    >>> map decodeBase64
     >>> note "Base 64 decoding failed"
     >=> (decodeToString >>> (lmap message))
     >=> jsonParser
