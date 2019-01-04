@@ -40,9 +40,12 @@ instance encryptStringMessage :: Encrypt Base64 EncryptedMessage where
   decrypt message ring = do
     let unwrappedMessage = unwrap message
     let nonce = unwrappedMessage.nonce
-    decryptedBytes <- decryptFn message nonce
+    let contents = unwrappedMessage.messageContents
+    let decryptedBytes = decryptMessage nonce contents ring
     pure $ encodeBase64 decryptedBytes
 
+decryptMessage :: Nonce -> MessageContents -> Keyring -> Either DecryptionError Message
+decryptMessage = ?impl
 
 encryptMessage :: Message -> (Keyring -> CryptoKey) -> Keyring -> Nonce -> EncryptedMessage
 encryptMessage message keyFn keyring nonce = cryptoFn key where
