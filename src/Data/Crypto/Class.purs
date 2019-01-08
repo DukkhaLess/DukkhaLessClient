@@ -4,11 +4,12 @@ import Prelude
 
 import Crypt.NaCl (BoxPublicKey, BoxSecretKey, boxAfter, boxBefore, boxOpenAfter, fromUint8Array, generateNonce, secretBox, secretBoxOpen, toUint8Array)
 import Crypt.NaCl.Types (BoxSharedKey, Message, Nonce, SecretBoxKey)
-import Data.ArrayBuffer.Typed (asUint8Array, dataView)
-import Data.ArrayBuffer.DataView (whole, buffer)
 import Data.Argonaut.Decode (class DecodeJson)
 import Data.Argonaut.Encode (class EncodeJson)
 import Data.ArrayBuffer.ArrayBuffer (fromString, decodeToString)
+import Data.ArrayBuffer.DataView (whole, buffer)
+import Data.ArrayBuffer.Typed (asUint8Array, dataView)
+import Data.ArrayBuffer.Types (ArrayBuffer)
 import Data.Base64 (Base64(..), encodeBase64, decodeBase64)
 import Data.Bifunctor (lmap)
 import Data.Crypto.Types (DocumentMetaData, Document, EncryptedMessage(..), MessageContents(..), SenderPublicKey(..))
@@ -38,16 +39,14 @@ class CipherText b <= Encrypt a b where
 
 instance encryptStringMessage :: Encrypt String EncryptedMessage where
   encrypt str keyFn keyring = do
-    let b64 = encodeBase64 $ fromString str
-    encrypt b64 keyFn keyring
+    let buff = fromString str
+    encrypt buff keyFn keyring
   decrypt message ring = do
-    b64 <- decrypt message ring
-    let buff = decodeBase64 b64
+    buff <- decrypt message ring
     lmap (\e -> Description (show e)) $ decodeToString buff
 
-instance encryptBase64Message :: Encrypt Base64 EncryptedMessage where
-  encrypt content keyFn keyring = do
-    let buff = decodeBase64 content
+instance encryptArrayBufferMessage :: Encrypt ArrayBuffer EncryptedMessage where
+  encrypt buff keyFn keyring = do
     let message = fromUint8Array $ asUint8Array $ whole buff
     nonce <- generateNonce
     pure $ encryptMessage message keyFn keyring nonce
@@ -56,7 +55,7 @@ instance encryptBase64Message :: Encrypt Base64 EncryptedMessage where
     let nonce = unwrappedMessage.nonce
     let contents = unwrappedMessage.contents
     decryptedBytes <- decryptMessage nonce contents ring
-    pure $ encodeBase64 $ buffer $ dataView $ toUint8Array $ decryptedBytes
+    pure $ buffer $ dataView $ toUint8Array $ decryptedBytes
     
 decryptMessage :: Nonce -> MessageContents -> Keyring -> Either DecryptionError Message
 decryptMessage nonce (Boxed boxContents (SenderPublicKey senderKey)) ring

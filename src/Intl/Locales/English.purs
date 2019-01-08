@@ -20,7 +20,7 @@ localise term = case term of
   Term.Session session -> localiseSession session
   Term.NotFound notFound -> localiseNotFound notFound
   Term.Validation validation -> localiseValidation validation
-  Term.Journal jorunal -> localiseJournal journal
+  Term.Journal journal -> localiseJournal journal
 
 localiseIntro :: Intro.Introduction -> Maybe String
 localiseIntro Intro.Title = j "Dukkhaless Self-Care"
