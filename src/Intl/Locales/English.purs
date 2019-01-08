@@ -10,6 +10,7 @@ import Intl.Terms.Resources as Resource
 import Intl.Terms.Sessions as Sessions
 import Intl.Terms.Validation (ValidationMsg(..))
 import Intl.Terms.Validation as Validation
+import Intl.Terms.Journals as Journals
 import Prelude (show, ($))
 
 localise :: Term.Term -> Maybe String
@@ -19,6 +20,7 @@ localise term = case term of
   Term.Session session -> localiseSession session
   Term.NotFound notFound -> localiseNotFound notFound
   Term.Validation validation -> localiseValidation validation
+  Term.Journal jorunal -> localiseJournal journal
 
 localiseIntro :: Intro.Introduction -> Maybe String
 localiseIntro Intro.Title = j "Dukkhaless Self-Care"
@@ -56,3 +58,8 @@ localiseValidation msg = case msg of
   (RequiredCharacters cts) -> j $ "Must contain: "
   (MustMatchOtherField field) -> j $ "Does not match"
   (ParserFailed reason) -> j $ "Parsing failed. Reason given was: " <> reason
+  
+localiseJournal :: Journals.Journals -> Maybe String
+localiseJournal msg = case msg of
+  (Journals.JournalEntries) -> j $ "Journal Entries"
+  (Journals.Create) -> j $ "New Entry"
