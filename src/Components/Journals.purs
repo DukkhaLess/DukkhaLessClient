@@ -1,19 +1,34 @@
 module Components.Journals where
 
 import Prelude
+import Data.Const (Const)
+import Data.Maybe (Maybe(..))
+import Effect.Aff (Aff)
 import Intl (LocaliseFn)
 import Halogen as H
 import Halogen.Component.ChildPath (ChildPath, cpL, cpR, (:>))
 import Halogen.Data.Prism (type (<\/>), type (\/))
 import Halogen.HTML as HH
 import Intl.Terms.Journals as Journals
+import Components.Journals.List as JournalList
+import Components.Journals.Entry as JournalEntry
 
 data Query a = QNoOp a
-data Input = INoOp
 
 newtype State = State {}
 
-component :: LocaliseFn -> H.Component HH.HTML Query Input Message Aff
+type ChildQuery
+  = JournalList.Query
+  <\/> JournalEntry.Query
+  <\/> Const Void
+
+type ChildSlot
+  = JournalList.Slot
+  \/ JournalEntry.Slot
+  \/ Void
+
+
+component :: LocaliseFn -> H.Component HH.HTML Query Unit Unit Aff
 component t =
   H.parentComponent
     { initialState
@@ -25,9 +40,12 @@ component t =
       render :: State -> H.ParentHTML Query ChildQuery ChildSlot Aff
       render state = HH.text "hi"
 
-      eval :: Query ~> H.ParentDSL State Query ChildQuery ChildSlot Message Aff
+      eval :: Query ~> H.ParentDSL State Query ChildQuery ChildSlot Unit Aff
       eval (QNoOp next) = pure next
 
-      receive :: Input -> Maybe (Query Unit)
-      receive INoOp = Nothing
+      receive :: Unit -> Maybe (Query Unit)
+      receive _ = Nothing
+
+      initialState :: Unit -> State
+      initialState _ = State {}
  
