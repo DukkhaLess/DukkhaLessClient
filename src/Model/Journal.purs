@@ -10,14 +10,6 @@ import Data.Newtype (unwrap, wrap)
 import Data.DateTime (DateTime(..))
 import Data.Maybe (Maybe)
 
-newtype JournalEntry
-  = JournalEntry
-    { title :: String
-    , content :: String
-    , createdAt :: DateTime
-    , lastUpdated :: DateTime
-    }
-
 newtype JournalMeta
   = JournalMeta
     { title :: String
@@ -26,13 +18,37 @@ newtype JournalMeta
     , id :: Maybe DocumentId
     }
 
+newtype JournalEntry
+  = JournalEntry
+    { content :: String
+    , metaData :: JournalMeta
+    }
+
 instance encryptJournalEntry :: Encrypt JournalEntry Document where
-  encrypt entry keyFn ring = ?entEntry
+  encrypt (JournalEntry entry) keyFn ring = do
+    meta <- encrypt entry.metaData keyFn ring
+    contents <- encrypt entry.content keyFn ring
+    pure $ Document {
+      metaData: meta,
+      content: wrap contents
+    }
   decrypt (Document document) ring = do
-    ?impl
+    meta <- decrypt document.metaData ring
+    contents <- decrypt (unwrap document.content) ring
+    pure $ JournalEntry {
+      content: contents,
+      metaData: meta
+    }
 
 instance encryptJournalMeta :: Encrypt JournalMeta DocumentMetaData where
-  encrypt meta keyFn ring = ?encryptJournalMeta
+  encrypt (JournalMeta meta) keyFn ring = do
+    title <- encrypt meta.title keyFn ring
+    pure $ DocumentMetaData {
+      title: wrap title,
+      createdAt: meta.createdAt,
+      lastUpdated: meta.lastUpdated,
+      id: meta.id
+    }
   decrypt (DocumentMetaData documentMeta) ring = do
     let titleCt = unwrap documentMeta.title
     title <- decrypt titleCt ring
