@@ -62,6 +62,8 @@ instance decodeJsonMessageContents :: DecodeJson MessageContents where
 
 newtype Title = Title EncryptedMessage
 
+derive instance newtypeTitle :: Newtype Title _
+
 instance encodeJsonTitle :: EncodeJson Title where
   encodeJson (Title msg) = encodeJson msg
 
@@ -69,6 +71,8 @@ instance decodeJsonTitle :: DecodeJson Title where
   decodeJson str = decodeJson str <#> Title
 
 newtype DocumentContent = DocumentContent EncryptedMessage
+
+derive instance newtypeDocumentContent :: Newtype DocumentContent _
 
 newtype EncryptedMessage
   = EncryptedMessage
@@ -131,6 +135,8 @@ instance decodeJsonDocumentMetaData :: DecodeJson DocumentMetaData where
      , id: id
      }
 
+derive instance newtypeDocumentMeta :: Newtype DocumentMetaData _
+
 newtype Document
   = Document
     { metaData :: DocumentMetaData
@@ -152,3 +158,4 @@ instance decodeJsonDocument :: DecodeJson Document where
       { metaData: metaData
       , content: content
       }
+derive instance newtypeDocument :: Newtype Document _

@@ -8,8 +8,9 @@ import Data.ArrayBuffer.Typed (asUint8Array, dataView)
 import Data.ArrayBuffer.DataView (whole, buffer)
 import Data.Argonaut.Decode (class DecodeJson)
 import Data.Argonaut.Encode (class EncodeJson)
-import Data.ArrayBuffer.ArrayBuffer (fromString)
+import Data.ArrayBuffer.ArrayBuffer (fromString, decodeToString)
 import Data.Base64 (Base64(..), encodeBase64, decodeBase64)
+import Data.Bifunctor (lmap)
 import Data.Crypto.Types (DocumentMetaData, Document, EncryptedMessage(..), MessageContents(..), SenderPublicKey(..))
 import Data.Either (Either, note)
 import Data.Newtype (unwrap)
@@ -35,6 +36,15 @@ class CipherText b <= Encrypt a b where
   encrypt :: a -> (Keyring -> CryptoKey) -> Keyring -> Effect b
   decrypt :: b -> Keyring -> Either DecryptionError a
 
+instance encryptStringMessage :: Encrypt String EncryptedMessage where
+  encrypt str keyFn keyring = do
+    let b64 = encodeBase64 $ fromString str
+    encrypt b64 keyFn keyring
+  decrypt message ring = do
+    b64 <- decrypt message ring
+    let buff = decodeBase64 b64
+    lmap (\e -> Description (show e)) $ decodeToString buff
+
 instance encryptBase64Message :: Encrypt Base64 EncryptedMessage where
   encrypt content keyFn keyring = do
     let buff = decodeBase64 content
@@ -47,7 +57,7 @@ instance encryptBase64Message :: Encrypt Base64 EncryptedMessage where
     let contents = unwrappedMessage.contents
     decryptedBytes <- decryptMessage nonce contents ring
     pure $ encodeBase64 $ buffer $ dataView $ toUint8Array $ decryptedBytes
-
+    
 decryptMessage :: Nonce -> MessageContents -> Keyring -> Either DecryptionError Message
 decryptMessage nonce (Boxed boxContents (SenderPublicKey senderKey)) ring
   = note InvalidKeys
