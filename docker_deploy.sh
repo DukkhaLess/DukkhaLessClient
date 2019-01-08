@@ -13,5 +13,5 @@ else
   docker build -t $DOCKER_REPOSITORY:$TRAVIS_COMMIT -t $DOCKER_REPOSITORY:$DOCKER_BRANCH_TAG .
 fi
 
-echo "$DOCKER_PASSWORD" | docker login --username $DOCKER_USERNAME --password-stdin
+docker login -u $DOCKER_USERNAME -p $DOCKER_PASSWORD
 docker push $DOCKER_REPOSITORY
