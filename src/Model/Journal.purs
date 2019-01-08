@@ -24,11 +24,12 @@ newtype JournalMeta
     , updatedAt :: DateTime
     , id :: Maybe DocumentId
     }
-
+{-
 instance encryptJournalMeta :: Encrypt JournalMeta DocumentMetaData where
-  encrypt = _
-  decrypt = _
+  encrypt = ?encJournal
+  decrypt = ?decJournal
 
 instance encryptJournalEntry :: Encrypt JournalEntry Document where
-  encrypt = _
-  decrypt = _
+  encrypt = ?entEntry
+  decrypt = ?decEntry
+-}

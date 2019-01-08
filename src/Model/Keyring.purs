@@ -5,6 +5,7 @@ module Model.Keyring
   , Keyring(..)
   , boxPrivateKey
   , boxPublicKey
+  , secretBoxKey
   ) where
 
 import Prelude
@@ -49,6 +50,9 @@ boxPrivateKey (Keyring keyring) = privKey keyring.boxKeyPair where
 boxPublicKey :: Keyring -> BoxPublicKey
 boxPublicKey (Keyring keyring) = pubKey keyring.boxKeyPair where
   pubKey (BoxKeyPair pair) = pair.publicKey
+
+secretBoxKey :: Keyring -> SecretBoxKey
+secretBoxKey (Keyring keyring) = keyring.secretBoxKey
 
 instance showKeyring :: Show Keyring where
   show = runBase64 <<< encodeBase64 <<< fromString <<< stringify <<< encodeJson
