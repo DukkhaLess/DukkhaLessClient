@@ -3,6 +3,7 @@ module AppRouting.Router where
 
 import AppRouting.Routes as R
 import Components.Intro as Intro
+import Components.Journals as Journals
 import Components.NotFound as NotFound
 import Components.Resources as Resources
 import Components.Sessions as Sessions
@@ -28,6 +29,7 @@ type ChildQuery
   <\/> Resources.Query
   <\/> Sessions.Query
   <\/> NotFound.Query
+  <\/> Journals.Query
   <\/> Const Void
 
 type ChildSlot
@@ -35,6 +37,7 @@ type ChildSlot
   \/ Resources.Slot
   \/ Sessions.Slot
   \/ NotFound.Slot
+  \/ Journals.Slot
   \/ Void
 
 
@@ -52,6 +55,9 @@ pathToSessions = cpR :> cpR :> cpL
 
 pathToNotFound :: ChildPath NotFound.Query ChildQuery NotFound.Slot ChildSlot
 pathToNotFound = cpR :> cpR :> cpR :> cpL
+
+pathToJournals :: ChildPath Journals.Query ChildQuery Journals.Slot ChildSlot
+pathToJournals =  cpR :> cpR :> cpR :> cpR :> cpL
 
 component :: Model -> H.Component HH.HTML Input Unit Void Aff
 component initialModel = H.parentComponent
@@ -109,6 +115,13 @@ component initialModel = H.parentComponent
         pathToNotFound
         NotFound.Slot
         (NotFound.component model.localiseFn)
+        unit
+        nada
+    viewPage model (R.Journals r) =
+      HH.slot'
+        pathToJournals
+        Journals.Slot
+        (Journals.component model.localiseFn)
         unit
         nada
 

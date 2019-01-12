@@ -17,6 +17,10 @@ data Query a = QNoOp a
 
 newtype State = State {}
 
+data Slot = Slot
+derive instance eqSlot :: Eq Slot
+derive instance ordSlot :: Ord Slot
+
 type ChildQuery
   = JournalList.Query
   <\/> JournalEntry.Query
