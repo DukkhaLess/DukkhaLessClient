@@ -3,10 +3,9 @@ module AppRouting.Routes where
 import Prelude
 
 import Control.Alternative ((<|>))
+import Data.Array (tail)
 import Data.Foldable (foldl)
-import Data.Generic.Rep as G
-import Data.Generic.Rep.Show as GShow
-import Data.Maybe (Maybe)
+import Data.Maybe (Maybe(..), fromMaybe)
 import Data.String (toLower, split, Pattern(..))
 import Routing.Match (Match, lit, end)
 
@@ -16,26 +15,25 @@ class ReverseRoute a where
 leader :: String
 leader = "#/"
 
-instance showSessions :: Show Sessions where
-  show r = toLower $ case r of
-    otherwise -> GShow.genericShow otherwise
-
-
 data Sessions
   = Login
   | Register
 
-derive instance genericSessions :: G.Generic Sessions _
+instance reverseRouteSessions :: ReverseRoute Sessions where
+  reverseRoute r = case r of
+    Login -> "login"
+    Register -> "register"
+
 
 data Journals
   = List
   | Edit (Maybe String)
 
-derive instance genericJournals :: G.Generic Journals _
-
-instance showJournals :: Show Journals where
-  show j = toLower $ case j of
-    otherwise -> GShow.genericShow otherwise
+instance reverseRouteJournals :: ReverseRoute Journals where
+  reverseRoute j = case j of
+    List -> ""
+    Edit Nothing -> "edit"
+    Edit (Just id) -> id <> "/" <> "edit"
 
 data Routes
   = Intro
@@ -44,29 +42,26 @@ data Routes
   | NotFound
   | Journals Journals
 
-derive instance genericRoutes :: G.Generic Routes _
-
-
-instance showRoutes :: Show Routes where
-  show r = toLower $ case r of
-    (Sessions s) -> "sessions/" <> show s
-    otherwise -> GShow.genericShow r
-
 instance reverseRouteRoutes :: ReverseRoute Routes where
-  reverseRoute route = case route of
-    r -> leader <> (show r)
+  reverseRoute r = leader <> toLower case r of
+    Intro -> "into"
+    Resources -> "resources"
+    NotFound -> "notfound"
+    (Sessions s) -> "sessions/" <> reverseRoute s
+    (Journals j) -> "journals/" <> reverseRoute j
 
 routes :: Match Routes
 routes
   = (Intro <$ end)
-  <|> route Intro
-  <|> route Resources
-  <|> route (Sessions Login)
-  <|> route (Sessions Register)
+  <|> routeSimple Intro
+  <|> routeSimple Resources
+  <|> routeSimple (Sessions Login)
+  <|> routeSimple (Sessions Register)
+  <|> routeSimple (Journals List)
   <|> (pure NotFound)
 
   where
-    route :: Routes -> Match Routes
-    route r = r <$ (foldl concatRoutes (lit "") $ split (Pattern "/") (show r))
+    routeSimple :: Routes -> Match Routes
+    routeSimple r = r <$ (foldl concatRoutes (lit "") $ fromMaybe [] $ tail $ split (Pattern "/") (reverseRoute r))
     concatRoutes :: Match Unit -> String -> Match Unit
     concatRoutes ms s = ms *> lit s

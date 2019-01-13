@@ -17,7 +17,7 @@ import Halogen.Data.Prism (type (<\/>), type (\/))
 import Halogen.HTML as HH
 import Halogen.HTML.Properties as HP
 import Model (Model, Session)
-import Prelude (type (~>), Unit, Void, const, pure, unit, (<<<), bind, ($), discard, map, show)
+import Prelude (type (~>), Unit, Void, const, pure, unit, (<<<), bind, ($), discard, map)
 import Routing.Hash (matches)
 
 data Input a
@@ -86,7 +86,7 @@ component initialModel = H.parentComponent
         [ HH.ul_ (map link [R.Intro, R.Resources])
         ]
 
-    link r = HH.li_ [ HH.a [ HP.href $ R.reverseRoute r ] [ HH.text $ show r ] ]
+    link r = HH.li_ [ HH.a [ HP.href $ R.reverseRoute r ] [ HH.text $ R.reverseRoute r ] ]
 
     viewPage :: Model -> R.Routes -> H.ParentHTML Input ChildQuery ChildSlot Aff
     viewPage model R.Intro =
