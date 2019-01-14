@@ -7,7 +7,7 @@ import Data.Array (tail)
 import Data.Foldable (foldl)
 import Data.Maybe (Maybe(..), fromMaybe)
 import Data.String (toLower, split, Pattern(..))
-import Routing.Match (Match, lit, end)
+import Routing.Match (Match, lit, end, str)
 
 class ReverseRoute a where
   reverseRoute :: a -> String
@@ -66,6 +66,7 @@ routes
   <|> routeSimple (Sessions Login)
   <|> routeSimple (Sessions Register)
   <|> routeSimple (Journals $ Edit Nothing)
+  <|> ((lit journalsName *> str <* lit edit) <#> Just <#> Edit <#> Journals)
   <|> routeSimple (Journals List)
   <|> (pure NotFound)
 
