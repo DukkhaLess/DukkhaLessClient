@@ -3,6 +3,7 @@ module Components.Sessions.Login where
 import Prelude
 
 import AppRouting.Routes as R
+import AppRouting.Routes.Sessions as RS
 import Components.Helpers.Forms as HF
 import Control.Monad.Error.Class (throwError)
 import Data.Either (Either(..), note, either)
@@ -92,7 +93,7 @@ component t =
                     ]
                   , HH.a
                     [ HP.classes [block, textCentered]
-                    , HP.href $ R.reverseRoute $ R.Sessions R.Register
+                    , HP.href $ R.reverseRoute $ R.Sessions RS.Register
                     ]
                     [ HH.text $ t $ Term.Session Sessions.RegisterInstead
                     ]

@@ -1,7 +1,9 @@
-module AppRouting.Router where
+module Components.Router where
 
 
 import AppRouting.Routes as R
+import AppRouting.Routes.Sessions as RS
+import AppRouting.Routes.Journals as RJ
 import Components.Intro as Intro
 import Components.Journals as Journals
 import Components.NotFound as NotFound
@@ -77,13 +79,13 @@ component initialModel = H.parentComponent
     sessionlessMenu :: H.ParentHTML Input ChildQuery ChildSlot Aff
     sessionlessMenu =
       HH.nav_
-        [ HH.ul_ (map link [R.Intro, R.Resources, R.Sessions R.Login])
+        [ HH.ul_ (map link [R.Intro, R.Resources, R.Sessions RS.Login])
         ]
 
     sessionedMenu :: Session -> H.ParentHTML Input ChildQuery ChildSlot Aff
     sessionedMenu session =
       HH.nav_
-        [ HH.ul_ (map link [R.Intro, R.Resources])
+        [ HH.ul_ (map link [R.Intro, R.Resources, R.Journals $ RJ.Edit Nothing])
         ]
 
     link r = HH.li_ [ HH.a [ HP.href $ R.reverseRoute r ] [ HH.text $ R.reverseRoute r ] ]

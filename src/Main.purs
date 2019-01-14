@@ -28,7 +28,7 @@ import Halogen.VDom.Driver (runUI)
 import Intl (localiseString)
 import Intl.Locales (preferredUserLanguages)
 
-import AppRouting.Router as Router
+import Components.Router as Router
 import Halogen.Aff as HA
 import Model as ML
 

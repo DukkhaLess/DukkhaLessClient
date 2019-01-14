@@ -1,47 +1,24 @@
-module AppRouting.Routes where
+module AppRouting.Routes
+  ( module ARC
+  , Routes(..)
+  , routes
+  ) where
 
 import Prelude
 
+import AppRouting.Class (class ReverseRoute, reverseRoute)
+import AppRouting.Class (class ReverseRoute, reverseRoute) as ARC
+import AppRouting.Literals
+import AppRouting.Routes.Journals (Journals)
+import AppRouting.Routes.Journals as RJ
+import AppRouting.Routes.Sessions (Sessions)
+import AppRouting.Routes.Sessions as RS
 import Control.Alternative ((<|>))
 import Data.Array (tail)
 import Data.Foldable (foldl)
 import Data.Maybe (Maybe(..), fromMaybe)
 import Data.String (toLower, split, Pattern(..))
 import Routing.Match (Match, lit, end, str)
-
-class ReverseRoute a where
-  reverseRoute :: a -> String
-
-data Sessions
-  = Login
-  | Register
-
-leader :: String
-leader = "#/"
-
-edit :: String
-edit = "edit"
-
-sessionsName :: String
-sessionsName = "sessions"
-  
-journalsName :: String
-journalsName = "journals"
-
-instance reverseRouteSessions :: ReverseRoute Sessions where
-  reverseRoute r = case r of
-    Login -> "login"
-    Register -> "register"
-
-data Journals
-  = List
-  | Edit (Maybe String)
-
-instance reverseRouteJournals :: ReverseRoute Journals where
-  reverseRoute j = case j of
-    List -> ""
-    Edit Nothing -> edit
-    Edit (Just id) -> id <> "/" <> edit
 
 data Routes
   = Intro
@@ -54,7 +31,7 @@ instance reverseRouteRoutes :: ReverseRoute Routes where
   reverseRoute r = leader <> toLower case r of
     Intro -> "into"
     Resources -> "resources"
-    NotFound -> "notfound/"
+    NotFound -> "notfound"
     (Sessions s) -> sessionsName <> "/" <> reverseRoute s
     (Journals j) -> journalsName <> "/" <> reverseRoute j
 
@@ -63,11 +40,11 @@ routes
   = (Intro <$ end)
   <|> routeSimple Intro
   <|> routeSimple Resources
-  <|> routeSimple (Sessions Login)
-  <|> routeSimple (Sessions Register)
-  <|> routeSimple (Journals $ Edit Nothing)
-  <|> ((lit journalsName *> str <* lit edit) <#> Just <#> Edit <#> Journals)
-  <|> routeSimple (Journals List)
+  <|> routeSimple (Sessions RS.Login)
+  <|> routeSimple (Sessions RS.Register)
+  <|> routeSimple (Journals $ RJ.Edit Nothing)
+  <|> ((lit journalsName *> str <* lit edit) <#> Just <#> RJ.Edit <#> Journals)
+  <|> routeSimple (Journals RJ.List)
   <|> (pure NotFound)
 
   where

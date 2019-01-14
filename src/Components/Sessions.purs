@@ -2,7 +2,7 @@ module Components.Sessions where
 
 import Prelude
 
-import AppRouting.Routes as R
+import AppRouting.Routes.Sessions as RS
 import Components.Sessions.Login as Login
 import Components.Sessions.Register as Register
 import Data.Const (Const)
@@ -17,7 +17,7 @@ import Intl (LocaliseFn)
 import Model (Session)
 
 data Query a
-  = UpdateRoute R.Sessions a
+  = UpdateRoute RS.Sessions a
   | ReceivedSession Session a
 
 data Message
@@ -34,11 +34,11 @@ type ChildSlot
   \/ Void
 
 data Input
-  = RouteContext R.Sessions
+  = RouteContext RS.Sessions
 
 type State =
   { session :: Maybe Session
-  , routeContext :: R.Sessions
+  , routeContext :: RS.Sessions
   }
 
 pathToLogin :: ChildPath Login.Query ChildQuery Login.Slot ChildSlot
@@ -73,14 +73,14 @@ component t =
       
       renderUnAuthed :: State -> H.ParentHTML Query ChildQuery ChildSlot Aff
       renderUnAuthed s = case s.routeContext of
-        R.Login ->
+        RS.Login ->
           HH.slot'
             pathToLogin
             Login.Slot
             (Login.component t)
             unit
             mapLoginMessage
-        R.Register ->
+        RS.Register ->
           HH.slot'
             pathToRegister
             Register.Slot
