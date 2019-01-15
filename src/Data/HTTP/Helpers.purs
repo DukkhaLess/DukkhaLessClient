@@ -37,18 +37,11 @@ unsafePostCleartext (ApiPath path) payload
     payload' = encodeJson payload
     path' = apiLocation <> withLeadingSlash path
 
-post :: forall a. CipherText a => ApiPath -> a -> Request Json
-post = unsafePostCleartext
-
-unsafePostCleartext' :: forall a. EncodeJson a => ApiPath -> a -> SessionToken-> Request Json
-unsafePostCleartext' a p (SessionToken t)
-  = (unsafePostCleartext a p)
+post :: forall a. CipherText a => ApiPath -> a -> SessionToken -> Request Json
+post a p (SessionToken t) = (unsafePostCleartext a p)
     { headers = [RequestHeader "Authorization" t]
     , withCredentials = true
     }
-
-post' :: forall a. CipherText a => ApiPath -> a -> SessionToken-> Request Json
-post' = unsafePostCleartext'
 
 withLeadingSlash :: String -> String
 withLeadingSlash s = case charAt 0 s of
