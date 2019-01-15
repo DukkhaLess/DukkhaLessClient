@@ -1,5 +1,7 @@
 module Model where
 
+import Prelude
+
 import AppRouting.Routes as Routes
 import Data.Argonaut ((.?))
 import Data.Argonaut.Core (fromString, jsonEmptyObject)
@@ -11,8 +13,9 @@ import Data.Generic.Rep.Show (genericShow)
 import Data.Maybe (Maybe(..))
 import Data.Newtype (class Newtype, unwrap, wrap)
 import Intl (LocaliseFn)
+import Model.Journal (JournalsState)
+import Model.Journal as MJ
 import Model.Keyring (Keyring)
-import Prelude
 
 newtype Username = Username String
 derive instance newtypeUsername :: Newtype Username _
@@ -61,6 +64,7 @@ type Model =
   { localiseFn :: LocaliseFn
   , currentPage :: Routes.Routes
   , session :: Maybe Session
+  , journalsState :: JournalsState
   }
 
 initial :: LocaliseFn -> Model
@@ -68,4 +72,5 @@ initial f =
   { localiseFn: f
   , currentPage: Routes.Intro
   , session: Nothing
+  , journalsState: MJ.default
   }

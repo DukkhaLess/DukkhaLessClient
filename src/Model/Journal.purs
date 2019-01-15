@@ -6,7 +6,7 @@ import Data.Argonaut.Decode.Combinators ((.?))
 import Data.Argonaut.Encode.Combinators ((~>), (:=))
 import Data.Crypto.Class (class CipherText, class Encrypt, decrypt, encrypt)
 import Data.Crypto.Types (Document(..), DocumentId, DocumentMetaData(..))
-import Data.Newtype (unwrap, wrap)
+import Data.Newtype (unwrap, wrap, class Newtype)
 import Data.DateTime (DateTime(..))
 import Data.Maybe (Maybe)
 
@@ -18,27 +18,7 @@ newtype JournalMeta
     , id :: Maybe DocumentId
     }
 
-newtype JournalEntry
-  = JournalEntry
-    { content :: String
-    , metaData :: JournalMeta
-    }
-
-instance encryptJournalEntry :: Encrypt JournalEntry Document where
-  encrypt (JournalEntry entry) keyFn ring = do
-    meta <- encrypt entry.metaData keyFn ring
-    contents <- encrypt entry.content keyFn ring
-    pure $ Document {
-      metaData: meta,
-      content: wrap contents
-    }
-  decrypt (Document document) ring = do
-    meta <- decrypt document.metaData ring
-    contents <- decrypt (unwrap document.content) ring
-    pure $ JournalEntry {
-      content: contents,
-      metaData: meta
-    }
+derive instance newtypeJournalMeta :: Newtype JournalMeta _
 
 instance encryptJournalMeta :: Encrypt JournalMeta DocumentMetaData where
   encrypt (JournalMeta meta) keyFn ring = do
@@ -59,4 +39,36 @@ instance encryptJournalMeta :: Encrypt JournalMeta DocumentMetaData where
       id: documentMeta.id
     }
 
-    
+newtype JournalEntry
+  = JournalEntry
+    { content :: String
+    , metaData :: JournalMeta
+    }
+
+derive instance newtypeJournalEntry :: Newtype JournalEntry _
+
+instance encryptJournalEntry :: Encrypt JournalEntry Document where
+  encrypt (JournalEntry entry) keyFn ring = do
+    meta <- encrypt entry.metaData keyFn ring
+    contents <- encrypt entry.content keyFn ring
+    pure $ Document {
+      metaData: meta,
+      content: wrap contents
+    }
+  decrypt (Document document) ring = do
+    meta <- decrypt document.metaData ring
+    contents <- decrypt (unwrap document.content) ring
+    pure $ JournalEntry {
+      content: contents,
+      metaData: meta
+    }
+
+newtype JournalsState
+  = JournalsState
+    {
+    }
+
+default :: JournalsState
+default = JournalsState {}
+
+derive instance newtypeJournalsState :: Newtype JournalsState _

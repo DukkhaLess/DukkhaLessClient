@@ -2,8 +2,8 @@ module Components.Router where
 
 
 import AppRouting.Routes as R
-import AppRouting.Routes.Sessions as RS
 import AppRouting.Routes.Journals as RJ
+import AppRouting.Routes.Sessions as RS
 import Components.Intro as Intro
 import Components.Journals as Journals
 import Components.NotFound as NotFound
@@ -124,7 +124,7 @@ component initialModel = H.parentComponent
         pathToJournals
         Journals.Slot
         (Journals.component model.localiseFn)
-        unit
+        (Journals.JournalsContext { routeContext: r, journalsState: model.journalsState})
         nada
 
     eval :: Input ~> H.ParentDSL Model Input ChildQuery ChildSlot Void Aff
