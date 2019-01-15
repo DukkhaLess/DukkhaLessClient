@@ -2,6 +2,7 @@ module Components.Journals.Entry where
 
 import Prelude
 
+import Data.Crypto.Types (DocumentId)
 import Data.Default (default)
 import Data.Maybe (Maybe(..), fromMaybe)
 import Effect.Aff (Aff)
@@ -37,10 +38,10 @@ initialState (Input input) = State { entry: fromMaybe default input.alreadyEditi
 component :: forall a. LocaliseFn -> H.Component HH.HTML Query Input Message Aff
 component t =
   H.component
-    { initialState: initialState
+    { initialState
     , render
     , eval
-    , receiver: const Nothing
+    , receiver
     }
   where
 
@@ -49,3 +50,6 @@ component t =
 
   eval :: Query ~> H.ComponentDSL State Query Message Aff
   eval (NoOp next) = pure next
+
+  receiver :: Input -> Maybe (Query Unit)
+  receiver _ = Nothing

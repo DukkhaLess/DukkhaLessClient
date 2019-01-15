@@ -5,6 +5,7 @@ import Prelude
 import AppRouting.Routes.Journals as RJ
 import Components.Journals.Entry as JournalEntry
 import Components.Journals.List as JournalList
+import Data.Crypto.Types (DocumentId(..))
 import Data.Const (Const)
 import Data.Maybe (Maybe(..))
 import Data.Newtype (unwrap)
@@ -14,7 +15,6 @@ import Halogen.Component.ChildPath (ChildPath, cpL, cpR, (:>))
 import Halogen.Data.Prism (type (<\/>), type (\/))
 import Halogen.HTML as HH
 import Intl (LocaliseFn)
-import Intl.Terms.Journals as Journals
 import Model.Journal as MJ
 
 data Query a = QNoOp a
@@ -71,7 +71,10 @@ component t =
             pathToEdit
             JournalEntry.Slot
             (JournalEntry.component t)
-            (JournalEntry.Input {alreadyEditing: (unwrap state.journalsState).openForEdit })
+            (JournalEntry.Input
+              { alreadyEditing: (unwrap state.journalsState).openForEdit
+              , desiredEntry: id <#> UUID}
+            )
             mapEditMessage
         RJ.List ->
           HH.slot'
