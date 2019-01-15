@@ -2,13 +2,15 @@ module Components.Journals.Entry where
 
 import Prelude
 
-import Data.Maybe (Maybe(..))
+import Data.Default (default)
+import Data.Maybe (Maybe(..), fromMaybe)
 import Effect.Aff (Aff)
 import Halogen as H
 import Halogen.HTML as HH
 import Halogen.HTML.Events as HE
 import Halogen.HTML.Properties as HP
 import Intl (LocaliseFn)
+import Model.Journal (JournalEntry(..), JournalMeta(..))
 
 data Query a = NoOp a
 
@@ -18,12 +20,20 @@ derive instance ordSlot :: Ord Slot
 
 data Message = MNoMsg
 
-newtype State = State {}
+newtype State
+  = State 
+    { entry :: JournalEntry
+    }
 
-initialState :: forall a. a -> State
-initialState = const $ State {}
+newtype Input
+  = Input
+  { alreadyEditing :: (Maybe JournalEntry)
+  }
 
-component :: forall a. LocaliseFn -> H.Component HH.HTML Query a Message Aff
+initialState :: Input -> State
+initialState (Input input) = State { entry: fromMaybe default input.alreadyEditing }
+
+component :: forall a. LocaliseFn -> H.Component HH.HTML Query Input Message Aff
 component t =
   H.component
     { initialState: initialState

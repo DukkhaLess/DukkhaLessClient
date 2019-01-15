@@ -29,7 +29,8 @@
     "purescript-newtype": "^3.0.0",
     "purescript-affjax": "^7.0.0",
     "purescript-datetime": "^4.1.0",
-    "purescript-uint": "4.0.2"
+    "purescript-uint": "4.0.2",
+    "purescript-now": "^4.0.0"
   },
   "devDependencies": {
     "purescript-quickcheck": "^5.0.0",

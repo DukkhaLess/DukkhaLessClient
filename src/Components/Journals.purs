@@ -7,6 +7,7 @@ import Components.Journals.Entry as JournalEntry
 import Components.Journals.List as JournalList
 import Data.Const (Const)
 import Data.Maybe (Maybe(..))
+import Data.Newtype (unwrap)
 import Effect.Aff (Aff)
 import Halogen as H
 import Halogen.Component.ChildPath (ChildPath, cpL, cpR, (:>))
@@ -70,7 +71,7 @@ component t =
             pathToEdit
             JournalEntry.Slot
             (JournalEntry.component t)
-            unit
+            (JournalEntry.Input {alreadyEditing: (unwrap state.journalsState).openForEdit })
             mapEditMessage
         RJ.List ->
           HH.slot'

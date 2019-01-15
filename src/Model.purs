@@ -8,6 +8,7 @@ import Data.Argonaut.Core (fromString, jsonEmptyObject)
 import Data.Argonaut.Decode.Class (class DecodeJson, decodeJson)
 import Data.Argonaut.Encode.Class (class EncodeJson)
 import Data.Argonaut.Encode.Combinators ((~>), (:=))
+import Data.Default (default)
 import Data.Generic.Rep (class Generic)
 import Data.Generic.Rep.Show (genericShow)
 import Data.Maybe (Maybe(..))
@@ -72,5 +73,5 @@ initial f =
   { localiseFn: f
   , currentPage: Routes.Intro
   , session: Nothing
-  , journalsState: MJ.default
+  , journalsState: default
   }

@@ -4,28 +4,41 @@ import Prelude
 
 import Data.Crypto.Class (class Encrypt, decrypt, encrypt)
 import Data.Crypto.Types (Document(..), DocumentId, DocumentMetaData(..))
+import Data.Default
 import Data.Map (Map, empty)
-import Data.Maybe (Maybe(..))
+import Data.Maybe (Maybe(..), maybe)
 import Data.Newtype (unwrap, wrap, class Newtype)
 import Data.DateTime (DateTime)
+import Effect.Now (nowDateTime)
 
 newtype JournalMeta
   = JournalMeta
     { title :: String
-    , createdAt :: DateTime
-    , lastUpdated :: DateTime
+    , createdAt :: Maybe DateTime
+    , lastUpdated :: Maybe DateTime
     , id :: Maybe DocumentId
     }
 
 derive instance newtypeJournalMeta :: Newtype JournalMeta _
 
+instance defaultJournalMeta :: Default JournalMeta where
+  default
+    = JournalMeta
+      { title: ""
+      , createdAt: Nothing
+      , lastUpdated: Nothing
+      , id: Nothing
+      }
+
 instance encryptJournalMeta :: Encrypt JournalMeta DocumentMetaData where
   encrypt (JournalMeta meta) keyFn ring = do
     title <- encrypt meta.title keyFn ring
+    createdAt <- maybe nowDateTime pure meta.createdAt
+    lastUpdated <- maybe nowDateTime pure meta.lastUpdated
     pure $ DocumentMetaData {
       title: wrap title,
-      createdAt: meta.createdAt,
-      lastUpdated: meta.lastUpdated,
+      createdAt: createdAt,
+      lastUpdated: lastUpdated,
       id: meta.id
     }
   decrypt (DocumentMetaData documentMeta) ring = do
@@ -33,8 +46,8 @@ instance encryptJournalMeta :: Encrypt JournalMeta DocumentMetaData where
     title <- decrypt titleCt ring
     pure $ JournalMeta {
       title: title,
-      createdAt: documentMeta.createdAt,
-      lastUpdated: documentMeta.lastUpdated,
+      createdAt: Just documentMeta.createdAt,
+      lastUpdated: Just documentMeta.lastUpdated,
       id: documentMeta.id
     }
 
@@ -45,6 +58,13 @@ newtype JournalEntry
     }
 
 derive instance newtypeJournalEntry :: Newtype JournalEntry _
+
+instance defaultJournalEntry :: Default JournalEntry where
+  default
+    = JournalEntry
+      { content: ""
+      , metaData: default
+      }
 
 instance encryptJournalEntry :: Encrypt JournalEntry Document where
   encrypt (JournalEntry entry) keyFn ring = do
@@ -68,11 +88,11 @@ newtype JournalsState
     , cachedMeta :: Map DocumentId JournalMeta
     }
 
-default :: JournalsState
-default
-  = JournalsState
-    { openForEdit: Nothing
-    , cachedMeta: empty
-    }
+instance defaultJournalsState :: Default JournalsState where
+  default
+    = JournalsState
+      { openForEdit: Nothing
+      , cachedMeta: empty
+      }
 
 derive instance newtypeJournalsState :: Newtype JournalsState _
