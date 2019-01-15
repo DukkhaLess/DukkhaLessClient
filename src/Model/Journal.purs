@@ -2,13 +2,12 @@ module Model.Journal where
 
 import Prelude
 
-import Data.Argonaut.Decode.Combinators ((.?))
-import Data.Argonaut.Encode.Combinators ((~>), (:=))
-import Data.Crypto.Class (class CipherText, class Encrypt, decrypt, encrypt)
+import Data.Crypto.Class (class Encrypt, decrypt, encrypt)
 import Data.Crypto.Types (Document(..), DocumentId, DocumentMetaData(..))
+import Data.Map (Map, empty)
+import Data.Maybe (Maybe(..))
 import Data.Newtype (unwrap, wrap, class Newtype)
-import Data.DateTime (DateTime(..))
-import Data.Maybe (Maybe)
+import Data.DateTime (DateTime)
 
 newtype JournalMeta
   = JournalMeta
@@ -65,10 +64,15 @@ instance encryptJournalEntry :: Encrypt JournalEntry Document where
 
 newtype JournalsState
   = JournalsState
-    {
+    { openForEdit :: Maybe JournalEntry
+    , cachedMeta :: Map DocumentId JournalEntry
     }
 
 default :: JournalsState
-default = JournalsState {}
+default
+  = JournalsState
+    { openForEdit: Nothing
+    , cachedMeta: empty
+    }
 
 derive instance newtypeJournalsState :: Newtype JournalsState _
