@@ -65,7 +65,7 @@ instance encryptJournalEntry :: Encrypt JournalEntry Document where
 newtype JournalsState
   = JournalsState
     { openForEdit :: Maybe JournalEntry
-    , cachedMeta :: Map DocumentId JournalEntry
+    , cachedMeta :: Map DocumentId JournalMeta
     }
 
 default :: JournalsState
