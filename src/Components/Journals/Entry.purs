@@ -27,7 +27,8 @@ newtype State
 
 newtype Input
   = Input
-  { alreadyEditing :: (Maybe JournalEntry)
+  { alreadyEditing :: Maybe JournalEntry
+  , desiredEntry :: Maybe DocumentId
   }
 
 initialState :: Input -> State
