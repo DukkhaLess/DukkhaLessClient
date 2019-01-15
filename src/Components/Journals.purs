@@ -14,7 +14,7 @@ import Halogen.Data.Prism (type (<\/>), type (\/))
 import Halogen.HTML as HH
 import Intl (LocaliseFn)
 import Intl.Terms.Journals as Journals
-import Model.Journal (JournalsState(..))
+import Model.Journal as MJ
 
 data Query a = QNoOp a
 
@@ -23,7 +23,7 @@ data Message = MNoOp
 newtype State 
   = State
     { routeContext :: RJ.Journals
-    , journalsState :: JournalsState
+    , journalsState :: MJ.JournalsState
     }
 
 data Slot = Slot
@@ -33,7 +33,7 @@ derive instance ordSlot :: Ord Slot
 data Input
   = JournalsContext
   { routeContext :: RJ.Journals
-  , journalsState :: JournalsState
+  , journalsState :: MJ.JournalsState
   }
 
 type ChildQuery
@@ -47,6 +47,13 @@ type ChildSlot
   \/ Void
 
 
+pathToList :: ChildPath JournalList.Query ChildQuery JournalList.Slot ChildSlot
+pathToList = cpL
+
+pathToEdit :: ChildPath JournalEntry.Query ChildQuery JournalEntry.Slot ChildSlot
+pathToEdit = cpR :> cpL
+
+
 component :: LocaliseFn -> H.Component HH.HTML Query Input Message Aff
 component t =
   H.parentComponent
@@ -57,7 +64,21 @@ component t =
     }
     where
       render :: State -> H.ParentHTML Query ChildQuery ChildSlot Aff
-      render state = HH.text "hi"
+      render (State state) = case state.routeContext of
+        RJ.Edit id ->
+          HH.slot'
+            pathToEdit
+            JournalEntry.Slot
+            (JournalEntry.component t)
+            unit
+            mapEditMessage
+        RJ.List ->
+          HH.slot'
+            pathToList
+            JournalList.Slot
+            (JournalList.component t)
+            unit
+            mapListMessage
 
       eval :: Query ~> H.ParentDSL State Query ChildQuery ChildSlot Message Aff
       eval (QNoOp next) = pure next
@@ -68,3 +89,8 @@ component t =
       initialState :: Input -> State
       initialState (JournalsContext c) = State c
  
+mapEditMessage :: JournalEntry.Message -> Maybe (Query Unit)
+mapEditMessage _ = Nothing
+
+mapListMessage :: JournalList.Message -> Maybe (Query Unit)
+mapListMessage _ = Nothing
