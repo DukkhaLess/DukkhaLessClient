@@ -29,7 +29,7 @@ data Routes
 
 instance reverseRouteRoutes :: ReverseRoute Routes where
   reverseRoute r = leader <> toLower case r of
-    Intro -> "into"
+    Intro -> "intro"
     Resources -> "resources"
     NotFound -> "notfound"
     (Sessions s) -> sessionsName <> "/" <> reverseRoute s
