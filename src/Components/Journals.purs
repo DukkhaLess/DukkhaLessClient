@@ -2,6 +2,7 @@ module Components.Journals where
 
 import Prelude
 
+import AppM (CurrentSessionRow, JournalMetaCacheRow, EditingJournalEntryRow)
 import Components.Journals.Entry as JournalEntry
 import Components.Journals.List as JournalList
 import Control.Monad.Reader.Class (class MonadAsk)
@@ -58,7 +59,12 @@ pathToList = cpL
 pathToEdit :: ChildPath JournalEntry.Query ChildQuery JournalEntry.Slot ChildSlot
 pathToEdit = cpR :> cpL
 
-type RequiredState r = (JournalEntry.RequiredState + r)
+type RequiredState r =
+  ( CurrentSessionRow
+  + JournalMetaCacheRow
+  + EditingJournalEntryRow
+  + r
+  )
 
 component
   :: forall m r

@@ -2,6 +2,7 @@ module Components.Journals.Entry where
 
 import Prelude
 
+import AppM (CurrentSessionRow, EditingJournalEntryRow)
 import Control.Monad.Reader.Class (class MonadAsk)
 import Data.Crypto.Types (DocumentId)
 import Data.Default (default)
@@ -15,6 +16,7 @@ import Halogen.HTML.Properties as HP
 import Intl (LocaliseFn)
 import Model (Session(..))
 import Model.Journal (JournalEntry(..), JournalMeta(..))
+import Type.Row (type (+))
 
 data Query a = NoOp a
 
@@ -38,9 +40,9 @@ initialState :: Input -> State
 initialState (Input input) = State { entry: default }
 
 type RequiredState r =
-  ( currentSession :: AVar (Maybe Session)
-  , editingJournalEntry :: AVar (Maybe JournalEntry)
-  | r
+  ( EditingJournalEntryRow
+  + CurrentSessionRow
+  + r
   )
 
 component 
