@@ -2,20 +2,26 @@ module Components.Journals where
 
 import Prelude
 
-import Data.Routing.Routes.Journals as RJ
 import Components.Journals.Entry as JournalEntry
 import Components.Journals.List as JournalList
-import Data.Crypto.Types (DocumentId(..))
+import Control.Monad.Reader.Class (class MonadAsk)
 import Data.Const (Const)
+import Data.Crypto.Types (DocumentId(..))
+import Data.Map (Map)
 import Data.Maybe (Maybe(..))
 import Data.Newtype (unwrap)
+import Data.Routing.Routes.Journals as RJ
+import Effect.AVar (AVar)
 import Effect.Aff.Class (class MonadAff)
 import Halogen as H
 import Halogen.Component.ChildPath (ChildPath, cpL, cpR, (:>))
 import Halogen.Data.Prism (type (<\/>), type (\/))
 import Halogen.HTML as HH
 import Intl (LocaliseFn)
+import Model (Session(..))
+import Model.Journal (JournalEntry(..), JournalMeta(..))
 import Model.Journal as MJ
+import Type.Row (type (+))
 
 data Query a = QNoOp a
 
@@ -52,10 +58,12 @@ pathToList = cpL
 pathToEdit :: ChildPath JournalEntry.Query ChildQuery JournalEntry.Slot ChildSlot
 pathToEdit = cpR :> cpL
 
+type RequiredState r = (JournalEntry.RequiredState + r)
 
 component
-  :: forall m
+  :: forall m r
   . MonadAff m 
+  => MonadAsk (Record (RequiredState r)) m
   => LocaliseFn
   -> H.Component HH.HTML Query Input Message m
 component t =

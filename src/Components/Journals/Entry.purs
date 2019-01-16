@@ -2,15 +2,18 @@ module Components.Journals.Entry where
 
 import Prelude
 
+import Control.Monad.Reader.Class (class MonadAsk)
 import Data.Crypto.Types (DocumentId)
 import Data.Default (default)
 import Data.Maybe (Maybe(..), fromMaybe)
+import Effect.AVar (AVar)
 import Effect.Aff.Class (class MonadAff)
 import Halogen as H
 import Halogen.HTML as HH
 import Halogen.HTML.Events as HE
 import Halogen.HTML.Properties as HP
 import Intl (LocaliseFn)
+import Model (Session(..))
 import Model.Journal (JournalEntry(..), JournalMeta(..))
 
 data Query a = NoOp a
@@ -34,9 +37,16 @@ newtype Input
 initialState :: Input -> State
 initialState (Input input) = State { entry: default }
 
+type RequiredState r =
+  ( currentSession :: AVar (Maybe Session)
+  , editingJournalEntry :: AVar (Maybe JournalEntry)
+  | r
+  )
+
 component 
-  :: forall m
+  :: forall m r
   . MonadAff m
+  => MonadAsk (Record (RequiredState r)) m
   => LocaliseFn -> H.Component HH.HTML Query Input Message m
 component t =
   H.component
