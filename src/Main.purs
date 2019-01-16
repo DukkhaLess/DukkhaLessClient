@@ -21,7 +21,7 @@ module Main where
 
 import Prelude
 
-import AppM (makeEnv, runAppM)
+import AppM (makeAppState, runAppM)
 import Data.Maybe (Maybe(..))
 import Data.Routing.Routes as Routes
 import Effect (Effect)
@@ -42,7 +42,7 @@ main = HA.runHalogenAff $ do
     userLanguages <- liftEffect preferredUserLanguages
     let translate = localiseString userLanguages
         
-    env <- makeEnv translate
+    env <- makeAppState translate
 
     existingSession <- pure Nothing
         

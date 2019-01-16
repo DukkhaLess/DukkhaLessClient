@@ -1,7 +1,7 @@
 module Components.Router where
 
 
-import AppM (Env)
+import AppM (AppState)
 import Components.Intro as Intro
 import Components.Journals as Journals
 import Components.NotFound as NotFound
@@ -64,7 +64,7 @@ pathToJournals = cpR :> cpR :> cpL
 component
   :: forall m
   . MonadAff m
-  => MonadAsk Env m
+  => MonadAsk AppState m
   => LocaliseFn
   -> H.Component HH.HTML Query Unit Void m
 component localiseFn = H.parentComponent
