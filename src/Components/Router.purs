@@ -1,11 +1,13 @@
 module Components.Router where
 
 
+import AppM (Env)
 import Components.Intro as Intro
 import Components.Journals as Journals
 import Components.NotFound as NotFound
 import Components.Resources as Resources
 import Components.Sessions as Sessions
+import Control.Monad.Reader.Class (class MonadAsk)
 import Data.Const (Const)
 import Data.Maybe (Maybe(..))
 import Data.Routing.Routes as R
@@ -29,17 +31,13 @@ data Query a
   | UpdateSession Session a
 
 type ChildQuery
-  = Intro.Query
-  <\/> Resources.Query
-  <\/> Sessions.Query
+  =    Sessions.Query
   <\/> NotFound.Query
   <\/> Journals.Query
   <\/> Const Void
 
 type ChildSlot
-  = Intro.Slot
-  \/ Resources.Slot
-  \/ Sessions.Slot
+  =  Sessions.Slot
   \/ NotFound.Slot
   \/ Journals.Slot
   \/ Void
@@ -54,24 +52,19 @@ type State =
 nada  :: forall a b. a -> Maybe b
 nada = const Nothing
 
-pathToIntro :: ChildPath Intro.Query ChildQuery Intro.Slot ChildSlot
-pathToIntro = cpL
-
-pathToResources :: ChildPath Resources.Query ChildQuery Resources.Slot ChildSlot
-pathToResources = cpR :> cpL
-
 pathToSessions :: ChildPath Sessions.Query ChildQuery Sessions.Slot ChildSlot
-pathToSessions = cpR :> cpR :> cpL
+pathToSessions = cpL
 
 pathToNotFound :: ChildPath NotFound.Query ChildQuery NotFound.Slot ChildSlot
-pathToNotFound = cpR :> cpR :> cpR :> cpL
+pathToNotFound = cpR :> cpL
 
 pathToJournals :: ChildPath Journals.Query ChildQuery Journals.Slot ChildSlot
-pathToJournals =  cpR :> cpR :> cpR :> cpR :> cpL
+pathToJournals = cpR :> cpR :> cpL
 
 component
   :: forall m
   . MonadAff m
+  => MonadAsk Env m
   => LocaliseFn
   -> H.Component HH.HTML Query Unit Void m
 component localiseFn = H.parentComponent
@@ -104,20 +97,8 @@ component localiseFn = H.parentComponent
 
     viewPage :: State -> H.ParentHTML Query ChildQuery ChildSlot m
     viewPage { localiseFn, currentRoute } = case currentRoute of
-      R.Intro ->
-        HH.slot'
-          pathToIntro
-          Intro.Slot
-          (Intro.component localiseFn)
-          unit
-          nada
-      R.Resources ->
-        HH.slot'
-          pathToResources
-          Resources.Slot
-          (Resources.component localiseFn)
-          unit
-          nada
+      R.Intro -> Intro.render localiseFn
+      R.Resources ->Resources.render localiseFn
       (R.Sessions r) ->
         HH.slot'
           pathToSessions
