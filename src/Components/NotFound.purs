@@ -17,6 +17,7 @@ import Style.Bulogen
   , title
   )
 import Data.Maybe (Maybe(..))
+import Effect.Aff.Class (class MonadAff)
 import Halogen as H
 import Halogen.HTML as HH
 import Halogen.HTML.Properties as HP
@@ -32,7 +33,11 @@ data Slot = Slot
 derive instance eqSlot :: Eq Slot
 derive instance ordSlot :: Ord Slot
 
-component :: forall m. LocaliseFn -> H.Component HH.HTML Query Unit Message m
+component
+  :: forall m
+  . MonadAff m
+  => LocaliseFn
+  -> H.Component HH.HTML Query Unit Message m
 component localiseFn =
   H.component
     { initialState: const localiseFn

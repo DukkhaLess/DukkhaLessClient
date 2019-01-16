@@ -9,7 +9,7 @@ import Data.Crypto.Types (DocumentId(..))
 import Data.Const (Const)
 import Data.Maybe (Maybe(..))
 import Data.Newtype (unwrap)
-import Effect.Aff (Aff)
+import Effect.Aff.Class (class MonadAff)
 import Halogen as H
 import Halogen.Component.ChildPath (ChildPath, cpL, cpR, (:>))
 import Halogen.Data.Prism (type (<\/>), type (\/))
@@ -55,7 +55,11 @@ pathToEdit :: ChildPath JournalEntry.Query ChildQuery JournalEntry.Slot ChildSlo
 pathToEdit = cpR :> cpL
 
 
-component :: LocaliseFn -> H.Component HH.HTML Query Input Message Aff
+component
+  :: forall m
+  . MonadAff m 
+  => LocaliseFn
+  -> H.Component HH.HTML Query Input Message m
 component t =
   H.parentComponent
     { initialState
@@ -64,7 +68,7 @@ component t =
     , receiver: receive
     }
     where
-      render :: State -> H.ParentHTML Query ChildQuery ChildSlot Aff
+      render :: State -> H.ParentHTML Query ChildQuery ChildSlot m
       render (State state) = case state.routeContext of
         RJ.Edit id ->
           HH.slot'
@@ -84,7 +88,7 @@ component t =
             unit
             mapListMessage
 
-      eval :: Query ~> H.ParentDSL State Query ChildQuery ChildSlot Message Aff
+      eval :: Query ~> H.ParentDSL State Query ChildQuery ChildSlot Message m
       eval (QNoOp next) = pure next
 
       receive :: Input -> Maybe (Query Unit)

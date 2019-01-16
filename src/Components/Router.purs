@@ -13,6 +13,7 @@ import Data.Const (Const)
 import Data.Maybe (Maybe(..))
 import Effect (Effect)
 import Effect.Aff (Aff, launchAff)
+import Effect.Aff.Class (class MonadAff)
 import Halogen as H
 import Halogen.Component.ChildPath (ChildPath, cpL, cpR, (:>))
 import Halogen.Data.Prism (type (<\/>), type (\/))
@@ -61,7 +62,11 @@ pathToNotFound = cpR :> cpR :> cpR :> cpL
 pathToJournals :: ChildPath Journals.Query ChildQuery Journals.Slot ChildSlot
 pathToJournals =  cpR :> cpR :> cpR :> cpR :> cpL
 
-component :: Model -> H.Component HH.HTML Input Unit Void Aff
+component
+  :: forall m
+  . MonadAff m
+  => Model
+  -> H.Component HH.HTML Input Unit Void m
 component initialModel = H.parentComponent
   { initialState: const initialModel
   , render
@@ -69,20 +74,20 @@ component initialModel = H.parentComponent
   , receiver: const Nothing
   }
   where
-    render :: Model -> H.ParentHTML Input ChildQuery ChildSlot Aff
+    render :: Model -> H.ParentHTML Input ChildQuery ChildSlot m
     render model = HH.div_ [navMenu, viewPage model model.currentPage] where
       navMenu = case model.session of
         Just session -> sessionedMenu session
         Nothing      -> sessionlessMenu
 
 
-    sessionlessMenu :: H.ParentHTML Input ChildQuery ChildSlot Aff
+    sessionlessMenu :: H.ParentHTML Input ChildQuery ChildSlot m
     sessionlessMenu =
       HH.nav_
         [ HH.ul_ (map link [R.Intro, R.Resources, R.Sessions RS.Login])
         ]
 
-    sessionedMenu :: Session -> H.ParentHTML Input ChildQuery ChildSlot Aff
+    sessionedMenu :: Session -> H.ParentHTML Input ChildQuery ChildSlot m
     sessionedMenu session =
       HH.nav_
         [ HH.ul_ (map link [R.Intro, R.Resources, R.Journals $ RJ.Edit Nothing])
@@ -90,7 +95,7 @@ component initialModel = H.parentComponent
 
     link r = HH.li_ [ HH.a [ HP.href $ R.reverseRoute r ] [ HH.text $ R.reverseRoute r ] ]
 
-    viewPage :: Model -> R.Routes -> H.ParentHTML Input ChildQuery ChildSlot Aff
+    viewPage :: Model -> R.Routes -> H.ParentHTML Input ChildQuery ChildSlot m
     viewPage model R.Intro =
       HH.slot'
         pathToIntro
@@ -127,7 +132,7 @@ component initialModel = H.parentComponent
         (Journals.JournalsContext { routeContext: r, journalsState: model.journalsState})
         nada
 
-    eval :: Input ~> H.ParentDSL Model Input ChildQuery ChildSlot Void Aff
+    eval :: Input ~> H.ParentDSL Model Input ChildQuery ChildSlot Void m
     eval (Goto loc next) = do
       H.modify_ (_{ currentPage = loc})
       pure next

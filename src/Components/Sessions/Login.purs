@@ -14,7 +14,7 @@ import Data.Newtype (wrap)
 import Data.Tuple (Tuple(..), fst, snd)
 import Data.Validation as V
 import Data.Validation.Rules as VR
-import Effect.Aff (Aff)
+import Effect.Aff.Class (class MonadAff)
 import Effect.Exception (error, Error)
 import Halogen as H
 import Halogen.HTML as HH
@@ -53,7 +53,11 @@ data Slot = Slot
 derive instance eqSlot :: Eq Slot
 derive instance ordSlot :: Ord Slot
 
-component :: forall a. LocaliseFn -> H.Component HH.HTML Query a Message Aff
+component
+  :: forall a m
+  . MonadAff m
+  => LocaliseFn
+  -> H.Component HH.HTML Query a Message m
 component t =
   H.component
     { initialState: initialState
@@ -110,7 +114,7 @@ component t =
       ]
 
 
-  eval :: Query ~> H.ComponentDSL State Query Message Aff
+  eval :: Query ~> H.ComponentDSL State Query Message m
   eval (UpdateUsername username next) = do
     state <- H.get
     H.put state { username = wrap username }

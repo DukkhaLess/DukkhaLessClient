@@ -7,7 +7,7 @@ import Components.Sessions.Login as Login
 import Components.Sessions.Register as Register
 import Data.Const (Const)
 import Data.Maybe (Maybe(..))
-import Effect.Aff (Aff)
+import Effect.Aff.Class (class MonadAff)
 import Effect.Console (log)
 import Halogen as H
 import Halogen.Component.ChildPath (ChildPath, cpL, cpR, (:>))
@@ -57,7 +57,11 @@ data Slot = Slot
 derive instance eqSlot :: Eq Slot
 derive instance ordSlot :: Ord Slot
 
-component :: LocaliseFn -> H.Component HH.HTML Query Input Message Aff
+component
+  :: forall m
+  . MonadAff m
+  => LocaliseFn
+  -> H.Component HH.HTML Query Input Message m
 component t =
   H.parentComponent
     { initialState
@@ -66,12 +70,12 @@ component t =
     , receiver: receive
     }
     where
-      render :: State -> H.ParentHTML Query ChildQuery ChildSlot Aff
+      render :: State -> H.ParentHTML Query ChildQuery ChildSlot m
       render s = case s.session of
         Nothing -> renderUnAuthed s
         Just session -> HH.text "Authenticated!"
       
-      renderUnAuthed :: State -> H.ParentHTML Query ChildQuery ChildSlot Aff
+      renderUnAuthed :: State -> H.ParentHTML Query ChildQuery ChildSlot m
       renderUnAuthed s = case s.routeContext of
         RS.Login ->
           HH.slot'
@@ -88,7 +92,7 @@ component t =
             unit
             mapRegisterMessage
       
-      eval :: Query ~> H.ParentDSL State Query ChildQuery ChildSlot Message Aff
+      eval :: Query ~> H.ParentDSL State Query ChildQuery ChildSlot Message m
       eval (UpdateRoute route next) = do
         H.modify_ (_{ routeContext = route })
         pure next

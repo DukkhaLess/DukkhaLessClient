@@ -5,7 +5,7 @@ import Prelude
 import Data.Crypto.Types (DocumentId)
 import Data.Default (default)
 import Data.Maybe (Maybe(..), fromMaybe)
-import Effect.Aff (Aff)
+import Effect.Aff.Class (class MonadAff)
 import Halogen as H
 import Halogen.HTML as HH
 import Halogen.HTML.Events as HE
@@ -35,7 +35,10 @@ newtype Input
 initialState :: Input -> State
 initialState (Input input) = State { entry: fromMaybe default input.alreadyEditing }
 
-component :: forall a. LocaliseFn -> H.Component HH.HTML Query Input Message Aff
+component 
+  :: forall a m
+  . MonadAff m
+  => LocaliseFn -> H.Component HH.HTML Query Input Message m
 component t =
   H.component
     { initialState
@@ -48,7 +51,7 @@ component t =
   render :: State -> H.ComponentHTML Query
   render _ = HH.text "Hi"
 
-  eval :: Query ~> H.ComponentDSL State Query Message Aff
+  eval :: Query ~> H.ComponentDSL State Query Message m
   eval (NoOp next) = pure next
 
   receiver :: Input -> Maybe (Query Unit)

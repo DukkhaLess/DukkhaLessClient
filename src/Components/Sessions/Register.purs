@@ -15,7 +15,7 @@ import Data.Newtype (wrap, unwrap)
 import Data.Tuple (Tuple(..))
 import Data.Validation as V
 import Data.Validation.Rules as VR
-import Effect.Aff (Aff)
+import Effect.Aff.Class (class MonadAff)
 import Effect.Clipboard as EC
 import Effect.Exception (error, Error)
 import Halogen as H
@@ -63,7 +63,11 @@ data Slot = Slot
 derive instance eqSlot :: Eq Slot
 derive instance ordSlot :: Ord Slot
 
-component :: forall a. LocaliseFn -> H.Component HH.HTML Query a Message Aff
+component
+  :: forall a m
+  . MonadAff m
+  => LocaliseFn
+  -> H.Component HH.HTML Query a Message m
 component t =
   H.lifecycleComponent
     { initialState
@@ -147,7 +151,7 @@ component t =
             , HP.placeholder "Your secret keys."
             ]
 
-  eval :: Query ~> H.ComponentDSL State Query Message Aff
+  eval :: Query ~> H.ComponentDSL State Query Message m
   eval (GenerateKeyring next) = do
     state <- H.get
     nextState <- do
