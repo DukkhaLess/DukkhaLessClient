@@ -18,6 +18,7 @@ import Data.Maybe (Maybe(..))
 import Data.Newtype (class Newtype)
 import Data.String.CodeUnits (charAt)
 import Effect.Aff (Aff)
+import Effect.Aff.Class (class MonadAff, liftAff)
 import Model (SessionToken(..))
 
 newtype ApiPath = ApiPath String
@@ -49,9 +50,13 @@ withLeadingSlash s = case charAt 0 s of
   Just '/' -> s
   Just _   -> "/" <> s
 
-request :: forall a. DecodeJson a => Request Json -> Aff (Response (Either String a))
+request
+  :: forall a m
+  . DecodeJson a
+  => MonadAff m
+  => Request Json -> m (Response (Either String a))
 request req = do
-  resp <- AJ.request req
+  resp <- liftAff $ AJ.request req
   let body = lmap printResponseFormatError resp.body >>= decodeJson
   pure $ resp
     { body = body
