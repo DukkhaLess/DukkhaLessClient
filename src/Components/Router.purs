@@ -1,9 +1,9 @@
 module Components.Router where
 
 
-import AppRouting.Routes as R
-import AppRouting.Routes.Journals as RJ
-import AppRouting.Routes.Sessions as RS
+import Data.Routing.Routes as R
+import Data.Routing.Routes.Journals as RJ
+import Data.Routing.Routes.Sessions as RS
 import Components.Intro as Intro
 import Components.Journals as Journals
 import Components.NotFound as NotFound

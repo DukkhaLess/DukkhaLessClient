@@ -1,4 +1,4 @@
-module AppRouting.Literals where
+module Data.Routing.Literals where
 
 leader :: String
 leader = "#/"

@@ -2,7 +2,7 @@ module Components.Sessions where
 
 import Prelude
 
-import AppRouting.Routes.Sessions as RS
+import Data.Routing.Routes.Sessions as RS
 import Components.Sessions.Login as Login
 import Components.Sessions.Register as Register
 import Data.Const (Const)

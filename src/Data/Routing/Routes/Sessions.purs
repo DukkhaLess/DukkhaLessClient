@@ -1,6 +1,6 @@
-module AppRouting.Routes.Sessions where
+module Data.Routing.Routes.Sessions where
 
-import AppRouting.Class (class ReverseRoute)
+import Data.Routing.Class (class ReverseRoute)
 
 data Sessions
   = Login

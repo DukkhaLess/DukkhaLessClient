@@ -2,8 +2,8 @@ module Components.Sessions.Login where
 
 import Prelude
 
-import AppRouting.Routes as R
-import AppRouting.Routes.Sessions as RS
+import Data.Routing.Routes as R
+import Data.Routing.Routes.Sessions as RS
 import Components.Helpers.Forms as HF
 import Control.Monad.Error.Class (throwError)
 import Data.Either (Either(..), note, either)

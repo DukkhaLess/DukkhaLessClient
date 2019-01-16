@@ -1,8 +1,8 @@
-module AppRouting.Routes.Journals where
+module Data.Routing.Routes.Journals where
 
 import Prelude
 
-import AppRouting.Class (class ReverseRoute)
+import Data.Routing.Class (class ReverseRoute)
 import Data.Maybe (Maybe(..))
 
 data Journals

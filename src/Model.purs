@@ -2,7 +2,7 @@ module Model where
 
 import Prelude
 
-import AppRouting.Routes as Routes
+import Data.Routing.Routes as Routes
 import Data.Argonaut ((.?))
 import Data.Argonaut.Core (fromString, jsonEmptyObject)
 import Data.Argonaut.Decode.Class (class DecodeJson, decodeJson)

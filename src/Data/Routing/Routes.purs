@@ -1,4 +1,4 @@
-module AppRouting.Routes
+module Data.Routing.Routes
   ( module ARC
   , Routes(..)
   , routes
@@ -6,13 +6,13 @@ module AppRouting.Routes
 
 import Prelude
 
-import AppRouting.Class (class ReverseRoute, reverseRoute)
-import AppRouting.Class (class ReverseRoute, reverseRoute) as ARC
-import AppRouting.Literals
-import AppRouting.Routes.Journals (Journals)
-import AppRouting.Routes.Journals as RJ
-import AppRouting.Routes.Sessions (Sessions)
-import AppRouting.Routes.Sessions as RS
+import Data.Routing.Class (class ReverseRoute, reverseRoute)
+import Data.Routing.Class (class ReverseRoute, reverseRoute) as ARC
+import Data.Routing.Literals
+import Data.Routing.Routes.Journals (Journals)
+import Data.Routing.Routes.Journals as RJ
+import Data.Routing.Routes.Sessions (Sessions)
+import Data.Routing.Routes.Sessions as RS
 import Control.Alternative ((<|>))
 import Data.Array (tail)
 import Data.Foldable (foldl)

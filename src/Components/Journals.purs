@@ -2,7 +2,7 @@ module Components.Journals where
 
 import Prelude
 
-import AppRouting.Routes.Journals as RJ
+import Data.Routing.Routes.Journals as RJ
 import Components.Journals.Entry as JournalEntry
 import Components.Journals.List as JournalList
 import Data.Crypto.Types (DocumentId(..))
