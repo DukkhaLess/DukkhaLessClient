@@ -28,15 +28,14 @@ newtype State
 
 newtype Input
   = Input
-  { alreadyEditing :: Maybe JournalEntry
-  , desiredEntry :: Maybe DocumentId
+  { desiredEntry :: Maybe DocumentId
   }
 
 initialState :: Input -> State
-initialState (Input input) = State { entry: fromMaybe default input.alreadyEditing }
+initialState (Input input) = State { entry: default }
 
 component 
-  :: forall a m
+  :: forall m
   . MonadAff m
   => LocaliseFn -> H.Component HH.HTML Query Input Message m
 component t =

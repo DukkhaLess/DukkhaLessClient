@@ -3,17 +3,32 @@ module AppM where
 import Prelude
 
 import Control.Monad.Reader.Trans (class MonadAsk, ReaderT, ask, asks, runReaderT)
-import Data.Maybe (Maybe)
+import Data.Maybe (Maybe(..))
 import Effect.AVar (AVar)
 import Effect.Aff (Aff)
+import Effect.Aff.AVar (new)
 import Effect.Aff.Class (class MonadAff)
 import Effect.Class (class MonadEffect, liftEffect)
+import Intl (LocaliseFn)
 import Model (Session(..))
 import Type.Equality (class TypeEquals, from)
 
 
 type Env =
-  { currentSession :: AVar (Maybe Session)}
+  { currentSession :: AVar (Maybe Session)
+  , localiseFn :: AVar LocaliseFn
+  }
+
+
+makeEnv :: LocaliseFn -> Aff Env
+makeEnv l = do
+  localiseFn <- new l
+  currentSession <- new Nothing
+  pure $
+    { localiseFn
+    , currentSession
+    }
+    
 
 newtype AppM a = AppM (ReaderT Env Aff a)
 

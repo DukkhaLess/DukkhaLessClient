@@ -24,7 +24,6 @@ data Message = MNoOp
 newtype State 
   = State
     { routeContext :: RJ.Journals
-    , journalsState :: MJ.JournalsState
     }
 
 data Slot = Slot
@@ -34,7 +33,6 @@ derive instance ordSlot :: Ord Slot
 data Input
   = JournalsContext
   { routeContext :: RJ.Journals
-  , journalsState :: MJ.JournalsState
   }
 
 type ChildQuery
@@ -76,8 +74,7 @@ component t =
             JournalEntry.Slot
             (JournalEntry.component t)
             (JournalEntry.Input
-              { alreadyEditing: (unwrap state.journalsState).openForEdit
-              , desiredEntry: id <#> UUID}
+              { desiredEntry: id <#> UUID }
             )
             mapEditMessage
         RJ.List ->

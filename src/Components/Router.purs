@@ -1,9 +1,6 @@
 module Components.Router where
 
 
-import Data.Routing.Routes as R
-import Data.Routing.Routes.Journals as RJ
-import Data.Routing.Routes.Sessions as RS
 import Components.Intro as Intro
 import Components.Journals as Journals
 import Components.NotFound as NotFound
@@ -11,6 +8,9 @@ import Components.Resources as Resources
 import Components.Sessions as Sessions
 import Data.Const (Const)
 import Data.Maybe (Maybe(..))
+import Data.Routing.Routes as R
+import Data.Routing.Routes.Journals as RJ
+import Data.Routing.Routes.Sessions as RS
 import Effect (Effect)
 import Effect.Aff (Aff, launchAff)
 import Effect.Aff.Class (class MonadAff)
@@ -19,6 +19,7 @@ import Halogen.Component.ChildPath (ChildPath, cpL, cpR, (:>))
 import Halogen.Data.Prism (type (<\/>), type (\/))
 import Halogen.HTML as HH
 import Halogen.HTML.Properties as HP
+import Intl (LocaliseFn)
 import Model (Model, Session)
 import Prelude (type (~>), Unit, Void, const, pure, unit, (<<<), bind, ($), discard, map)
 import Routing.Hash (matches)
@@ -43,6 +44,12 @@ type ChildSlot
   \/ Journals.Slot
   \/ Void
 
+type State =
+  { localiseFn :: LocaliseFn
+  , currentRoute :: R.Routes
+  , session :: Maybe Session
+  }
+
 
 nada  :: forall a b. a -> Maybe b
 nada = const Nothing
@@ -65,18 +72,18 @@ pathToJournals =  cpR :> cpR :> cpR :> cpR :> cpL
 component
   :: forall m
   . MonadAff m
-  => Model
+  => State
   -> H.Component HH.HTML Input Unit Void m
-component initialModel = H.parentComponent
-  { initialState: const initialModel
+component initialState = H.parentComponent
+  { initialState: const initialState
   , render
   , eval
   , receiver: const Nothing
   }
   where
-    render :: Model -> H.ParentHTML Input ChildQuery ChildSlot m
-    render model = HH.div_ [navMenu, viewPage model model.currentPage] where
-      navMenu = case model.session of
+    render :: State -> H.ParentHTML Input ChildQuery ChildSlot m
+    render state = HH.div_ [navMenu, viewPage state] where
+      navMenu = case state.session of
         Just session -> sessionedMenu session
         Nothing      -> sessionlessMenu
 
@@ -95,46 +102,47 @@ component initialModel = H.parentComponent
 
     link r = HH.li_ [ HH.a [ HP.href $ R.reverseRoute r ] [ HH.text $ R.reverseRoute r ] ]
 
-    viewPage :: Model -> R.Routes -> H.ParentHTML Input ChildQuery ChildSlot m
-    viewPage model R.Intro =
-      HH.slot'
-        pathToIntro
-        Intro.Slot
-        (Intro.component model.localiseFn)
-        unit
-        nada
-    viewPage model R.Resources =
-      HH.slot'
-        pathToResources
-        Resources.Slot
-        (Resources.component model.localiseFn)
-        unit
-        nada
-    viewPage model (R.Sessions r) =
-      HH.slot'
-        pathToSessions
-        Sessions.Slot
-        (Sessions.component model.localiseFn)
-        (Sessions.RouteContext r)
-        mapSessionMessage
-    viewPage model R.NotFound =
-      HH.slot'
-        pathToNotFound
-        NotFound.Slot
-        (NotFound.component model.localiseFn)
-        unit
-        nada
-    viewPage model (R.Journals r) =
-      HH.slot'
-        pathToJournals
-        Journals.Slot
-        (Journals.component model.localiseFn)
-        (Journals.JournalsContext { routeContext: r, journalsState: model.journalsState})
-        nada
+    viewPage :: State -> H.ParentHTML Input ChildQuery ChildSlot m
+    viewPage { localiseFn, currentRoute } = case currentRoute of
+      R.Intro ->
+        HH.slot'
+          pathToIntro
+          Intro.Slot
+          (Intro.component localiseFn)
+          unit
+          nada
+      R.Resources ->
+        HH.slot'
+          pathToResources
+          Resources.Slot
+          (Resources.component localiseFn)
+          unit
+          nada
+      (R.Sessions r) ->
+        HH.slot'
+          pathToSessions
+          Sessions.Slot
+          (Sessions.component localiseFn)
+          (Sessions.RouteContext r)
+          mapSessionMessage
+      R.NotFound ->
+        HH.slot'
+          pathToNotFound
+          NotFound.Slot
+          (NotFound.component localiseFn)
+          unit
+          nada
+      (R.Journals r) ->
+        HH.slot'
+          pathToJournals
+          Journals.Slot
+          (Journals.component localiseFn)
+          (Journals.JournalsContext { routeContext: r })
+          nada
 
-    eval :: Input ~> H.ParentDSL Model Input ChildQuery ChildSlot Void m
+    eval :: Input ~> H.ParentDSL State Input ChildQuery ChildSlot Void m
     eval (Goto loc next) = do
-      H.modify_ (_{ currentPage = loc})
+      H.modify_ (_{ currentRoute = loc})
       pure next
     eval (UpdateSession sess next) = do
       H.modify_ (_{ session = Just sess })
