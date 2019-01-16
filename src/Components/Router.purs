@@ -24,7 +24,7 @@ import Model (Model, Session)
 import Prelude (type (~>), Unit, Void, const, pure, unit, (<<<), bind, ($), discard, map)
 import Routing.Hash (matches)
 
-data Input a
+data Query a
   = Goto R.Routes a
   | UpdateSession Session a
 
@@ -72,29 +72,29 @@ pathToJournals =  cpR :> cpR :> cpR :> cpR :> cpL
 component
   :: forall m
   . MonadAff m
-  => State
-  -> H.Component HH.HTML Input Unit Void m
-component initialState = H.parentComponent
-  { initialState: const initialState
+  => LocaliseFn
+  -> H.Component HH.HTML Query Unit Void m
+component localiseFn = H.parentComponent
+  { initialState: const { localiseFn, session: Nothing, currentRoute: R.Intro }
   , render
   , eval
   , receiver: const Nothing
   }
   where
-    render :: State -> H.ParentHTML Input ChildQuery ChildSlot m
+    render :: State -> H.ParentHTML Query ChildQuery ChildSlot m
     render state = HH.div_ [navMenu, viewPage state] where
       navMenu = case state.session of
         Just session -> sessionedMenu session
         Nothing      -> sessionlessMenu
 
 
-    sessionlessMenu :: H.ParentHTML Input ChildQuery ChildSlot m
+    sessionlessMenu :: H.ParentHTML Query ChildQuery ChildSlot m
     sessionlessMenu =
       HH.nav_
         [ HH.ul_ (map link [R.Intro, R.Resources, R.Sessions RS.Login])
         ]
 
-    sessionedMenu :: Session -> H.ParentHTML Input ChildQuery ChildSlot m
+    sessionedMenu :: Session -> H.ParentHTML Query ChildQuery ChildSlot m
     sessionedMenu session =
       HH.nav_
         [ HH.ul_ (map link [R.Intro, R.Resources, R.Journals $ RJ.Edit Nothing])
@@ -102,7 +102,7 @@ component initialState = H.parentComponent
 
     link r = HH.li_ [ HH.a [ HP.href $ R.reverseRoute r ] [ HH.text $ R.reverseRoute r ] ]
 
-    viewPage :: State -> H.ParentHTML Input ChildQuery ChildSlot m
+    viewPage :: State -> H.ParentHTML Query ChildQuery ChildSlot m
     viewPage { localiseFn, currentRoute } = case currentRoute of
       R.Intro ->
         HH.slot'
@@ -140,7 +140,7 @@ component initialState = H.parentComponent
           (Journals.JournalsContext { routeContext: r })
           nada
 
-    eval :: Input ~> H.ParentDSL State Input ChildQuery ChildSlot Void m
+    eval :: Query ~> H.ParentDSL State Query ChildQuery ChildSlot Void m
     eval (Goto loc next) = do
       H.modify_ (_{ currentRoute = loc})
       pure next
@@ -148,12 +148,12 @@ component initialState = H.parentComponent
       H.modify_ (_{ session = Just sess })
       pure next
 
-routeSignal :: H.HalogenIO Input Void Aff -> Effect (Effect Unit)
+routeSignal :: H.HalogenIO Query Void Aff -> Effect (Effect Unit)
 routeSignal driver = matches R.routes hashChanged
   where
     hashChanged _ newRoute = do
       _ <- launchAff $ driver.query <<< H.action <<< Goto $ newRoute
       pure unit
 
-mapSessionMessage :: Sessions.Message -> Maybe (Input Unit)
+mapSessionMessage :: Sessions.Message -> Maybe (Query Unit)
 mapSessionMessage (Sessions.SessionCreated session) = Just (UpdateSession session unit)

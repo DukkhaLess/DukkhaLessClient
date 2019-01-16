@@ -48,11 +48,6 @@ main = HA.runHalogenAff $ do
         
     body <- HA.awaitBody
     _ <- liftEffect removeLoader
-    let initialRouterState =
-          { localiseFn: translate
-          , currentRoute: Routes.Intro
-          , session: existingSession
-          }
-    let rootComponent = H.hoist (runAppM env) (Router.component initialRouterState)
+    let rootComponent = H.hoist (runAppM env) (Router.component translate)
     router <- runUI rootComponent unit body
     forkAff $ liftEffect $ Router.routeSignal router
