@@ -4,8 +4,10 @@ import Data.HTTP.Helpers
 import Data.HTTP.Payloads
 import Prelude
 
-import Data.Crypto.Class (decrypt)
-import Data.Crypto.Types (DocumentId)
+import Affjax (Response)
+import Data.Bifunctor (lmap)
+import Data.Crypto.Class (DecryptionError(..), decrypt)
+import Data.Crypto.Types (Document(..), DocumentId)
 import Data.Either (Either)
 import Data.Newtype (unwrap)
 import Effect.Aff.Class (class MonadAff)
@@ -24,9 +26,8 @@ getJournalEntry
   => SessionToken
   -> DocumentId
   -> Keyring
-  -> m (Either String JournalEntry)
+  -> m (Either DecryptionError JournalEntry)
 getJournalEntry sessionToken id keyring = do
-  response <- request (get (ApiPath "/journals/" <> unwrap id) sessionToken)
-  result <- response.body <#> decrypt keyring
-  pure result
+  response <- request (get (ApiPath ("/journals/" <> unwrap id)) sessionToken) :: m (Response (Either String Document))
+  pure $ (lmap Description response.body) >>= decrypt keyring
 

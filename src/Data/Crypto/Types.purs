@@ -23,8 +23,9 @@ data MessageContents
   = Boxed Box SenderPublicKey
   | SecretBoxed SecretBox
 
-data DocumentId
+newtype DocumentId
   = UUID String
+derive instance newtypeDocumentId :: Newtype DocumentId _
 
 instance encodeDocumentId :: EncodeJson DocumentId where
   encodeJson (UUID id) = encodeJson id

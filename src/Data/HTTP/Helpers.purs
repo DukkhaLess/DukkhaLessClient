@@ -15,13 +15,15 @@ import Data.Bifunctor (lmap)
 import Data.Either (Either(Left))
 import Data.HTTP.Method (Method(..))
 import Data.Maybe (Maybe(..))
-import Data.Newtype (class Newtype)
+import Data.Newtype (class Newtype, unwrap, wrap)
 import Data.String.CodeUnits (charAt)
 import Effect.Aff.Class (class MonadAff, liftAff)
 import Model (SessionToken(..))
 
 newtype ApiPath = ApiPath String
 derive instance newtypeApiPath :: Newtype ApiPath _
+instance semigroupApiPath :: Semigroup ApiPath where
+  append a b = wrap $ unwrap a <> unwrap b
 
 apiLocation :: String
 apiLocation = "/api"
