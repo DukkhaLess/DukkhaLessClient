@@ -16,6 +16,7 @@ import Halogen.HTML.Properties as HP
 import Intl (LocaliseFn)
 import Model (Session(..))
 import Model.Journal (JournalEntry(..), JournalMeta(..))
+import Network.RemoteData (RemoteData(..))
 import Type.Row (type (+))
 
 data Query a = NoOp a
@@ -28,7 +29,7 @@ data Message = MNoMsg
 
 newtype State
   = State 
-    { entry :: JournalEntry
+    { entry :: RemoteData String JournalEntry
     }
 
 newtype Input
@@ -37,7 +38,7 @@ newtype Input
   }
 
 initialState :: Input -> State
-initialState (Input input) = State { entry: default }
+initialState (Input input) = State { entry: NotAsked }
 
 type RequiredState r =
   ( EditingJournalEntryRow
