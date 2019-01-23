@@ -8,7 +8,6 @@ import Components.Journals.List as JournalList
 import Control.Monad.Reader.Class (class MonadAsk)
 import Data.Const (Const)
 import Data.Crypto.Types (DocumentId(..))
-import Data.Map (Map)
 import Data.Maybe (Maybe(..))
 import Data.Newtype (unwrap)
 import Data.Routing.Routes.Journals as RJ
@@ -90,14 +89,14 @@ component t =
             (JournalEntry.Input
               { desiredEntry: id <#> UUID }
             )
-            mapEditMessage
+            (const Nothing)
         RJ.List ->
           HH.slot'
             pathToList
             JournalList.Slot
             (JournalList.component t)
             unit
-            mapListMessage
+            (const Nothing)
 
       eval :: Query ~> H.ParentDSL State Query ChildQuery ChildSlot Message m
       eval (QNoOp next) = pure next
@@ -107,9 +106,3 @@ component t =
 
       initialState :: Input -> State
       initialState (JournalsContext c) = State c
- 
-mapEditMessage :: JournalEntry.Message -> Maybe (Query Unit)
-mapEditMessage _ = Nothing
-
-mapListMessage :: JournalList.Message -> Maybe (Query Unit)
-mapListMessage _ = Nothing

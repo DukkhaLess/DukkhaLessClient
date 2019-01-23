@@ -10,6 +10,7 @@ import Data.Maybe (Maybe(..), fromMaybe, maybe)
 import Effect.AVar (AVar)
 import Effect.Aff.Class (class MonadAff)
 import Halogen as H
+import Halogen as H
 import Halogen.HTML as HH
 import Halogen.HTML.Events as HE
 import Halogen.HTML.Properties as HP
@@ -17,6 +18,7 @@ import Intl (LocaliseFn)
 import Model (Session(..))
 import Model.Journal (JournalEntry(..), JournalMeta(..))
 import Network.RemoteData (RemoteData(..))
+import Type.Data.Boolean (kind Boolean)
 import Type.Row (type (+))
 
 data Query a = Initialize a
@@ -30,6 +32,7 @@ data Message = MNoMsg
 type State =
   { entry :: RemoteData String JournalEntry
   , desiredEntryId :: Maybe DocumentId
+  , editing :: Boolean
   }
 
 newtype Input
@@ -40,6 +43,7 @@ newtype Input
 initialState :: Input -> State
 initialState (Input input) = 
   { entry: NotAsked
+  , editing: false
   , desiredEntryId: input.desiredEntry
   }
 
@@ -66,7 +70,30 @@ component t =
   where
 
   render :: State -> H.ComponentHTML Query
-  render _ = HH.text "Hi"
+  render state = case state.entry of
+    Failure e -> loadingFailed e
+    Success a ->
+      case state.editing of 
+        false -> markdownRendered a
+        true  ->  markdownEdit a
+    NotAsked -> notAsked
+    Loading  -> loading
+    where
+
+    markdownRendered :: JournalEntry -> H.ComponentHTML Query
+    markdownRendered (JournalEntry e) = HH.text "Rendered!"
+
+    markdownEdit :: JournalEntry -> H.ComponentHTML Query
+    markdownEdit (JournalEntry e) = HH.text "Editing!"
+
+    loadingFailed :: String -> H.ComponentHTML Query
+    loadingFailed e = HH.text e
+
+    notAsked :: H.ComponentHTML Query
+    notAsked = HH.text "None requested"
+    
+    loading :: H.ComponentHTML Query
+    loading = HH.text "Loading"
 
   eval :: Query ~> H.ComponentDSL State Query Message m
   eval (Initialize next) = do
