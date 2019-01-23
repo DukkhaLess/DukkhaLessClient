@@ -26,19 +26,18 @@ derive instance newtypeApiPath :: Newtype ApiPath _
 apiLocation :: String
 apiLocation = "/api"
 
-unsafeRequestCleartext :: forall a. EncodeJson a => Method -> ApiPath -> a -> Request Json
+unsafeRequestCleartext :: Method -> ApiPath -> Maybe Json -> Request Json
 unsafeRequestCleartext method (ApiPath path) payload
  = defaultRequest
   { url = path'
-  , content = Just $ RB.Json (encodeJson payload)
+  , content = RB.Json <$> payload
   , method = Left method
   , responseFormat = json
   } where
-    payload' = encodeJson payload
     path' = apiLocation <> withLeadingSlash path
 
-unsafePostCleartext :: forall a. EncodeJson a => ApiPath -> a -> Request Json
-unsafePostCleartext = unsafeRequestCleartext POST
+unsafePostCleartext :: forall p. EncodeJson p => ApiPath -> p -> Request Json
+unsafePostCleartext a = unsafeRequestCleartext POST a <<< Just <<< encodeJson
 
 sessionHeaders :: Request Json -> SessionToken -> Request Json
 sessionHeaders req (SessionToken t) =
@@ -47,11 +46,11 @@ sessionHeaders req (SessionToken t) =
     , withCredentials = true
     }
 
-post :: forall a. CipherText a => ApiPath -> a -> SessionToken -> Request Json
-post a p = sessionHeaders (unsafePostCleartext a p)
+post :: forall p. CipherText p => ApiPath -> p -> SessionToken -> Request Json
+post a p = sessionHeaders (unsafePostCleartext a $ Just p)
 
-get :: forall a. CipherText a => ApiPath -> a -> SessionToken -> Request Json
-get a p = sessionHeaders (unsafeRequestCleartext GET a p)
+get :: ApiPath -> SessionToken -> Request Json
+get a = sessionHeaders (unsafeRequestCleartext GET a Nothing)
 
 withLeadingSlash :: String -> String
 withLeadingSlash s = case charAt 0 s of

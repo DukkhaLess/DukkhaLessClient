@@ -4,7 +4,6 @@ import Prelude
 
 import Crypt.NaCl (BoxPublicKey, BoxSecretKey, boxAfter, boxBefore, boxOpenAfter, fromUint8Array, generateNonce, secretBox, secretBoxOpen, toUint8Array)
 import Crypt.NaCl.Types (BoxSharedKey, Message, Nonce, SecretBoxKey)
-import Data.Argonaut.Decode (class DecodeJson)
 import Data.Argonaut.Encode (class EncodeJson)
 import Data.ArrayBuffer.ArrayBuffer (fromString, decodeToString)
 import Data.ArrayBuffer.DataView (whole, buffer)
@@ -15,8 +14,8 @@ import Data.Bifunctor (lmap)
 import Data.Crypto.Types (DocumentMetaData, Document, EncryptedMessage(..), MessageContents(..), SenderPublicKey(..))
 import Data.Either (Either, note)
 import Data.Newtype (unwrap)
-import Data.TextEncoder (encodeUtf8)
-import Effect (Effect)
+import Effect.Aff.Class (class MonadAff)
+import Effect.Class (liftEffect)
 import Model.Keyring (Keyring(..), boxPrivateKey, boxPublicKey, secretBoxKey)
 
 class EncodeJson a <= CipherText a
@@ -34,23 +33,23 @@ data CryptoKey
   | SecretBox SecretBoxKey
 
 class CipherText b <= Encrypt a b where
-  encrypt :: a -> (Keyring -> CryptoKey) -> Keyring -> Effect b
-  decrypt :: b -> Keyring -> Either DecryptionError a
+  encrypt :: forall m. MonadAff m => a -> (Keyring -> CryptoKey) -> Keyring -> m b
+  decrypt :: Keyring -> b -> Either DecryptionError a
 
 instance encryptStringMessage :: Encrypt String EncryptedMessage where
   encrypt str keyFn keyring = do
     let buff = fromString str
     encrypt buff keyFn keyring
-  decrypt message ring = do
-    buff <- decrypt message ring
+  decrypt ring message = do
+    buff <- decrypt ring message
     lmap (\e -> Description (show e)) $ decodeToString buff
 
 instance encryptArrayBufferMessage :: Encrypt ArrayBuffer EncryptedMessage where
   encrypt buff keyFn keyring = do
     let message = fromUint8Array $ asUint8Array $ whole buff
-    nonce <- generateNonce
+    nonce <- liftEffect $ generateNonce
     pure $ encryptMessage message keyFn keyring nonce
-  decrypt message ring = do
+  decrypt ring message = do
     let unwrappedMessage = unwrap message
     let nonce = unwrappedMessage.nonce
     let contents = unwrappedMessage.contents

@@ -1,14 +1,15 @@
 module Model.Journal where
 
+import Data.Default
 import Prelude
 
 import Data.Crypto.Class (class Encrypt, decrypt, encrypt)
 import Data.Crypto.Types (Document(..), DocumentId, DocumentMetaData(..))
-import Data.Default
+import Data.DateTime (DateTime)
 import Data.Map (Map, empty)
 import Data.Maybe (Maybe(..), maybe)
 import Data.Newtype (unwrap, wrap, class Newtype)
-import Data.DateTime (DateTime)
+import Effect.Class (liftEffect)
 import Effect.Now (nowDateTime)
 
 newtype JournalMeta
@@ -33,17 +34,17 @@ instance defaultJournalMeta :: Default JournalMeta where
 instance encryptJournalMeta :: Encrypt JournalMeta DocumentMetaData where
   encrypt (JournalMeta meta) keyFn ring = do
     title <- encrypt meta.title keyFn ring
-    createdAt <- maybe nowDateTime pure meta.createdAt
-    lastUpdated <- maybe nowDateTime pure meta.lastUpdated
+    createdAt <- liftEffect $ maybe nowDateTime pure meta.createdAt
+    lastUpdated <- liftEffect $ maybe nowDateTime pure meta.lastUpdated
     pure $ DocumentMetaData {
       title: wrap title,
       createdAt: createdAt,
       lastUpdated: lastUpdated,
       id: meta.id
     }
-  decrypt (DocumentMetaData documentMeta) ring = do
+  decrypt ring (DocumentMetaData documentMeta) = do
     let titleCt = unwrap documentMeta.title
-    title <- decrypt titleCt ring
+    title <- decrypt ring titleCt 
     pure $ JournalMeta {
       title: title,
       createdAt: Just documentMeta.createdAt,
@@ -74,9 +75,9 @@ instance encryptJournalEntry :: Encrypt JournalEntry Document where
       metaData: meta,
       content: wrap contents
     }
-  decrypt (Document document) ring = do
-    meta <- decrypt document.metaData ring
-    contents <- decrypt (unwrap document.content) ring
+  decrypt ring (Document document) = do
+    meta <- decrypt ring document.metaData
+    contents <- decrypt ring (unwrap document.content)
     pure $ JournalEntry {
       content: contents,
       metaData: meta
