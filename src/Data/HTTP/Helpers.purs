@@ -27,22 +27,32 @@ derive instance newtypeApiPath :: Newtype ApiPath _
 apiLocation :: String
 apiLocation = "/api"
 
-unsafePostCleartext :: forall a. EncodeJson a => ApiPath -> a -> Request Json
-unsafePostCleartext (ApiPath path) payload
+unsafeRequestCleartext :: forall a. EncodeJson a => Method -> ApiPath -> a -> Request Json
+unsafeRequestCleartext method (ApiPath path) payload
  = defaultRequest
   { url = path'
   , content = Just $ RB.Json (encodeJson payload)
-  , method = Left POST
-    , responseFormat = json
+  , method = Left method
+  , responseFormat = json
   } where
     payload' = encodeJson payload
     path' = apiLocation <> withLeadingSlash path
 
-post :: forall a. CipherText a => ApiPath -> a -> SessionToken -> Request Json
-post a p (SessionToken t) = (unsafePostCleartext a p)
+unsafePostCleartext :: forall a. EncodeJson a => ApiPath -> a -> Request Json
+unsafePostCleartext = unsafeRequestCleartext POST
+
+sessionHeaders :: Request Json -> SessionToken -> Request Json
+sessionHeaders req (SessionToken t) =
+    req 
     { headers = [RequestHeader "Authorization" t]
     , withCredentials = true
     }
+
+post :: forall a. CipherText a => ApiPath -> a -> SessionToken -> Request Json
+post a p = sessionHeaders (unsafePostCleartext a p)
+
+get :: forall a. CipherText a => ApiPath -> a -> SessionToken -> Request Json
+get a p = sessionHeaders (unsafeRequestCleartext GET a p)
 
 withLeadingSlash :: String -> String
 withLeadingSlash s = case charAt 0 s of
@@ -50,6 +60,7 @@ withLeadingSlash s = case charAt 0 s of
   Just '/' -> s
   Just _   -> "/" <> s
 
+-- | Request the desired JSON endpoint, parsing the result from JSON using the needed decoder
 request
   :: forall a m
   . DecodeJson a
