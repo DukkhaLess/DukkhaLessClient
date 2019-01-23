@@ -82,18 +82,3 @@ instance encryptJournalEntry :: Encrypt JournalEntry Document where
       content: contents,
       metaData: meta
     }
-
-newtype JournalsState
-  = JournalsState
-    { openForEdit :: Maybe JournalEntry
-    , cachedMeta :: Map DocumentId JournalMeta
-    }
-
-instance defaultJournalsState :: Default JournalsState where
-  default
-    = JournalsState
-      { openForEdit: Nothing
-      , cachedMeta: empty
-      }
-
-derive instance newtypeJournalsState :: Newtype JournalsState _

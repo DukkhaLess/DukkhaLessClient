@@ -14,7 +14,6 @@ import Data.Generic.Rep.Show (genericShow)
 import Data.Maybe (Maybe(..))
 import Data.Newtype (class Newtype, unwrap, wrap)
 import Intl (LocaliseFn)
-import Model.Journal (JournalsState)
 import Model.Journal as MJ
 import Model.Keyring (Keyring)
 
@@ -65,7 +64,6 @@ type Model =
   { localiseFn :: LocaliseFn
   , currentPage :: Routes.Routes
   , session :: Maybe Session
-  , journalsState :: JournalsState
   }
 
 initial :: LocaliseFn -> Model
@@ -73,5 +71,4 @@ initial f =
   { localiseFn: f
   , currentPage: Routes.Intro
   , session: Nothing
-  , journalsState: default
   }

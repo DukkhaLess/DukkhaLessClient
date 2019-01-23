@@ -21,7 +21,9 @@ import Network.RemoteData (RemoteData(..))
 import Type.Data.Boolean (kind Boolean)
 import Type.Row (type (+))
 
-data Query a = Initialize a
+data Query a
+  = Initialize a
+  | ToggleEdit Boolean a
 
 data Slot = Slot
 derive instance eqSlot :: Eq Slot
@@ -102,5 +104,8 @@ component t =
       Just id -> do
         H.modify_ (_{ entry = Loading })
       Nothing -> H.modify_ (_{ entry = Success default })
+    pure next
+  eval (ToggleEdit edit next) = do
+    H.modify_ (_{ editing = edit })
     pure next
     
