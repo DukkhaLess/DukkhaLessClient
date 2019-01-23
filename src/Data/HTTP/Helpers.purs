@@ -17,7 +17,6 @@ import Data.HTTP.Method (Method(..))
 import Data.Maybe (Maybe(..))
 import Data.Newtype (class Newtype)
 import Data.String.CodeUnits (charAt)
-import Effect.Aff (Aff)
 import Effect.Aff.Class (class MonadAff, liftAff)
 import Model (SessionToken(..))
 
