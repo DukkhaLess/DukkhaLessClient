@@ -13,7 +13,6 @@ import Data.DateTime (DateTime)
 import Data.DateTime.ISO (ISO(..), unwrapISO)
 import Data.Either (Either(..))
 import Data.JsonDecode.Helpers (decodeJObject, decodeJString)
-import Data.Lens (_1)
 import Data.Maybe (Maybe)
 import Data.Newtype (class Newtype)
 
