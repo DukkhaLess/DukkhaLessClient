@@ -18,8 +18,7 @@ newtype JournalMeta
     , createdAt :: Maybe DateTime
     , lastUpdated :: Maybe DateTime
     , id :: Maybe DocumentId
-    }
-
+    } 
 derive instance newtypeJournalMeta :: Newtype JournalMeta _
 
 instance defaultJournalMeta :: Default JournalMeta where
@@ -57,6 +56,11 @@ newtype JournalEntry
     { content :: String
     , metaData :: JournalMeta
     }
+
+setTitle :: String -> JournalEntry -> JournalEntry
+setTitle nextTitle (JournalEntry j) = wrap nextJournal where
+  nextJournal = j { metaData = wrap nextMeta }
+  nextMeta = (unwrap j.metaData) { title = nextTitle }
 
 derive instance newtypeJournalEntry :: Newtype JournalEntry _
 

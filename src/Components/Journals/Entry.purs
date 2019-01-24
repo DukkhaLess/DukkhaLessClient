@@ -23,7 +23,7 @@ import Halogen.HTML.Properties as HP
 import Halogen.HTML.Properties as HP
 import Intl (LocaliseFn)
 import Model (Session(..))
-import Model.Journal (JournalEntry(..), JournalMeta(..))
+import Model.Journal (JournalEntry(..), JournalMeta(..), setTitle)
 import Network.RemoteData (RemoteData(..))
 import Style.Bulogen as SB
 import Type.Data.Boolean (kind Boolean)
@@ -34,6 +34,7 @@ data Query a
   = Initialize a
   | ToggleEdit Boolean a
   | UpdateContents String a
+  | UpdateTitle String a
 
 data Slot = Slot
 derive instance eqSlot :: Eq Slot
@@ -147,6 +148,12 @@ component t =
     let newEntry = (wrap <<< (_{ content = mdText }) <<< unwrap ) <$> entry 
     H.modify_ (_{ entry = newEntry })
     pure next
+  eval (UpdateTitle nextTitle next) = do
+    entry <- H.gets (_.entry)
+    let nextEntry = entry <#> setTitle nextTitle
+    H.modify_ (_{ entry = nextEntry })
+    pure next
+ 
   
   mapEditMessageToQuery :: Edit.Message -> Maybe (Query Unit)
   mapEditMessageToQuery msg = case msg of
