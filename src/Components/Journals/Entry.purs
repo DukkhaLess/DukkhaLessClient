@@ -99,16 +99,7 @@ component t =
   render :: State -> H.ParentHTML Query ChildQuery ChildSlot m
   render state = case state.entry of
     Failure e -> loadingFailed e
-    Success a ->
-      case state.contentEditing of 
-        false -> markdownRendered a
-        true  ->
-          HH.slot'
-            pathToEdit
-            Edit.Slot
-            (Edit.component t)
-            (unwrap a).content
-            mapEditMessageToQuery
+    Success a -> entryRender a
     NotAsked -> notAsked
     Loading  -> loading
     where
