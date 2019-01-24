@@ -13,6 +13,7 @@ import Halogen.HTML.Events as HE
 import Halogen.HTML.Properties as HP
 import Intl (LocaliseFn)
 import Style.Bulogen as SB
+import Style.Classes as SC
 import Web.HTML.HTMLElement as WE
 
 type State = String
@@ -64,7 +65,7 @@ component t =
             [ textFieldClassName
             , SB.textarea
             , SB.fixedSize
-            , SB.cliped
+            , SC.xWrapped
             ]
           ]
         ]

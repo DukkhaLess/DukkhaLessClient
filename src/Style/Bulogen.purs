@@ -894,4 +894,3 @@ panelBlock = HH.ClassName "panel-block"
 
 tabs :: HH.ClassName
 tabs = HH.ClassName "tabs"
-
