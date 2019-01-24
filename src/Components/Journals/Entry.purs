@@ -32,9 +32,10 @@ import Web.HTML.Event.EventTypes (offline)
 
 data Query a
   = Initialize a
-  | ToggleEdit Boolean a
+  | ToggleContentEdit Boolean a
   | UpdateContents String a
   | UpdateTitle String a
+  | ToggleTitleEdit Boolean a
 
 data Slot = Slot
 derive instance eqSlot :: Eq Slot
@@ -56,7 +57,8 @@ data Message = MNoMsg
 type State =
   { entry :: RemoteData DecryptionError JournalEntry
   , desiredEntryId :: Maybe DocumentId
-  , editing :: Boolean
+  , contentEditing :: Boolean
+  , titleEditing :: Boolean
   }
 
 newtype Input
@@ -67,8 +69,9 @@ newtype Input
 initialState :: Input -> State
 initialState (Input input) = 
   { entry: NotAsked
-  , editing: false
+  , contentEditing: false
   , desiredEntryId: input.desiredEntry
+  , titleEditing: false
   }
 
 type RequiredState r =
@@ -97,7 +100,7 @@ component t =
   render state = case state.entry of
     Failure e -> loadingFailed e
     Success a ->
-      case state.editing of 
+      case state.contentEditing of 
         false -> markdownRendered a
         true  ->
           HH.slot'
@@ -110,10 +113,23 @@ component t =
     Loading  -> loading
     where
 
+    entryRender :: JournalEntry -> H.ParentHTML Query ChildQuery ChildSlot m
+    entryRender entry =
+      case state.contentEditing of 
+        false -> markdownRendered entry
+        true  ->
+          HH.slot'
+            pathToEdit
+            Edit.Slot
+            (Edit.component t)
+            (unwrap entry).content
+            mapEditMessageToQuery
+
+
     markdownRendered :: JournalEntry -> H.ParentHTML Query ChildQuery ChildSlot m
     markdownRendered (JournalEntry e) =
       HH.div []
-        [ HH.p [ HE.onClick (HE.input_ $ ToggleEdit true)]
+        [ HH.p [ HE.onClick (HE.input_ $ ToggleContentEdit true)]
           [ HH.text "test"
           , HH.div
             [ HP.class_ (HH.ClassName "markdown-body")
@@ -140,8 +156,11 @@ component t =
         H.modify_ (_{ entry = Loading })
       Nothing -> H.modify_ (_{ entry = Success default })
     pure next
-  eval (ToggleEdit edit next) = do
-    H.modify_ (_{ editing = edit })
+  eval (ToggleContentEdit edit next) = do
+    H.modify_ (_{ contentEditing = edit })
+    pure next
+  eval (ToggleTitleEdit edit next) = do
+    H.modify_ (_{ titleEditing = edit })
     pure next
   eval (UpdateContents mdText next) = do
     entry <- H.gets (_.entry)
@@ -153,12 +172,9 @@ component t =
     let nextEntry = entry <#> setTitle nextTitle
     H.modify_ (_{ entry = nextEntry })
     pure next
- 
   
   mapEditMessageToQuery :: Edit.Message -> Maybe (Query Unit)
   mapEditMessageToQuery msg = case msg of
-    Edit.Finalized -> Just $ ToggleEdit false unit
+    Edit.Finalized -> Just $ ToggleContentEdit false unit
     Edit.UpdatedContent c -> Just $ UpdateContents c unit
-
-    
     
