@@ -2,7 +2,7 @@ module Data.Crypto.Types where
 
 import Prelude
 
-import Crypt.NaCl (Box, BoxPublicKey, BoxSharedKey, Nonce, SecretBox, SecretBoxKey, fromUint8Array, toUint8Array)
+import Crypt.NaCl (Box, BoxSecretKey, BoxPublicKey, BoxSharedKey, Nonce, SecretBox, SecretBoxKey, fromUint8Array, toUint8Array)
 import Data.Argonaut (jsonEmptyObject)
 import Data.Argonaut.Decode (class DecodeJson, decodeJson)
 import Data.Argonaut.Decode.Combinators ((.?))
@@ -160,3 +160,12 @@ instance decodeJsonDocument :: DecodeJson Document where
       , content: content
       }
 derive instance newtypeDocument :: Newtype Document _
+
+data DecryptionError
+  = Description String
+  | InvalidKeys
+
+data CryptoKey
+  = BoxPair BoxPublicKey BoxSecretKey
+  | SecretBox SecretBoxKey
+

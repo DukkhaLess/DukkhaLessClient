@@ -6,8 +6,8 @@ import Prelude
 
 import Affjax (Response)
 import Data.Bifunctor (lmap)
-import Data.Crypto.Class (DecryptionError(..), decrypt)
-import Data.Crypto.Types (Document(..), DocumentId)
+import Data.Crypto.Class (decrypt)
+import Data.Crypto.Types (Document(..), DocumentId, DecryptionError(..))
 import Data.Either (Either)
 import Data.Newtype (unwrap)
 import Effect.Aff.Class (class MonadAff)

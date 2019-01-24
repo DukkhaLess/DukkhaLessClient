@@ -11,7 +11,7 @@ import Data.ArrayBuffer.Typed (asUint8Array, dataView)
 import Data.ArrayBuffer.Types (ArrayBuffer)
 import Data.Base64 (Base64(..), encodeBase64, decodeBase64)
 import Data.Bifunctor (lmap)
-import Data.Crypto.Types (DocumentMetaData, Document, EncryptedMessage(..), MessageContents(..), SenderPublicKey(..))
+import Data.Crypto.Types
 import Data.Either (Either, note)
 import Data.Newtype (unwrap)
 import Effect.Aff.Class (class MonadAff)
@@ -23,14 +23,6 @@ class EncodeJson a <= CipherText a
 instance cipherTextDocumentMetaData :: CipherText DocumentMetaData
 instance cipherTextDocument :: CipherText Document
 instance cipherTextEncryptedMessage :: CipherText EncryptedMessage
-
-data DecryptionError
-  = Description String
-  | InvalidKeys
-
-data CryptoKey
-  = BoxPair BoxPublicKey BoxSecretKey
-  | SecretBox SecretBoxKey
 
 class CipherText b <= Encrypt a b where
   encrypt :: forall m. MonadAff m => a -> (Keyring -> CryptoKey) -> Keyring -> m b
