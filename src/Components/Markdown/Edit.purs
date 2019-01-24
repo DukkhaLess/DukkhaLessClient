@@ -18,6 +18,8 @@ import Web.HTML.HTMLElement as WE
 type State = String
 
 data Slot = Slot
+derive instance eqSlot :: Eq Slot
+derive instance ordSlot :: Ord Slot
 
 data Query a
   = Initialize a

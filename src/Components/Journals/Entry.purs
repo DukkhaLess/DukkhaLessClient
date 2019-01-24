@@ -4,14 +4,20 @@ import Prelude
 
 import AppM (CurrentSessionRow, EditingJournalEntryRow)
 import Components.Helpers.Markdown (renderMarkdown)
+import Components.Markdown.Edit as Edit
 import Control.Monad.Reader.Class (class MonadAsk, asks)
+import Data.Const (Const)
+import Data.Crypto.Class (DecryptionError)
 import Data.Crypto.Types (DocumentId)
 import Data.Default (default)
 import Data.Markdown.Parser (MarkdownText(..))
 import Data.Maybe (Maybe(..), fromMaybe, maybe)
 import Data.Newtype (wrap, unwrap)
+import Data.Routing.Routes.Journals (Journals(..))
 import Effect.Aff.Class (class MonadAff)
 import Halogen as H
+import Halogen.Component.ChildPath (ChildPath, cpL, cpR, (:>))
+import Halogen.Data.Prism (type (<\/>), type (\/))
 import Halogen.HTML as HH
 import Halogen.HTML.Events as HE
 import Halogen.HTML.Properties as HP
@@ -23,6 +29,7 @@ import Network.RemoteData (RemoteData(..))
 import Style.Bulogen as SB
 import Type.Data.Boolean (kind Boolean)
 import Type.Row (type (+))
+import Web.HTML.Event.EventTypes (offline)
 
 data Query a
   = Initialize a
@@ -33,10 +40,21 @@ data Slot = Slot
 derive instance eqSlot :: Eq Slot
 derive instance ordSlot :: Ord Slot
 
+type ChildQuery
+  = Edit.Query
+  <\/> Const Void
+
+type ChildSlot
+  = Edit.Slot
+  \/ Void
+
+pathToEdit :: ChildPath Edit.Query ChildQuery Edit.Slot ChildSlot
+pathToEdit = cpL
+
 data Message = MNoMsg
 
 type State =
-  { entry :: RemoteData String JournalEntry
+  { entry :: RemoteData DecryptionError JournalEntry
   , desiredEntryId :: Maybe DocumentId
   , editing :: Boolean
   }
@@ -65,7 +83,7 @@ component
   => MonadAsk (Record (RequiredState r)) m
   => LocaliseFn -> H.Component HH.HTML Query Input Message m
 component t =
-  H.lifecycleComponent
+  H.lifecycleParentComponent
       { initialState
       , render
       , eval
@@ -75,18 +93,24 @@ component t =
       }
   where
 
-  render :: State -> H.ComponentHTML Query
+  render :: State -> H.ParentHTML Query ChildQuery ChildSlot m
   render state = case state.entry of
     Failure e -> loadingFailed e
     Success a ->
       case state.editing of 
         false -> markdownRendered a
-        true  ->  markdownEdit a
+        true  ->
+          HH.slot'
+            pathToEdit
+            Edit.Slot
+            (Edit.component t)
+            (unwrap a).content
+            mapEditMessageToQuery
     NotAsked -> notAsked
     Loading  -> loading
     where
 
-    markdownRendered :: JournalEntry -> H.ComponentHTML Query
+    markdownRendered :: JournalEntry -> H.ParentHTML Query ChildQuery ChildSlot m
     markdownRendered (JournalEntry e) =
       HH.div []
         [ HH.p [ HE.onClick (HE.input_ $ ToggleEdit true)]
@@ -95,28 +119,16 @@ component t =
           ]
         ]
 
-    markdownEdit :: JournalEntry -> H.ComponentHTML Query
-    markdownEdit (JournalEntry e) =
-      HH.div [] 
-        [ HH.textarea
-          [ HE.onValueChange (HE.input UpdateContents)
-          , HE.onFocusOut (HE.input_ $ ToggleEdit false)
-          , HP.classes [SB.textarea]
-          , HP.placeholder "Enter your journal entry"
-          , HP.value $ e.content
-          ]
-        ]
+    loadingFailed :: DecryptionError -> H.ParentHTML Query ChildQuery ChildSlot m
+    loadingFailed _ = HH.text "Error"
 
-    loadingFailed :: String -> H.ComponentHTML Query
-    loadingFailed e = HH.text e
-
-    notAsked :: H.ComponentHTML Query
+    notAsked :: H.ParentHTML Query ChildQuery ChildSlot m
     notAsked = HH.text "None requested"
     
-    loading :: H.ComponentHTML Query
+    loading :: H.ParentHTML Query ChildQuery ChildSlot m
     loading = HH.text "Loading"
 
-  eval :: Query ~> H.ComponentDSL State Query Message m
+  eval :: Query ~> H.ParentDSL State Query ChildQuery ChildSlot Message m
   eval (Initialize next) = do
     desiredEntry <- H.gets (_.desiredEntryId)
     case desiredEntry of
@@ -132,4 +144,11 @@ component t =
     let newEntry = (wrap <<< (_{ content = mdText }) <<< unwrap ) <$> entry 
     H.modify_ (_{ entry = newEntry })
     pure next
+  
+  mapEditMessageToQuery :: Edit.Message -> Maybe (Query Unit)
+  mapEditMessageToQuery msg = case msg of
+    Edit.Finalized -> Just $ ToggleEdit false unit
+    Edit.UpdatedContent c -> Just $ UpdateContents c unit
+
+    
     
