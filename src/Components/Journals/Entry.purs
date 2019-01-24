@@ -106,16 +106,25 @@ component t =
 
     entryRender :: JournalEntry -> H.ParentHTML Query ChildQuery ChildSlot m
     entryRender entry =
-      case state.contentEditing of 
-        false -> markdownRendered entry
-        true  ->
-          HH.slot'
-            pathToEdit
-            Edit.Slot
-            (Edit.component t)
-            (unwrap entry).content
-            mapEditMessageToQuery
-
+      HH.div []
+        [ case state.titleEditing of
+            false ->
+              HH.p
+                [] 
+                []
+            true ->
+              HH.input
+                []
+        , case state.contentEditing of 
+            false -> markdownRendered entry
+            true  ->
+              HH.slot'
+                pathToEdit
+                Edit.Slot
+                (Edit.component t)
+                (unwrap entry).content
+                mapEditMessageToQuery
+        ]
 
     markdownRendered :: JournalEntry -> H.ParentHTML Query ChildQuery ChildSlot m
     markdownRendered (JournalEntry e) =
