@@ -32,7 +32,8 @@
     "purescript-uint": "4.0.2",
     "purescript-now": "^4.0.0",
     "purescript-remotedata": "4.0.0",
-    "purescript-typelevel-prelude": "3.0.0"
+    "purescript-typelevel-prelude": "3.0.0",
+    "purescript-html-parser-halogen": "^0.3.0"
   },
   "devDependencies": {
     "purescript-quickcheck": "^5.0.0",

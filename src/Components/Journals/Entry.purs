@@ -3,27 +3,31 @@ module Components.Journals.Entry where
 import Prelude
 
 import AppM (CurrentSessionRow, EditingJournalEntryRow)
+import Components.Helpers.Markdown (renderMarkdown)
 import Control.Monad.Reader.Class (class MonadAsk, asks)
 import Data.Crypto.Types (DocumentId)
 import Data.Default (default)
+import Data.Markdown.Parser (MarkdownText(..))
 import Data.Maybe (Maybe(..), fromMaybe, maybe)
-import Effect.AVar (AVar)
+import Data.Newtype (wrap, unwrap)
 import Effect.Aff.Class (class MonadAff)
-import Halogen as H
 import Halogen as H
 import Halogen.HTML as HH
 import Halogen.HTML.Events as HE
+import Halogen.HTML.Properties as HP
 import Halogen.HTML.Properties as HP
 import Intl (LocaliseFn)
 import Model (Session(..))
 import Model.Journal (JournalEntry(..), JournalMeta(..))
 import Network.RemoteData (RemoteData(..))
+import Style.Bulogen as SB
 import Type.Data.Boolean (kind Boolean)
 import Type.Row (type (+))
 
 data Query a
   = Initialize a
   | ToggleEdit Boolean a
+  | UpdateContents String a
 
 data Slot = Slot
 derive instance eqSlot :: Eq Slot
@@ -83,10 +87,25 @@ component t =
     where
 
     markdownRendered :: JournalEntry -> H.ComponentHTML Query
-    markdownRendered (JournalEntry e) = HH.text "Rendered!"
+    markdownRendered (JournalEntry e) =
+      HH.div []
+        [ HH.p [ HE.onClick (HE.input_ $ ToggleEdit true)]
+          [ HH.text "test"
+          , renderMarkdown $ MarkdownText e.content
+          ]
+        ]
 
     markdownEdit :: JournalEntry -> H.ComponentHTML Query
-    markdownEdit (JournalEntry e) = HH.text "Editing!"
+    markdownEdit (JournalEntry e) =
+      HH.div [] 
+        [ HH.textarea
+          [ HE.onValueChange (HE.input UpdateContents)
+          , HE.onFocusOut (HE.input_ $ ToggleEdit false)
+          , HP.classes [SB.textarea]
+          , HP.placeholder "Enter your journal entry"
+          , HP.value $ e.content
+          ]
+        ]
 
     loadingFailed :: String -> H.ComponentHTML Query
     loadingFailed e = HH.text e
@@ -107,5 +126,10 @@ component t =
     pure next
   eval (ToggleEdit edit next) = do
     H.modify_ (_{ editing = edit })
+    pure next
+  eval (UpdateContents mdText next) = do
+    entry <- H.gets (_.entry)
+    let newEntry = (wrap <<< (_{ content = mdText }) <<< unwrap ) <$> entry 
+    H.modify_ (_{ entry = newEntry })
     pure next
     
