@@ -34,7 +34,7 @@ instance encryptStringMessage :: Encrypt String EncryptedMessage where
     encrypt buff keyFn keyring
   decrypt ring message = do
     buff <- decrypt ring message
-    lmap (\e -> Description (show e)) $ decodeToString buff
+    lmap Exception $ decodeToString buff
 
 instance encryptArrayBufferMessage :: Encrypt ArrayBuffer EncryptedMessage where
   encrypt buff keyFn keyring = do

@@ -15,6 +15,7 @@ import Data.Either (Either(..))
 import Data.JsonDecode.Helpers (decodeJObject, decodeJString)
 import Data.Maybe (Maybe)
 import Data.Newtype (class Newtype)
+import Effect.Exception (Error)
 
 newtype SenderPublicKey = SenderPublicKey BoxPublicKey
 
@@ -162,6 +163,7 @@ derive instance newtypeDocument :: Newtype Document _
 
 data DecryptionError
   = Description String
+  | Exception Error
   | InvalidKeys
 
 data CryptoKey
