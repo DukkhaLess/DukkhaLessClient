@@ -6,11 +6,10 @@ import Control.Monad.Reader.Trans (class MonadAsk, ReaderT, ask, asks, runReader
 import Data.Crypto.Types (DocumentId)
 import Data.Map (empty, Map)
 import Data.Maybe (Maybe(..))
-import Effect.AVar (AVar)
 import Effect.Aff (Aff)
-import Effect.Aff.AVar (new)
 import Effect.Aff.Class (class MonadAff)
 import Effect.Class (class MonadEffect, liftEffect)
+import Effect.Ref (Ref, new)
 import Intl (LocaliseFn)
 import Model (Session(..))
 import Model.Journal (JournalEntry(..), JournalMeta(..))
@@ -18,27 +17,27 @@ import Type.Equality (class TypeEquals, from)
 import Type.Row (type (+))
 
 type CurrentSessionRow r =
-  ( currentSession :: AVar (Maybe Session)
+  ( currentSession :: Ref (Maybe Session)
   | r
   )
 type CurrentSessionRow' r = Record (CurrentSessionRow r)
 
 type LocaliseFnRow r =
-  ( localiseFn :: AVar LocaliseFn
+  ( localiseFn :: Ref LocaliseFn
   | r
   )
 
 type LocaliseFnRow' r = Record (LocaliseFnRow r)
 
 type JournalMetaCacheRow r =
-  ( journalMetaCache :: AVar (Map DocumentId JournalMeta)
+  ( journalMetaCache :: Ref (Map DocumentId JournalMeta)
   | r
   )
 
 type JournalMetaCacheRow' r = Record (JournalMetaCacheRow r)
 
 type EditingJournalEntryRow r =
-  ( editingJournalEntry :: AVar (Maybe JournalEntry)
+  ( editingJournalEntry :: Ref (Maybe JournalEntry)
   | r
   )
 
@@ -54,7 +53,7 @@ type AppState =
       )
 
 makeAppState :: LocaliseFn -> Aff AppState
-makeAppState l = do
+makeAppState l = liftEffect $ do
   localiseFn <- new l
   currentSession <- new Nothing
   journalMetaCache <- new empty

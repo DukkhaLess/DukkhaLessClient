@@ -2,11 +2,11 @@ module Components.Journals.List where
 
 import Prelude
 
+import AppM (CurrentSessionRow, JournalMetaCacheRow)
 import Control.Monad.Reader.Class (class MonadAsk)
 import Data.Crypto.Types (DocumentId)
 import Data.Map (Map)
 import Data.Maybe (Maybe(..))
-import Effect.AVar (AVar)
 import Effect.Aff.Class (class MonadAff)
 import Halogen as H
 import Halogen.HTML as HH
@@ -15,6 +15,7 @@ import Halogen.HTML.Properties as HP
 import Intl (LocaliseFn)
 import Model (Session(..))
 import Model.Journal (JournalMeta(..))
+import Type.Row (type (+))
 
 data Query a = NoOp a
 
@@ -30,9 +31,9 @@ initialState :: forall a. a -> State
 initialState = const $ State {}
 
 type RequiredState r =
-  ( currentSession :: AVar (Maybe Session)
-  , journalMetaCache :: AVar (Map DocumentId JournalMeta)
-  | r
+  ( CurrentSessionRow
+  + JournalMetaCacheRow
+  + r
   )
 component
   :: forall a m r

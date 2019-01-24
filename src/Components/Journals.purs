@@ -11,7 +11,6 @@ import Data.Crypto.Types (DocumentId(..))
 import Data.Maybe (Maybe(..))
 import Data.Newtype (unwrap)
 import Data.Routing.Routes.Journals as RJ
-import Effect.AVar (AVar)
 import Effect.Aff.Class (class MonadAff)
 import Halogen as H
 import Halogen.Component.ChildPath (ChildPath, cpL, cpR, (:>))
