@@ -303,8 +303,8 @@ pullLeft :: HH.ClassName
 pullLeft = HH.ClassName "is-pulled-left"
 pullRight :: HH.ClassName
 pullRight = HH.ClassName "is-pulled-right"
-clip :: HH.ClassName
-clip = HH.ClassName "is-clipped"
+cliped :: HH.ClassName
+cliped = HH.ClassName "is-clipped"
 overlay :: HH.ClassName
 overlay = HH.ClassName "is-overlay"
 
@@ -681,6 +681,8 @@ radio = HH.ClassName "radio"
 button :: HH.ClassName
 button = HH.ClassName "button"
 
+fixedSize :: HH.ClassName
+fixedSize = HH.ClassName "has-fixed-size"
 file :: HH.ClassName
 file = HH.ClassName "file"
 fileLabel :: HH.ClassName

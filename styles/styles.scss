@@ -159,3 +159,13 @@ $strong-color: $text-strong;
 $strong-weight: $weight-bold;
 
 @import "../node_modules/bulma/bulma.sass";
+
+
+.markdown-body {
+  ul {
+    list-style: initial;
+  }
+  ol {
+    list-style: initial;
+  }
+}

@@ -115,7 +115,11 @@ component t =
       HH.div []
         [ HH.p [ HE.onClick (HE.input_ $ ToggleEdit true)]
           [ HH.text "test"
-          , renderMarkdown $ MarkdownText e.content
+          , HH.div
+            [ HP.class_ (HH.ClassName "markdown-body")
+            ]
+            [ renderMarkdown $ MarkdownText e.content
+            ]
           ]
         ]
 

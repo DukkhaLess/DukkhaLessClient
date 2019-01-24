@@ -20,7 +20,6 @@
     "tweetnacl": "^1.0.0"
   },
   "devDependencies": {
-    "babel-loader": "^7.1.4",
     "browser-sync": "^2.24.4",
     "del": "^3.0.0",
     "google-closure-compiler": "20180610.0.2",

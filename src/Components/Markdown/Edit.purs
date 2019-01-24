@@ -47,26 +47,31 @@ component t =
     , finalizer: Nothing
     }
   where
+
   textFieldClassName :: HH.ClassName
   textFieldClassName = HH.ClassName "markdown_editor_open"
+
   render :: State -> H.ComponentHTML Query
   render s =
       HH.div [] 
         [ HH.textarea
           [ HE.onValueChange (HE.input UpdateContents)
           , HE.onFocusOut (HE.input_ $ SendFinalize)
-          , HP.classes [SB.textarea]
           , HP.placeholder "Enter your journal entry"
           , HP.value $ s
+          , HP.rows 20
           , HP.classes
             [ textFieldClassName
+            , SB.textarea
+            , SB.fixedSize
+            , SB.cliped
             ]
           ]
         ]
 
   eval :: Query ~> H.ComponentDSL State Query Message m
   eval (Initialize next) = do
-    element <- liftAff $ HU.selectElement $ wrap $ unwrap textFieldClassName
+    element <- liftAff $ HU.selectElement $ wrap $ "." <> unwrap textFieldClassName
     liftEffect $ maybe (pure unit) (WE.focus) element
     pure next
   eval (UpdateContents newText next) = do
