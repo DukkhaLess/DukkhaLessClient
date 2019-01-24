@@ -4,6 +4,7 @@ import Prelude
 
 import AppM (CurrentSessionRow, EditingJournalEntryRow)
 import Components.Helpers.Markdown (renderMarkdown)
+import Components.Helpers.Widgets as CW
 import Components.Markdown.Edit as Edit
 import Control.Monad.Reader.Class (class MonadAsk, asks)
 import Data.Const (Const)
@@ -101,7 +102,7 @@ component t =
     Failure e -> loadingFailed e
     Success a -> entryRender a
     NotAsked -> notAsked
-    Loading  -> loading
+    Loading  -> CW.loading
     where
 
     entryRender :: JournalEntry -> H.ParentHTML Query ChildQuery ChildSlot m
@@ -144,9 +145,6 @@ component t =
 
     notAsked :: H.ParentHTML Query ChildQuery ChildSlot m
     notAsked = HH.text "None requested"
-    
-    loading :: H.ParentHTML Query ChildQuery ChildSlot m
-    loading = HH.text "Loading"
 
   eval :: Query ~> H.ParentDSL State Query ChildQuery ChildSlot Message m
   eval (Initialize next) = do
