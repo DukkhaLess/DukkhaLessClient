@@ -24,7 +24,7 @@ derive instance newtypeJournalMeta :: Newtype JournalMeta _
 instance defaultJournalMeta :: Default JournalMeta where
   default
     = JournalMeta
-      { title: ""
+      { title: "..."
       , createdAt: Nothing
       , lastUpdated: Nothing
       , id: Nothing

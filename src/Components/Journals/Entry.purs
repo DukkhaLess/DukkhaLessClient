@@ -27,6 +27,7 @@ import Model (Session(..))
 import Model.Journal (JournalEntry(..), JournalMeta(..), setTitle)
 import Network.RemoteData (RemoteData(..))
 import Style.Bulogen as SB
+import Style.Bulogen as SB
 import Type.Data.Boolean (kind Boolean)
 import Type.Row (type (+))
 import Web.HTML.Event.EventTypes (offline)
@@ -110,14 +111,26 @@ component t =
       HH.div []
         [ case state.titleEditing of
             false ->
-              HH.p
-                [] 
-                []
+              HH.h1
+                [ HP.classes
+                  [ SB.tile
+                  ]
+                ] 
+                [ HH.text title
+                ]
             true ->
               HH.input
-                []
+                [ HP.classes
+                  [ SB.input
+                  ]
+                , HP.value title
+                , HE.onValueChange (HE.input UpdateTitle)
+                , HE.onFocusOut (HE.input_ $ ToggleTitleEdit false)
+                ]
         , case state.contentEditing of 
-            false -> markdownRendered entry
+            false -> case (unwrap entry).content of
+              ""      -> markdownPlaceholder
+              content -> markdownRendered content
             true  ->
               HH.slot'
                 pathToEdit
@@ -126,16 +139,32 @@ component t =
                 (unwrap entry).content
                 mapEditMessageToQuery
         ]
+        where
+          title = (unwrap (unwrap entry).metaData).title
+        
+    markdownPlaceholder :: H.ParentHTML Query ChildQuery ChildSlot m
+    markdownPlaceholder =
+      HH.div
+        [ HP.classes
+          [ SB.section
+          , SB.medium
+          ]
+        , HE.onClick (HE.input_ $ ToggleContentEdit true)
+        ]
+        [ HH.p []
+          [ HH.text "Placeholder!"
+          ]
+        ]
 
-    markdownRendered :: JournalEntry -> H.ParentHTML Query ChildQuery ChildSlot m
-    markdownRendered (JournalEntry e) =
+
+    markdownRendered :: String -> H.ParentHTML Query ChildQuery ChildSlot m
+    markdownRendered content =
       HH.div []
         [ HH.p [ HE.onClick (HE.input_ $ ToggleContentEdit true)]
-          [ HH.text "test"
-          , HH.div
+          [ HH.div
             [ HP.class_ (HH.ClassName "markdown-body")
             ]
-            [ renderMarkdown $ MarkdownText e.content
+            [ renderMarkdown $ MarkdownText content
             ]
           ]
         ]

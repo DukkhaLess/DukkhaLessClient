@@ -162,6 +162,8 @@ $strong-weight: $weight-bold;
 
 
 .markdown-body {
+  min-width: 200px;
+  min-height: 200px;
   ul {
     list-style: initial;
   }
