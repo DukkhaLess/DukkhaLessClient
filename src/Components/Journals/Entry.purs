@@ -10,6 +10,7 @@ import Control.Monad.Reader.Class (class MonadAsk, asks)
 import Data.Const (Const)
 import Data.Crypto.Types (DocumentId, DecryptionError)
 import Data.Default (default)
+import Data.Guards
 import Data.Markdown.Parser (MarkdownText(..))
 import Data.Maybe (Maybe(..), fromMaybe, maybe)
 import Data.Newtype (wrap, unwrap)
@@ -116,21 +117,33 @@ component t =
                   [ SB.tile
                   ]
                 ] 
-                [ HH.text title
+                [ HH.text $ guardMap ((/=) "") "Title" identity title
                 ]
             true ->
-              HH.input
+              HH.div
                 [ HP.classes
-                  [ SB.input
+                  [
                   ]
-                , HP.value title
-                , HE.onValueChange (HE.input UpdateTitle)
-                , HE.onFocusOut (HE.input_ $ ToggleTitleEdit false)
+                ]
+                [ HH.input
+                    [ HP.classes
+                      [ SB.input
+                      ]
+                    , HP.value title
+                    , HE.onValueChange (HE.input UpdateTitle)
+                    , HE.onFocusOut (HE.input_ $ ToggleTitleEdit false)
+                    ]
+                , HH.button
+                  [ HP.classes
+                    [ SB.primary
+                    , SB.button
+                    ]
+                  ]
+                  [ HH.text "Save"
+                  ]
                 ]
         , case state.contentEditing of 
-            false -> case (unwrap entry).content of
-              ""      -> markdownPlaceholder
-              content -> markdownRendered content
+            false -> guardMap ((/=) "") markdownPlaceholder markdownRendered (unwrap entry).content
             true  ->
               HH.slot'
                 pathToEdit
