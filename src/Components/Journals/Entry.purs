@@ -1,5 +1,6 @@
 module Components.Journals.Entry where
 
+import Data.Guards
 import Prelude
 
 import AppM (CurrentSessionRow, EditingJournalEntryRow)
@@ -7,10 +8,11 @@ import Components.Helpers.Markdown (renderMarkdown)
 import Components.Helpers.Widgets as CW
 import Components.Markdown.Edit as Edit
 import Control.Monad.Reader.Class (class MonadAsk, asks)
+import Control.Monad.State (class MonadState)
+import Control.Monad.State as MS
 import Data.Const (Const)
 import Data.Crypto.Types (DocumentId, DecryptionError)
 import Data.Default (default)
-import Data.Guards
 import Data.Markdown.Parser (MarkdownText(..))
 import Data.Maybe (Maybe(..), fromMaybe, maybe)
 import Data.Newtype (wrap, unwrap)
@@ -31,7 +33,6 @@ import Style.Bulogen as SB
 import Style.Bulogen as SB
 import Type.Data.Boolean (kind Boolean)
 import Type.Row (type (+))
-import Web.HTML.Event.EventTypes (offline)
 
 data Query a
   = Initialize a
@@ -92,7 +93,7 @@ component t =
   H.lifecycleParentComponent
       { initialState
       , render
-      , eval
+      , eval: eval H.raise
       , receiver: const Nothing
       , initializer: Just $ H.action Initialize
       , finalizer: Nothing
@@ -188,31 +189,37 @@ component t =
     notAsked :: H.ParentHTML Query ChildQuery ChildSlot m
     notAsked = HH.text "None requested"
 
-  eval :: Query ~> H.ParentDSL State Query ChildQuery ChildSlot Message m
-  eval (Initialize next) = do
-    desiredEntry <- H.gets (_.desiredEntryId)
-    case desiredEntry of
-      Just id -> do
-        H.modify_ (_{ entry = Loading })
-      Nothing -> H.modify_ (_{ entry = Success default })
-    pure next
-  eval (ToggleContentEdit edit next) = do
-    H.modify_ (_{ contentEditing = edit })
-    pure next
-  eval (ToggleTitleEdit edit next) = do
-    H.modify_ (_{ titleEditing = edit })
-    pure next
-  eval (UpdateContents mdText next) = do
-    entry <- H.gets (_.entry)
-    let newEntry = (wrap <<< (_{ content = mdText }) <<< unwrap ) <$> entry 
-    H.modify_ (_{ entry = newEntry })
-    pure next
-  eval (UpdateTitle nextTitle next) = do
-    entry <- H.gets (_.entry)
-    let nextEntry = entry <#> setTitle nextTitle
-    H.modify_ (_{ entry = nextEntry })
-    pure next
-  
+  eval
+    :: forall t
+    . MonadState State t
+    => (Message -> t Unit)
+    -> Query ~> t
+  eval raise query = case query of
+    (Initialize next) -> do
+      desiredEntry <- MS.gets (_.desiredEntryId)
+      case desiredEntry of
+        Just id -> do
+          MS.modify_ (_{ entry = Loading })
+        Nothing -> MS.modify_ (_{ entry = Success default })
+      raise $ MNoMsg
+      pure next
+    (ToggleContentEdit edit next) -> do
+      MS.modify_ (_{ contentEditing = edit })
+      pure next
+    (ToggleTitleEdit edit next) -> do
+      MS.modify_ (_{ titleEditing = edit })
+      pure next
+    (UpdateContents mdText next) -> do
+      entry <- MS.gets (_.entry)
+      let newEntry = (wrap <<< (_{ content = mdText }) <<< unwrap ) <$> entry 
+      MS.modify_ (_{ entry = newEntry })
+      pure next
+    (UpdateTitle nextTitle next) -> do
+      entry <- MS.gets (_.entry)
+      let nextEntry = entry <#> setTitle nextTitle
+      MS.modify_ (_{ entry = nextEntry })
+      pure next
+    
   mapEditMessageToQuery :: Edit.Message -> Maybe (Query Unit)
   mapEditMessageToQuery msg = case msg of
     Edit.Finalized -> Just $ ToggleContentEdit false unit
