@@ -2,19 +2,20 @@ module Components.Sessions.Login where
 
 import Prelude
 
-import Data.Routing.Routes as R
-import Data.Routing.Routes.Sessions as RS
 import Components.Helpers.Forms as HF
 import Control.Monad.Error.Class (throwError)
+import Control.Monad.State (class MonadState, get, put, modify_)
 import Data.Either (Either(..), note, either)
 import Data.HTTP.Helpers (ApiPath(..), unsafePostCleartext, request)
 import Data.HTTP.Payloads (SubmitLogin(SubmitLogin))
 import Data.Maybe (Maybe(..))
 import Data.Newtype (wrap)
+import Data.Routing.Routes as R
+import Data.Routing.Routes.Sessions as RS
 import Data.Tuple (Tuple(..), fst, snd)
 import Data.Validation as V
 import Data.Validation.Rules as VR
-import Effect.Aff.Class (class MonadAff)
+import Effect.Aff.Class (class MonadAff, liftAff)
 import Effect.Exception (error, Error)
 import Halogen as H
 import Halogen.HTML as HH
@@ -26,11 +27,16 @@ import Intl.Terms.Sessions as Sessions
 import Model (KeyringUsage(Enabled), Password, Session, Username)
 import Model.Keyring (Keyring)
 import Style.Bulogen (block, button, container, hero, heroBody, input, primary, subtitle, textCentered, textarea, title)
+import Web.File.FileList (FileList)
+import Web.HTML.Event.DataTransfer (files)
+import Web.HTML.Event.DataTransfer as HA
+import Web.HTML.Event.DragEvent (dataTransfer)
 
 data Query a
   = UpdateKey String a
   | UpdateUsername String a
   | UpdatePassword String a
+  | DropFiles (Maybe FileList) a
   | Submit a
 
 data Message
@@ -62,7 +68,7 @@ component t =
   H.component
     { initialState: initialState
     , render
-    , eval
+    , eval: eval H.raise
     , receiver: const Nothing
     }
   where
@@ -88,6 +94,7 @@ component t =
                         [ HE.onValueChange (HE.input UpdateKey)
                         , HP.classes [textarea]
                         , HP.placeholder "Your secret keys."
+                        , HE.onDrop $ HE.input (dataTransfer >>> files >>> DropFiles)
                         ]
                   , HH.a
                     [ HP.classes [button, primary, block]
@@ -114,33 +121,41 @@ component t =
       ]
 
 
-  eval :: Query ~> H.ComponentDSL State Query Message m
-  eval (UpdateUsername username next) = do
-    state <- H.get
-    H.put state { username = wrap username }
-    pure next
-  eval (UpdatePassword password next) = do
-    state <- H.get
-    H.put state { password = wrap password }
-    pure next
-  eval (UpdateKey keyStr next) = do
-    state <- H.get
-    let keyringValidation = V.updateValidation state.keyring keyStr
-    H.put state { keyring = keyringValidation }
-    pure next
-  eval (Submit next) = do
-    state <- H.get
-    H.modify_ (_{ keyring = V.touch state.keyring })
-    payloadAndKeyring <- H.liftAff $ either throwError pure (prepareLoginPayload state)
-    let payload = fst payloadAndKeyring
-    let keyring = snd payloadAndKeyring
-    response <- H.liftAff $ request (unsafePostCleartext (ApiPath "/login") payload)
-    case response.body of
-      Right token -> do
-        H.raise $ SessionCreated $ wrap { username: state.username, keyringUsage: Enabled keyring, sessionToken: token }
-        pure next
-      Left _ -> do
-        pure next
+  eval
+    :: forall t
+    . MonadState State t
+    => MonadAff t
+    => (Message -> t Unit)
+    -> Query ~> t
+  eval raise query = case query of
+    (UpdateUsername username next) -> do
+      state <- get
+      put state { username = wrap username }
+      pure next
+    (UpdatePassword password next) -> do
+      state <- get
+      put state { password = wrap password }
+      pure next
+    (UpdateKey keyStr next) -> do
+      state <- get
+      let keyringValidation = V.updateValidation state.keyring keyStr
+      put state { keyring = keyringValidation }
+      pure next
+    (Submit next) -> do
+      state <- get
+      modify_ (_{ keyring = V.touch state.keyring })
+      payloadAndKeyring <- liftAff $ either throwError pure (prepareLoginPayload state)
+      let payload = fst payloadAndKeyring
+      let keyring = snd payloadAndKeyring
+      response <- liftAff $ request (unsafePostCleartext (ApiPath "/login") payload)
+      case response.body of
+        Right token -> do
+          raise $ SessionCreated $ wrap { username: state.username, keyringUsage: Enabled keyring, sessionToken: token }
+          pure next
+        Left _ -> do
+          pure next
+    (DropFiles files next) -> do
+      pure next
 
   prepareLoginPayload :: State -> Either Error (Tuple SubmitLogin Keyring)
   prepareLoginPayload state = note (error "Validation failed for login payload") result where
