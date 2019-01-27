@@ -7,12 +7,11 @@ import Components.Journals as Journals
 import Components.NotFound as NotFound
 import Components.Resources as Resources
 import Components.Sessions as Sessions
+import Components.Pure.Nav
 import Control.Monad.Reader.Class (class MonadAsk)
 import Data.Const (Const)
 import Data.Maybe (Maybe(..))
 import Data.Routing.Routes as R
-import Data.Routing.Routes.Journals as RJ
-import Data.Routing.Routes.Sessions as RS
 import Effect (Effect)
 import Effect.Aff (Aff, launchAff)
 import Effect.Aff.Class (class MonadAff)
@@ -80,23 +79,8 @@ component localiseFn = H.parentComponent
         Just session -> sessionedMenu session
         Nothing      -> sessionlessMenu
 
-
-    sessionlessMenu :: H.ParentHTML Query ChildQuery ChildSlot m
-    sessionlessMenu =
-      HH.nav_
-        [ HH.ul_ (map link [R.Intro, R.Resources, R.Sessions RS.Login])
-        ]
-
-    sessionedMenu :: Session -> H.ParentHTML Query ChildQuery ChildSlot m
-    sessionedMenu session =
-      HH.nav_
-        [ HH.ul_ (map link [R.Intro, R.Resources, R.Journals $ RJ.Edit Nothing])
-        ]
-
-    link r = HH.li_ [ HH.a [ HP.href $ R.reverseRoute r ] [ HH.text $ R.reverseRoute r ] ]
-
     viewPage :: State -> H.ParentHTML Query ChildQuery ChildSlot m
-    viewPage { localiseFn, currentRoute } = case currentRoute of
+    viewPage { currentRoute } = case currentRoute of
       R.Intro -> Intro.render localiseFn
       R.Resources ->Resources.render localiseFn
       (R.Sessions r) ->
