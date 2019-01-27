@@ -1,4 +1,4 @@
-module Components.Helpers.Markdown where
+module Components.Pure.Markdown where
 
 import Prelude
 

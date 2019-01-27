@@ -1,4 +1,4 @@
-module Components.Helpers.Widgets where
+module Components.Pure.Widgets where
 
 import Halogen as H
 import Halogen.HTML as HH

@@ -4,8 +4,8 @@ import Data.Guards
 import Prelude
 
 import AppM (CurrentSessionRow, EditingJournalEntryRow)
-import Components.Helpers.Markdown (renderMarkdown)
-import Components.Helpers.Widgets as CW
+import Components.Pure.Markdown (renderMarkdown)
+import Components.Pure.Widgets as CW
 import Components.Markdown.Edit as Edit
 import Control.Monad.Reader.Class (class MonadAsk, asks)
 import Control.Monad.State (class MonadState)
