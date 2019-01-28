@@ -24,9 +24,7 @@ sessionlessMenuItems
  -> Array (HTML a b)
 sessionlessMenuItems t =
   map (Left >>> link t)
-    [ R.Intro
-    , R.Resources
-    , R.Sessions RS.Login
+    [ R.Sessions RS.Login
     ]
 
 navWrapper
@@ -56,6 +54,7 @@ navWrapper t items =
               [ HP.classes
                 [ SB.navbarItem
                 ]
+                , HP.href $ R.reverseRoute R.Intro
               ]
               [ HH.img
                   [ HP.alt "DukkhaLess, a self-care and jounraling application for everyone!"
@@ -117,8 +116,7 @@ sessionedMenuItems
 sessionedMenuItems t _ =
   snoc 
     ( map (Left >>> link t) 
-        [ R.Intro
-        , R.Resources
+        [
         ]
     )
     ( link t $ Right $ Tuple (Journal Journals)
