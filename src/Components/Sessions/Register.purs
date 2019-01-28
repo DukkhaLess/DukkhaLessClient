@@ -29,7 +29,7 @@ import Intl.Terms.Validation as TV
 import Model (KeyringUsage(Enabled), Password, Session, Username(..))
 import Model.Keyring (Keyring, generateKeyring)
 import Partial.Unsafe (unsafePartial)
-import Style.Bulogen (block, button, container, hero, heroBody, input, link, primary, pullRight, spaced, subtitle, textarea, title, textCentered)
+import Style.Bulogen (block, button, container, hero, heroBody, input, link, primary, pullRight, spaced, subtitle, textarea, title, textCentered, success)
 
 data Query a
   = GenerateKeyring a
@@ -119,7 +119,7 @@ component t =
                 ]
               , keyBox state.preparedRing
               , HH.a
-                [ HP.classes [button, primary, block]
+                [ HP.classes [button, success, block]
                 , HE.onClick (HE.input_ AttemptSubmit)
                 ]
                 [ HH.text $ t $ Term.Session Sessions.Submit

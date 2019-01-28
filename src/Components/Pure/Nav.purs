@@ -2,7 +2,7 @@ module Components.Pure.Nav where
 
 import Prelude
 
-import Data.Array (snoc)
+import Data.Array ((:))
 import Data.Either (Either(..))
 import Data.Maybe (Maybe(..))
 import Data.Routing.Routes as R
@@ -13,26 +13,42 @@ import Halogen.HTML (HTML)
 import Halogen.HTML as HH
 import Halogen.HTML.Properties as HP
 import Intl (LocaliseFn)
-import Intl.Terms (Term(Journal))
+import Intl.Terms (Term(Journal, Session))
 import Intl.Terms.Journals (Journals(..))
+import Intl.Terms.Sessions (Sessions(Login))
 import Model (Session)
 import Style.Bulogen as SB
 
 sessionlessMenuItems
  :: forall a b
  .  LocaliseFn
- -> Array (HTML a b)
-sessionlessMenuItems t =
-  map (Left >>> link t)
-    [ R.Sessions RS.Login
-    ]
+ -> Tuple (Array (HTML a b)) (Array (HTML a b))
+sessionlessMenuItems t = 
+  Tuple
+  (map (Left >>> link t) [])
+  [ HH.div
+      [ HP.classes
+        [ SB.navbarItem
+        ]
+      ]
+      [ HH.a
+        [ HP.href $ R.reverseRoute $ R.Sessions RS.Login 
+        , HP.classes
+          [ SB.button
+          , SB.info
+          ]
+        ]
+        [ HH.text $ t $ Session Login
+        ]
+      ]
+  ]
 
 navWrapper
   :: forall a b
   .  LocaliseFn
-  -> Array (HTML a b)
+  -> Tuple (Array (HTML a b)) (Array (HTML a b))
   -> HTML a b
-navWrapper t items =
+navWrapper t (Tuple leftItems rightItems) =
   HH.div
     [ HP.classes
       [ SB.paddingless
@@ -42,7 +58,7 @@ navWrapper t items =
       HH.nav
         [ HP.classes
           [ SB.navbar
-          , SB.success
+          , SB.primary
           ]
         ]
         [ HH.div
@@ -84,13 +100,13 @@ navWrapper t items =
               [ SB.navbarStart
               ]
             ]
-            items
+            leftItems
           , HH.div
             [ HP.classes
               [ SB.navbarEnd
               ]
             ]
-            []
+            rightItems
           ]
         ]
     ]
@@ -112,18 +128,18 @@ sessionedMenuItems
   :: forall a b
   .  LocaliseFn
   -> Session
-  -> Array (HTML a b)
+  -> Tuple (Array (HTML a b)) (Array (HTML a b))
 sessionedMenuItems t _ =
-  snoc 
-    ( map (Left >>> link t) 
-        [
+  Tuple
+    leftItems
+    []
+    where
+    leftItems =
+      ( link t $ Right $ Tuple (Journal Journals)
+        [ R.Journals $ RJ.Edit Nothing
+        , R.Journals RJ.List
         ]
-    )
-    ( link t $ Right $ Tuple (Journal Journals)
-      [ R.Journals $ RJ.Edit Nothing
-      , R.Journals RJ.List
-      ]
-    )
+      ) : []
 
 link
   :: forall a b

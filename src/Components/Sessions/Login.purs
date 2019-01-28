@@ -26,7 +26,7 @@ import Intl.Terms as Term
 import Intl.Terms.Sessions as Sessions
 import Model (KeyringUsage(Enabled), Password, Session, Username)
 import Model.Keyring (Keyring)
-import Style.Bulogen (block, button, container, hero, heroBody, input, primary, subtitle, textCentered, textarea, title)
+import Style.Bulogen (block, button, container, hero, heroBody, input, primary, subtitle, textCentered, textarea, title, success)
 import Web.File.FileList (FileList)
 import Web.HTML.Event.DataTransfer (files)
 import Web.HTML.Event.DataTransfer as HA
@@ -97,7 +97,7 @@ component t =
                         , HE.onDrop $ HE.input (dataTransfer >>> files >>> DropFiles)
                         ]
                   , HH.a
-                    [ HP.classes [button, primary, block]
+                    [ HP.classes [button, success, block]
                     , HE.onClick (HE.input_ Submit)
                     ]
                     [ HH.text $ t $ Term.Session Sessions.Submit
