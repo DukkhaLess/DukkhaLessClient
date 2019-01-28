@@ -76,8 +76,8 @@ component localiseFn = H.parentComponent
     render :: State -> H.ParentHTML Query ChildQuery ChildSlot m
     render state = HH.div_ [navMenu, viewPage state] where
       navMenu = case state.session of
-        Just session -> sessionedMenu session
-        Nothing      -> sessionlessMenu
+        Just session -> sessionedMenu localiseFn session
+        Nothing      -> sessionlessMenu localiseFn
 
     viewPage :: State -> H.ParentHTML Query ChildQuery ChildSlot m
     viewPage { currentRoute } = case currentRoute of

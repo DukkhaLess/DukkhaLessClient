@@ -61,5 +61,7 @@ localiseValidation msg = case msg of
   
 localiseJournal :: Journals.Journals -> Maybe String
 localiseJournal msg = case msg of
-  (Journals.JournalEntries) -> j $ "Journal Entries"
-  (Journals.Create) -> j $ "New Entry"
+  Journals.JournalEntries -> j $ "Journal Entries"
+  Journals.Create -> j $ "New Entry"
+  Journals.Journals -> j $ "Journals"
+    
