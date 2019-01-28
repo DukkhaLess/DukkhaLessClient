@@ -108,9 +108,9 @@ gulp.task("designPage", ["revision"], function () {
 
 gulp.task("revisionRewrite", ['copyStaticAssets'], revisionRewriteFn);
 
-gulp.task("revisionRewriteProd", ['copyStaticAssetsProd'], revisionRewriteFn);
+gulp.task("revisionRewriteProd", ['revisionProd'], revisionRewriteFn);
 
-gulp.task("buildToProd", ['revisionRewriteProd'], function () {
+gulp.task("buildToProd", ['copyStaticAssetsProd'], function () {
   return gulp.src(['dist/static/*.js', 'dist/static/*.css'])
     .pipe(gzip({
       gzipOptions: {
