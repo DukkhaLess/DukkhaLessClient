@@ -15,21 +15,32 @@ import Style.Bulogen as SB
 sessionlessMenuItems
  :: forall a b
  . Array (HTML a b)
-sessionlessMenuItems =
-   [ HH.ul_ (map link [R.Intro, R.Resources, R.Sessions RS.Login])
-    ]
+sessionlessMenuItems = map link [R.Intro, R.Resources, R.Sessions RS.Login]
 
 navWrapper
   :: forall a b
   .  Array (HTML a b)
   -> HTML a b
-navWrapper items = HH.nav
+navWrapper items =
+  HH.nav
     [ HP.classes
       [ SB.navbar
       , SB.success
       ]
     ]
-    items
+    [ HH.div
+        [ HP.classes
+          [ SB.navbarStart
+          ]
+        ]
+        items
+    , HH.div
+      [ HP.classes
+        [ SB.navbarEnd
+        ]
+      ]
+      []
+    ]
    
 sessionlessMenu
   :: forall a b
@@ -46,9 +57,14 @@ sessionedMenuItems
   :: forall a b
   . Session
   -> Array (HTML a b)
-sessionedMenuItems _ =
-    [ HH.ul_ (map link [R.Intro, R.Resources, R.Journals $ RJ.Edit Nothing])
-    ]
+sessionedMenuItems _ = map link [R.Intro, R.Resources, R.Journals $ RJ.Edit Nothing]
 
 link :: forall a b. R.Routes -> HTML a b
-link r = HH.li_ [ HH.a [ HP.href $ R.reverseRoute r ] [ HH.text $ R.reverseRoute r ] ]
+link r =
+  HH.a 
+    [ HP.href $ R.reverseRoute r
+    , HP.classes
+      [ SB.navbarItem
+      ]
+    ]
+    [ HH.text $ R.reverseRoute r ]
