@@ -35,52 +35,65 @@ navWrapper
   -> Array (HTML a b)
   -> HTML a b
 navWrapper t items =
-  HH.nav
+  HH.div
     [ HP.classes
-      [ SB.navbar
-      , SB.success
+      [ SB.paddingless
       ]
     ]
-    [ HH.div
-      [ HP.classes
-        [ SB.navbarBrand
+    [
+      HH.nav
+        [ HP.classes
+          [ SB.navbar
+          , SB.success
+          ]
         ]
-      ]
-      [ HH.a
+        [ HH.div
           [ HP.classes
-            [ SB.navbarItem
+            [ SB.navbarBrand
             ]
           ]
-          [ HH.img
-              [ HP.alt "DukkhaLess, a self-care and jounraling application for everyone!"
-              , HP.src "static/assets/branding.png"
-              , HP.width 120
-              , HP.height 28
+          [ HH.a
+              [ HP.classes
+                [ SB.navbarItem
+                ]
               ]
+              [ HH.img
+                  [ HP.alt "DukkhaLess, a self-care and jounraling application for everyone!"
+                  , HP.src "static/assets/branding.png"
+                  , HP.width 120
+                  , HP.height 28
+                  ]
+              ]
+          , HH.div
+            [ HP.classes
+              [ SB.navbarBurger
+              , SB.burger
+              ]
+            ]
+            [ HH.span_ []
+            , HH.span_ []
+            , HH.span_ []
+            ]
           ]
-      , HH.div
-        [ HP.classes
-          [ SB.navbarBurger
-          , SB.burger
+        , HH.div 
+          [ HP.classes
+            [ SB.navbar
+            ]
+          ]
+          [ HH.div
+            [ HP.classes
+              [ SB.navbarStart
+              ]
+            ]
+            items
+          , HH.div
+            [ HP.classes
+              [ SB.navbarEnd
+              ]
+            ]
+            []
           ]
         ]
-        [ HH.span_ []
-        , HH.span_ []
-        , HH.span_ []
-        ]
-      ]
-    , HH.div
-        [ HP.classes
-          [ SB.navbarStart
-          ]
-        ]
-        items
-    , HH.div
-      [ HP.classes
-        [ SB.navbarEnd
-        ]
-      ]
-      []
     ]
    
 sessionlessMenu
