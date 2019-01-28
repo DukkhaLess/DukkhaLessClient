@@ -79,23 +79,28 @@ component t =
     }
     where
       render :: State -> H.ParentHTML Query ChildQuery ChildSlot m
-      render (State state) = case state.routeContext of
-        RJ.Edit id ->
-          HH.slot'
-            pathToEdit
-            JournalEntry.Slot
-            (JournalEntry.component t)
-            (JournalEntry.Input
-              { desiredEntry: id <#> UUID }
-            )
-            (const Nothing)
-        RJ.List ->
-          HH.slot'
-            pathToList
-            JournalList.Slot
-            (JournalList.component t)
-            unit
-            (const Nothing)
+      render (State state) = 
+        HH.div
+          []
+          [
+            case state.routeContext of
+              RJ.Edit id ->
+                HH.slot'
+                  pathToEdit
+                  JournalEntry.Slot
+                  (JournalEntry.component t)
+                  (JournalEntry.Input
+                    { desiredEntry: id <#> UUID }
+                  )
+                  (const Nothing)
+              RJ.List ->
+                HH.slot'
+                  pathToList
+                  JournalList.Slot
+                  (JournalList.component t)
+                  unit
+                  (const Nothing)
+          ]
 
       eval :: Query ~> H.ParentDSL State Query ChildQuery ChildSlot Message m
       eval (QNoOp next) = pure next
