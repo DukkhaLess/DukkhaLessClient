@@ -30,7 +30,6 @@ import Model (Session(..))
 import Model.Journal (JournalEntry(..), JournalMeta(..), setTitle)
 import Network.RemoteData (RemoteData(..))
 import Style.Bulogen as SB
-import Style.Bulogen as SB
 import Type.Data.Boolean (kind Boolean)
 import Type.Row (type (+))
 
