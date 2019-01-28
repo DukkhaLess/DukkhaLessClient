@@ -58,6 +58,16 @@ navWrapper t items =
               , HP.height 28
               ]
           ]
+      , HH.div
+        [ HP.classes
+          [ SB.navbarBurger
+          , SB.burger
+          ]
+          [ HH.span_ []
+          , HH.span_ []
+          , HH.span_ []
+          ]
+        ]
       ]
     , HH.div
         [ HP.classes
@@ -124,6 +134,7 @@ link t routes =
         [ HP.classes
           [ SB.navbarItem
           , SB.hasDropdown
+          , SB.hoverable
           ]
         ]
         [ HH.a

@@ -836,6 +836,8 @@ navbarBrand :: HH.ClassName
 navbarBrand = HH.ClassName "navbar-brand"
 navbarBurger :: HH.ClassName
 navbarBurger = HH.ClassName "navbar-burger"
+burger :: HH.ClassName
+burger = HH.ClassName "burger"
 navbarMenu :: HH.ClassName
 navbarMenu = HH.ClassName "navbar-menu"
 navbarStart :: HH.ClassName
