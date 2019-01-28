@@ -7,7 +7,7 @@ import Components.Journals as Journals
 import Components.NotFound as NotFound
 import Components.Resources as Resources
 import Components.Sessions as Sessions
-import Components.Pure.Nav
+import Components.Nav as Nav
 import Control.Monad.Reader.Class (class MonadAsk)
 import Data.Const (Const)
 import Data.Maybe (Maybe(..))
@@ -33,12 +33,14 @@ type ChildQuery
   =    Sessions.Query
   <\/> NotFound.Query
   <\/> Journals.Query
+  <\/> Nav.Query
   <\/> Const Void
 
 type ChildSlot
   =  Sessions.Slot
   \/ NotFound.Slot
   \/ Journals.Slot
+  \/ Nav.Slot
   \/ Void
 
 type State =
@@ -60,6 +62,9 @@ pathToNotFound = cpR :> cpL
 pathToJournals :: ChildPath Journals.Query ChildQuery Journals.Slot ChildSlot
 pathToJournals = cpR :> cpR :> cpL
 
+pathToNav :: ChildPath Nav.Query ChildQuery Nav.Slot ChildSlot
+pathToNav = cpR :> cpR :> cpR :> cpL
+
 component
   :: forall m
   . MonadAff m
@@ -75,9 +80,13 @@ component localiseFn = H.parentComponent
   where
     render :: State -> H.ParentHTML Query ChildQuery ChildSlot m
     render state = HH.div_ [navMenu, viewPage state] where
-      navMenu = case state.session of
-        Just session -> sessionedMenu localiseFn session
-        Nothing      -> sessionlessMenu localiseFn
+      navMenu =
+        HH.slot'
+          pathToNav
+          Nav.Slot
+          (Nav.component localiseFn)
+          state.session
+          nada
 
     viewPage :: State -> H.ParentHTML Query ChildQuery ChildSlot m
     viewPage { currentRoute } = case currentRoute of

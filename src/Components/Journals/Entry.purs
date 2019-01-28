@@ -1,4 +1,5 @@
-module Components.Journals.Entry where
+module Components.Journals.Entry
+  (component, Slot(..), Query, Message, Input(..)) where
 
 import Data.Guards
 import Prelude
