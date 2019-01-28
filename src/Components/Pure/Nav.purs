@@ -77,7 +77,7 @@ navWrapper t items =
           ]
         , HH.div 
           [ HP.classes
-            [ SB.navbar
+            [ SB.navbarMenu
             ]
           ]
           [ HH.div
