@@ -63,10 +63,10 @@ navWrapper t items =
           [ SB.navbarBurger
           , SB.burger
           ]
-          [ HH.span_ []
-          , HH.span_ []
-          , HH.span_ []
-          ]
+        ]
+        [ HH.span_ []
+        , HH.span_ []
+        , HH.span_ []
         ]
       ]
     , HH.div
