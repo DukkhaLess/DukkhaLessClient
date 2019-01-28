@@ -126,5 +126,18 @@ link t routes =
           , SB.hasDropdown
           ]
         ]
-        (map (Left >>> link t) rs)
+        [ HH.a
+          [ HP.classes
+            [ SB.navbarLink
+            ]
+          ]
+          [ HH.text $ t $ term
+          , HH.div
+            [ HP.classes
+              [ SB.navbarDropdown
+              ]
+            ]
+            (map (Left >>> link t) rs)
+        ]
+      ]
         
