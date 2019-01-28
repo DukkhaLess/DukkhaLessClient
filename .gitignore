@@ -20,3 +20,4 @@ auto-save-list
 tramp
 .\#*
 yarn.lock
+package-lock.json
