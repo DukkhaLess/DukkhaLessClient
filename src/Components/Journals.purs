@@ -16,10 +16,12 @@ import Halogen as H
 import Halogen.Component.ChildPath (ChildPath, cpL, cpR, (:>))
 import Halogen.Data.Prism (type (<\/>), type (\/))
 import Halogen.HTML as HH
+import Halogen.HTML.Properties as HP
 import Intl (LocaliseFn)
 import Model (Session(..))
 import Model.Journal (JournalEntry(..), JournalMeta(..))
 import Model.Journal as MJ
+import Style.Bulogen as SB
 import Type.Row (type (+))
 
 data Query a = QNoOp a
@@ -81,7 +83,10 @@ component t =
       render :: State -> H.ParentHTML Query ChildQuery ChildSlot m
       render (State state) = 
         HH.div
-          []
+          [ HP.classes
+            [ SB.container
+            ]
+          ]
           [
             case state.routeContext of
               RJ.Edit id ->

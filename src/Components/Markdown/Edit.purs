@@ -68,7 +68,7 @@ component t =
           , HP.classes
             [ textFieldClassName
             , SB.textarea
-            , SB.fixedSize
+            , SB.block
             , SC.xWrapped
             ]
           ]

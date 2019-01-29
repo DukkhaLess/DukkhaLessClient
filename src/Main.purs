@@ -23,7 +23,6 @@ import Prelude
 
 import AppM (makeAppState, runAppM)
 import Data.Maybe (Maybe(..))
-import Data.Routing.Routes as Routes
 import Effect (Effect)
 import Effect.Aff (forkAff)
 import Effect.Class (liftEffect)

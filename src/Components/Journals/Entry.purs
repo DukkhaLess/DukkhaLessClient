@@ -27,7 +27,6 @@ import Halogen.Data.Prism (type (<\/>), type (\/))
 import Halogen.HTML as HH
 import Halogen.HTML.Events as HE
 import Halogen.HTML.Properties as HP
-import Halogen.HTML.Properties as HP
 import Intl (LocaliseFn)
 import Intl.Terms (Term(..))
 import Intl.Terms.Common (Common(..))
@@ -36,6 +35,7 @@ import Model (Session(..))
 import Model.Journal (JournalEntry(..), JournalMeta(..), mapJournalMetaRec, setTitle)
 import Network.RemoteData (RemoteData(..))
 import Style.Bulogen as SB
+import Style.Classes as SC
 import Type.Data.Boolean (kind Boolean)
 import Type.Row (type (+))
 
@@ -116,7 +116,11 @@ component t =
     entryRender :: JournalEntry -> H.ParentHTML Query ChildQuery ChildSlot m
     entryRender entry =
       HH.div
-        []
+        [ HP.classes
+          [ SB.container
+          , SC.padTop
+          ]
+        ]
         [ case state.titleEditing of
             false ->
               HH.h1

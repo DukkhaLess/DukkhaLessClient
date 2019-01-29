@@ -19,7 +19,6 @@ import Halogen as H
 import Halogen.Component.ChildPath (ChildPath, cpL, cpR, (:>))
 import Halogen.Data.Prism (type (<\/>), type (\/))
 import Halogen.HTML as HH
-import Halogen.HTML.Properties as HP
 import Intl (LocaliseFn)
 import Model (Model, Session)
 import Prelude (type (~>), Unit, Void, const, pure, unit, (<<<), bind, ($), discard, map)
