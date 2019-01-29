@@ -12,19 +12,20 @@ import Data.Newtype (unwrap, wrap, class Newtype)
 import Effect.Class (liftEffect)
 import Effect.Now (nowDateTime)
 
-newtype JournalMeta
-  = JournalMeta
-    { title :: String
-    , createdAt :: Maybe DateTime
-    , lastUpdated :: Maybe DateTime
-    , id :: Maybe DocumentId
-    } 
+type JournalMetaRec =
+  { title :: String
+  , createdAt :: Maybe DateTime
+  , lastUpdated :: Maybe DateTime
+  , id :: Maybe DocumentId
+  } 
+
+newtype JournalMeta = JournalMeta JournalMetaRec
 derive instance newtypeJournalMeta :: Newtype JournalMeta _
 
 instance defaultJournalMeta :: Default JournalMeta where
   default
     = JournalMeta
-      { title: "..."
+      { title: ""
       , createdAt: Nothing
       , lastUpdated: Nothing
       , id: Nothing
@@ -57,11 +58,6 @@ newtype JournalEntry
     , metaData :: JournalMeta
     }
 
-setTitle :: String -> JournalEntry -> JournalEntry
-setTitle nextTitle (JournalEntry j) = wrap nextJournal where
-  nextJournal = j { metaData = wrap nextMeta }
-  nextMeta = (unwrap j.metaData) { title = nextTitle }
-
 derive instance newtypeJournalEntry :: Newtype JournalEntry _
 
 instance defaultJournalEntry :: Default JournalEntry where
@@ -86,3 +82,15 @@ instance encryptJournalEntry :: Encrypt JournalEntry Document where
       content: contents,
       metaData: meta
     }
+
+setTitle :: String -> JournalEntry -> JournalEntry
+setTitle s j = mapJournalMetaRec (_{ title = s }) j
+
+mapJournalMetaRec
+  :: (JournalMetaRec -> JournalMetaRec)
+  -> JournalEntry
+  -> JournalEntry
+mapJournalMetaRec f (JournalEntry j) = wrap nextJournal where
+  nextJournal = j { metaData = wrap nextMeta }
+  nextMeta = f $ unwrap j.metaData
+

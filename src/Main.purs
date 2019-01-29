@@ -44,7 +44,7 @@ main = HA.runHalogenAff $ do
         
     env <- makeAppState translate
 
-    existingSession <- pure Nothing
+    let existingSession = Nothing
         
     body <- HA.awaitBody
     _ <- liftEffect removeLoader

@@ -5,9 +5,9 @@ import Data.Guards
 import Prelude
 
 import AppM (CurrentSessionRow, EditingJournalEntryRow)
+import Components.Markdown.Edit as Edit
 import Components.Pure.Markdown (renderMarkdown)
 import Components.Pure.Widgets as CW
-import Components.Markdown.Edit as Edit
 import Control.Monad.Reader.Class (class MonadAsk, asks)
 import Control.Monad.State (class MonadState)
 import Control.Monad.State as MS
@@ -19,6 +19,8 @@ import Data.Maybe (Maybe(..), fromMaybe, maybe)
 import Data.Newtype (wrap, unwrap)
 import Data.Routing.Routes.Journals (Journals(..))
 import Effect.Aff.Class (class MonadAff)
+import Effect.Class (class MonadEffect, liftEffect)
+import Effect.Now (nowDateTime)
 import Halogen as H
 import Halogen.Component.ChildPath (ChildPath, cpL, cpR, (:>))
 import Halogen.Data.Prism (type (<\/>), type (\/))
@@ -28,7 +30,7 @@ import Halogen.HTML.Properties as HP
 import Halogen.HTML.Properties as HP
 import Intl (LocaliseFn)
 import Model (Session(..))
-import Model.Journal (JournalEntry(..), JournalMeta(..), setTitle)
+import Model.Journal (JournalEntry(..), JournalMeta(..), mapJournalMetaRec, setTitle)
 import Network.RemoteData (RemoteData(..))
 import Style.Bulogen as SB
 import Type.Data.Boolean (kind Boolean)
@@ -110,37 +112,54 @@ component t =
 
     entryRender :: JournalEntry -> H.ParentHTML Query ChildQuery ChildSlot m
     entryRender entry =
-      HH.div []
+      HH.div
+        []
         [ case state.titleEditing of
             false ->
               HH.h1
                 [ HP.classes
-                  [ SB.tile
+                  [ SB.title
                   ]
+                  , HE.onClick (HE.input_ $ ToggleTitleEdit true)
                 ] 
                 [ HH.text $ guardMap ((/=) "") "Title" identity title
                 ]
             true ->
               HH.div
                 [ HP.classes
-                  [
+                  [ SB.field
+                  , SB.addons
                   ]
                 ]
-                [ HH.input
+                [ HH.div
                     [ HP.classes
-                      [ SB.input
+                      [ SB.control
+                      , SB.expanded
                       ]
-                    , HP.value title
-                    , HE.onValueChange (HE.input UpdateTitle)
-                    , HE.onFocusOut (HE.input_ $ ToggleTitleEdit false)
                     ]
-                , HH.button
+                    [ HH.input
+                      [ HP.classes
+                        [ SB.input
+                        ]
+                      , HP.value title
+                      , HE.onValueChange (HE.input UpdateTitle)
+                      , HE.onFocusOut (HE.input_ $ ToggleTitleEdit false)
+                      ]
+                    ]
+                , HH.div
                   [ HP.classes
-                    [ SB.primary
-                    , SB.button
+                    [ SB.control
                     ]
                   ]
-                  [ HH.text "Save"
+                  [ HH.button
+                    [ HP.classes
+                      [ SB.primary
+                      , SB.button
+                      ]
+                      , HE.onClick (HE.input_ $ ToggleTitleEdit false)
+                    ]
+                    [ HH.text "Save"
+                    ]
                   ]
                 ]
         , case state.contentEditing of 
@@ -191,7 +210,9 @@ component t =
 
   eval
     :: forall t
-    . MonadState State t
+    .  MonadState State t
+    => MonadAff t
+    => MonadEffect t
     => (Message -> t Unit)
     -> Query ~> t
   eval raise query = case query of
@@ -200,7 +221,14 @@ component t =
       case desiredEntry of
         Just id -> do
           MS.modify_ (_{ entry = Loading })
-        Nothing -> MS.modify_ (_{ entry = Success default })
+        Nothing -> do
+          currentDate <- liftEffect nowDateTime
+          defaultEntry <- pure default
+          entry <- pure
+            $ mapJournalMetaRec
+              (_{ lastUpdated = Just currentDate, createdAt = Just currentDate})
+              defaultEntry
+          MS.modify_ (_{ entry = Success entry })
       raise $ MNoMsg
       pure next
     (ToggleContentEdit edit next) -> do
