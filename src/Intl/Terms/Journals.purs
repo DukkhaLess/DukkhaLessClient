@@ -8,3 +8,5 @@ data Journals
   | PlaceholderContent
   | LoadingError
   | Uninitialised
+  | FieldPlaceholderTitle
+  | FieldPlaceholderContent

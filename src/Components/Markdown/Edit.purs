@@ -12,11 +12,15 @@ import Halogen.HTML as HH
 import Halogen.HTML.Events as HE
 import Halogen.HTML.Properties as HP
 import Intl (LocaliseFn)
+import Intl.Terms (Term)
 import Style.Bulogen as SB
 import Style.Classes as SC
 import Web.HTML.HTMLElement as WE
 
-type State = String
+type State =
+  { content :: String
+  , fieldPrompt :: Term
+  }
 
 data Slot = Slot
 derive instance eqSlot :: Eq Slot
@@ -27,7 +31,7 @@ data Query a
   | UpdateContents String a
   | SendFinalize a
 
-type Input = String
+type Input = State
 
 data Message
   = UpdatedContent String
@@ -58,8 +62,8 @@ component t =
         [ HH.textarea
           [ HE.onValueChange (HE.input UpdateContents)
           , HE.onFocusOut (HE.input_ $ SendFinalize)
-          , HP.placeholder "Enter your journal entry"
-          , HP.value $ s
+          , HP.placeholder $ t $ s.fieldPrompt
+          , HP.value $ s.content
           , HP.rows 20
           , HP.classes
             [ textFieldClassName
@@ -76,7 +80,7 @@ component t =
     liftEffect $ maybe (pure unit) (WE.focus) element
     pure next
   eval (UpdateContents newText next) = do
-    H.put newText
+    H.modify_ (_{ content = newText })
     H.raise $ UpdatedContent newText
     pure next
   eval (SendFinalize next) = do

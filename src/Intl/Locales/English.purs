@@ -7,6 +7,7 @@ import Intl.Terms as Term
 import Intl.Terms.Common as Common
 import Intl.Terms.Introduction as Intro
 import Intl.Terms.Journals as Journals
+import Intl.Terms.Journals as Journals
 import Intl.Terms.NotFound as NotFound
 import Intl.Terms.Resources as Resource
 import Intl.Terms.Sessions as Sessions
@@ -70,6 +71,8 @@ localiseJournal msg = case msg of
   Journals.PlaceholderTitle -> j $ "Journal Entry Name"
   Journals.LoadingError -> j $ "Loading failed."
   Journals.Uninitialised -> j $ "No journal entry was selected."
+  Journals.FieldPlaceholderContent -> j $ "Enter your journal entry"
+  Journals.FieldPlaceholderTitle -> j $ "Title your journal entry"
 
 localiseCommon :: Common.Common -> Maybe String
 localiseCommon msg = case msg of

@@ -145,6 +145,7 @@ component t =
                         [ SB.input
                         ]
                       , HP.value title
+                      , HP.placeholder $ t $ Journal FieldPlaceholderTitle
                       , HE.onValueChange (HE.input UpdateTitle)
                       , HE.onFocusOut (HE.input_ $ ToggleTitleEdit false)
                       ]
@@ -172,7 +173,9 @@ component t =
                 pathToEdit
                 Edit.Slot
                 (Edit.component t)
-                (unwrap entry).content
+                { content: (unwrap entry).content
+                , fieldPrompt: Journal FieldPlaceholderContent
+                }
                 mapEditMessageToQuery
         ]
         where
