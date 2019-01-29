@@ -3,6 +3,7 @@ module Components.Journals where
 import Prelude
 
 import AppM (CurrentSessionRow, JournalMetaCacheRow, EditingJournalEntryRow)
+import Components.Helpers.StateAccessors (guardSession)
 import Components.Journals.Entry as JournalEntry
 import Components.Journals.List as JournalList
 import Control.Monad.Reader.Class (class MonadAsk)
@@ -24,7 +25,7 @@ import Model.Journal as MJ
 import Style.Bulogen as SB
 import Type.Row (type (+))
 
-data Query a = QNoOp a
+data Query a = Initialise a
 
 data Message = MNoOp
 
@@ -73,11 +74,13 @@ component
   => LocaliseFn
   -> H.Component HH.HTML Query Input Message m
 component t =
-  H.parentComponent
+  H.lifecycleParentComponent
     { initialState
     , render
     , eval
     , receiver: receive
+    , initializer: Just (Initialise unit)
+    , finalizer: Nothing
     }
     where
       render :: State -> H.ParentHTML Query ChildQuery ChildSlot m
@@ -108,7 +111,9 @@ component t =
           ]
 
       eval :: Query ~> H.ParentDSL State Query ChildQuery ChildSlot Message m
-      eval (QNoOp next) = pure next
+      eval (Initialise next) = do
+        _ <- guardSession
+        pure next
 
       receive :: Input -> Maybe (Query Unit)
       receive _ = Nothing

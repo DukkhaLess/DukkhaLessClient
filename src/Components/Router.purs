@@ -4,10 +4,11 @@ module Components.Router where
 import AppM (AppState)
 import Components.Intro as Intro
 import Components.Journals as Journals
+import Components.Nav as Nav
 import Components.NotFound as NotFound
 import Components.Resources as Resources
+import Components.Sessions (Message(..))
 import Components.Sessions as Sessions
-import Components.Nav as Nav
 import Control.Monad.Reader.Class (class MonadAsk)
 import Data.Const (Const)
 import Data.Maybe (Maybe(..))
@@ -26,7 +27,7 @@ import Routing.Hash (matches)
 
 data Query a
   = Goto R.Routes a
-  | UpdateSession Session a
+  | UpdateSession (Maybe Session) a
 
 type ChildQuery
   =    Sessions.Query
@@ -118,7 +119,7 @@ component localiseFn = H.parentComponent
       H.modify_ (_{ currentRoute = loc})
       pure next
     eval (UpdateSession sess next) = do
-      H.modify_ (_{ session = Just sess })
+      H.modify_ (_{ session = sess })
       pure next
 
 routeSignal :: H.HalogenIO Query Void Aff -> Effect (Effect Unit)
@@ -129,4 +130,6 @@ routeSignal driver = matches R.routes hashChanged
       pure unit
 
 mapSessionMessage :: Sessions.Message -> Maybe (Query Unit)
-mapSessionMessage (Sessions.SessionCreated session) = Just (UpdateSession session unit)
+mapSessionMessage message = case message of 
+  Sessions.SessionCreated session -> Just (UpdateSession (Just session) unit)
+  SessionErased -> Just $ UpdateSession Nothing unit

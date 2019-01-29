@@ -2,26 +2,33 @@ module Components.Sessions where
 
 import Prelude
 
-import Data.Routing.Routes.Sessions as RS
 import Components.Sessions.Login as Login
 import Components.Sessions.Register as Register
 import Data.Const (Const)
 import Data.Maybe (Maybe(..))
+import Data.Routing.Routes (reverseRoute)
+import Data.Routing.Routes as R
+import Data.Routing.Routes.Sessions as RS
 import Effect.Aff.Class (class MonadAff)
-import Effect.Console (log)
+import Halogen (liftEffect)
 import Halogen as H
 import Halogen.Component.ChildPath (ChildPath, cpL, cpR, (:>))
 import Halogen.Data.Prism (type (<\/>), type (\/))
 import Halogen.HTML as HH
 import Intl (LocaliseFn)
+import Intl.Terms as Term
+import Intl.Terms.Sessions (Sessions(..))
 import Model (Session)
+import Routing.Hash (setHash)
 
 data Query a
   = UpdateRoute RS.Sessions a
   | ReceivedSession Session a
+  | Initialise a
 
 data Message
   = SessionCreated Session
+  | SessionErased
 
 type ChildQuery
   = Login.Query
@@ -63,11 +70,13 @@ component
   => LocaliseFn
   -> H.Component HH.HTML Query Input Message m
 component t =
-  H.parentComponent
+  H.lifecycleParentComponent
     { initialState
     , render
     , eval
     , receiver: receive
+    , initializer: Just (Initialise unit)
+    , finalizer: Nothing
     }
     where
       render :: State -> H.ParentHTML Query ChildQuery ChildSlot m
@@ -91,16 +100,32 @@ component t =
             (Register.component t)
             unit
             mapRegisterMessage
+        RS.Logout -> HH.text $ t $ Term.Session Logout
       
       eval :: Query ~> H.ParentDSL State Query ChildQuery ChildSlot Message m
       eval (UpdateRoute route next) = do
-        H.modify_ (_{ routeContext = route })
+        mapRouteOrLogout route
         pure next
       eval (ReceivedSession s next) = do
         H.modify_ (_{ session = Just s })
-        H.liftEffect $ log "Session received"
         H.raise $ SessionCreated s
         pure next
+      eval (Initialise next) = do
+        currentRoute <- H.gets _.routeContext
+        mapRouteOrLogout currentRoute
+        pure next
+
+
+      mapRouteOrLogout :: RS.Sessions -> H.ParentDSL State Query ChildQuery ChildSlot Message m Unit
+      mapRouteOrLogout route =
+        case route of
+          RS.Logout -> do
+            H.raise $ SessionErased
+            liftEffect $ setHash $ reverseRoute $ R.Intro
+          r -> do
+            H.modify_ (_{ routeContext = route })
+      
+      
 
       receive :: Input -> Maybe (Query Unit)
       receive (RouteContext route) = Just $ UpdateRoute route unit
