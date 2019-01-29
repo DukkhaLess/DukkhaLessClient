@@ -11,6 +11,7 @@ import Intl.Terms.Resources (Resources)
 import Intl.Terms.Sessions (Sessions)
 import Intl.Terms.Validation (ValidationMsg)
 import Intl.Terms.Journals (Journals)
+import Intl.Terms.Common (Common)
 
 n :: forall a. Maybe a
 n = Nothing
@@ -25,3 +26,4 @@ data Term
   | NotFound NotFound
   | Validation ValidationMsg
   | Journal Journals
+  | Common Common

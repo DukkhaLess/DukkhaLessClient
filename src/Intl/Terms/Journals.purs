@@ -4,3 +4,7 @@ data Journals
   = JournalEntries
   | Create
   | Journals
+  | PlaceholderTitle
+  | PlaceholderContent
+  | LoadingError
+  | Uninitialised

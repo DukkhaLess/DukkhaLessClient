@@ -4,13 +4,14 @@ import Data.Maybe (Maybe)
 import Data.Semigroup ((<>))
 import Intl.Terms (j)
 import Intl.Terms as Term
+import Intl.Terms.Common as Common
 import Intl.Terms.Introduction as Intro
+import Intl.Terms.Journals as Journals
 import Intl.Terms.NotFound as NotFound
 import Intl.Terms.Resources as Resource
 import Intl.Terms.Sessions as Sessions
 import Intl.Terms.Validation (ValidationMsg(..))
 import Intl.Terms.Validation as Validation
-import Intl.Terms.Journals as Journals
 import Prelude (show, ($))
 
 localise :: Term.Term -> Maybe String
@@ -21,6 +22,7 @@ localise term = case term of
   Term.NotFound notFound -> localiseNotFound notFound
   Term.Validation validation -> localiseValidation validation
   Term.Journal journal -> localiseJournal journal
+  Term.Common common -> localiseCommon common
 
 localiseIntro :: Intro.Introduction -> Maybe String
 localiseIntro Intro.Title = j "Dukkhaless Self-Care"
@@ -64,4 +66,12 @@ localiseJournal msg = case msg of
   Journals.JournalEntries -> j $ "Journal Entries"
   Journals.Create -> j $ "New Entry"
   Journals.Journals -> j $ "Journals"
+  Journals.PlaceholderContent -> j $ "# Your Journal Entry"
+  Journals.PlaceholderTitle -> j $ "Journal Entry Name"
+  Journals.LoadingError -> j $ "Loading failed."
+  Journals.Uninitialised -> j $ "No journal entry was selected."
+
+localiseCommon :: Common.Common -> Maybe String
+localiseCommon msg = case msg of
+  Common.Save -> j $ "Save"
     

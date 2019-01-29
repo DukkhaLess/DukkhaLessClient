@@ -29,6 +29,9 @@ import Halogen.HTML.Events as HE
 import Halogen.HTML.Properties as HP
 import Halogen.HTML.Properties as HP
 import Intl (LocaliseFn)
+import Intl.Terms (Term(..))
+import Intl.Terms.Common (Common(..))
+import Intl.Terms.Journals (Journals(..))
 import Model (Session(..))
 import Model.Journal (JournalEntry(..), JournalMeta(..), mapJournalMetaRec, setTitle)
 import Network.RemoteData (RemoteData(..))
@@ -122,7 +125,7 @@ component t =
                   ]
                   , HE.onClick (HE.input_ $ ToggleTitleEdit true)
                 ] 
-                [ HH.text $ guardMap ((/=) "") "Title" identity title
+                [ HH.text $ guardMap ((/=) "") (t $ Journal PlaceholderTitle) identity title
                 ]
             true ->
               HH.div
@@ -158,12 +161,12 @@ component t =
                       ]
                       , HE.onClick (HE.input_ $ ToggleTitleEdit false)
                     ]
-                    [ HH.text "Save"
+                    [ HH.text $ t $ Common Save
                     ]
                   ]
                 ]
         , case state.contentEditing of 
-            false -> guardMap ((/=) "") markdownPlaceholder markdownRendered (unwrap entry).content
+            false -> guardMap ((/=) "") (markdownRendered $ t $ Journal PlaceholderContent) markdownRendered (unwrap entry).content
             true  ->
               HH.slot'
                 pathToEdit
@@ -175,21 +178,6 @@ component t =
         where
           title = (unwrap (unwrap entry).metaData).title
         
-    markdownPlaceholder :: H.ParentHTML Query ChildQuery ChildSlot m
-    markdownPlaceholder =
-      HH.div
-        [ HP.classes
-          [ SB.section
-          , SB.medium
-          ]
-        , HE.onClick (HE.input_ $ ToggleContentEdit true)
-        ]
-        [ HH.p []
-          [ HH.text "Placeholder!"
-          ]
-        ]
-
-
     markdownRendered :: String -> H.ParentHTML Query ChildQuery ChildSlot m
     markdownRendered content =
       HH.div []
@@ -203,10 +191,10 @@ component t =
         ]
 
     loadingFailed :: DecryptionError -> H.ParentHTML Query ChildQuery ChildSlot m
-    loadingFailed _ = HH.text "Error"
+    loadingFailed _ = HH.text $ t $ Journal $ LoadingError
 
     notAsked :: H.ParentHTML Query ChildQuery ChildSlot m
-    notAsked = HH.text "None requested"
+    notAsked = HH.text $ t $ Journal Uninitialised
 
   eval
     :: forall t
