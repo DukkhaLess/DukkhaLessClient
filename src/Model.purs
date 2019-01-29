@@ -57,16 +57,3 @@ newtype Session = Session
   }
 
 derive instance newtypeSession :: Newtype Session _
-
-type Model =
-  { localiseFn :: LocaliseFn
-  , currentPage :: Routes.Routes
-  , session :: Maybe Session
-  }
-
-initial :: LocaliseFn -> Model
-initial f =
-  { localiseFn: f
-  , currentPage: Routes.Intro
-  , session: Nothing
-  }

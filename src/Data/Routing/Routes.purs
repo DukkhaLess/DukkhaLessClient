@@ -42,7 +42,6 @@ routes
   <|> routeSimple Resources
   <|> routeSimple (Sessions RS.Login)
   <|> routeSimple (Sessions RS.Register)
-  <|> routeSimple (Sessions RS.Logout)
   <|> routeSimple (Journals $ RJ.Edit Nothing)
   <|> ((lit journalsName *> str <* lit edit) <#> Just <#> RJ.Edit <#> Journals)
   <|> routeSimple (Journals RJ.List)

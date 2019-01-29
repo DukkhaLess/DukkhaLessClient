@@ -7,7 +7,6 @@ import Components.Journals as Journals
 import Components.Nav as Nav
 import Components.NotFound as NotFound
 import Components.Resources as Resources
-import Components.Sessions (Message(..))
 import Components.Sessions as Sessions
 import Control.Monad.Reader.Class (class MonadAsk)
 import Data.Const (Const)
@@ -21,13 +20,11 @@ import Halogen.Component.ChildPath (ChildPath, cpL, cpR, (:>))
 import Halogen.Data.Prism (type (<\/>), type (\/))
 import Halogen.HTML as HH
 import Intl (LocaliseFn)
-import Model (Model, Session)
 import Prelude (type (~>), Unit, Void, const, pure, unit, (<<<), bind, ($), discard, map)
 import Routing.Hash (matches)
 
 data Query a
   = Goto R.Routes a
-  | UpdateSession (Maybe Session) a
 
 type ChildQuery
   =    Sessions.Query
@@ -46,7 +43,6 @@ type ChildSlot
 type State =
   { localiseFn :: LocaliseFn
   , currentRoute :: R.Routes
-  , session :: Maybe Session
   }
 
 
@@ -72,7 +68,7 @@ component
   => LocaliseFn
   -> H.Component HH.HTML Query Unit Void m
 component localiseFn = H.parentComponent
-  { initialState: const { localiseFn, session: Nothing, currentRoute: R.Intro }
+  { initialState: const { localiseFn, currentRoute: R.Intro }
   , render
   , eval
   , receiver: const Nothing
@@ -85,7 +81,7 @@ component localiseFn = H.parentComponent
           pathToNav
           Nav.Slot
           (Nav.component localiseFn)
-          state.session
+          state.currentRoute
           nada
 
     viewPage :: State -> H.ParentHTML Query ChildQuery ChildSlot m
@@ -98,7 +94,7 @@ component localiseFn = H.parentComponent
           Sessions.Slot
           (Sessions.component localiseFn)
           (Sessions.RouteContext r)
-          mapSessionMessage
+          nada
       R.NotFound ->
         HH.slot'
           pathToNotFound
@@ -118,9 +114,6 @@ component localiseFn = H.parentComponent
     eval (Goto loc next) = do
       H.modify_ (_{ currentRoute = loc})
       pure next
-    eval (UpdateSession sess next) = do
-      H.modify_ (_{ session = sess })
-      pure next
 
 routeSignal :: H.HalogenIO Query Void Aff -> Effect (Effect Unit)
 routeSignal driver = matches R.routes hashChanged
@@ -128,8 +121,3 @@ routeSignal driver = matches R.routes hashChanged
     hashChanged _ newRoute = do
       _ <- launchAff $ driver.query <<< H.action <<< Goto $ newRoute
       pure unit
-
-mapSessionMessage :: Sessions.Message -> Maybe (Query Unit)
-mapSessionMessage message = case message of 
-  Sessions.SessionCreated session -> Just (UpdateSession (Just session) unit)
-  SessionErased -> Just $ UpdateSession Nothing unit

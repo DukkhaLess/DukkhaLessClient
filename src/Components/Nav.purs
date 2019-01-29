@@ -3,16 +3,22 @@ module Components.Nav
 
 import Prelude
 
+import AppM (CurrentSessionRow')
+import Components.Helpers.StateAccessors (logout)
+import Control.Monad.Reader (class MonadAsk, asks)
 import Control.Monad.State (class MonadState, gets, modify_)
 import Data.Array (cons, (:))
 import Data.Either (Either(..))
 import Data.Guards (mapIf)
 import Data.Maybe (Maybe(..))
+import Data.Routing.Routes (Routes)
 import Data.Routing.Routes as R
 import Data.Routing.Routes.Journals as RJ
 import Data.Routing.Routes.Sessions as RS
 import Data.Tuple (Tuple(..))
 import Effect.Aff.Class (class MonadAff)
+import Effect.Class (class MonadEffect, liftEffect)
+import Effect.Ref as Ref
 import Halogen as H
 import Halogen.HTML as HH
 import Halogen.HTML.Events as HE
@@ -20,14 +26,16 @@ import Halogen.HTML.Properties as HP
 import Intl (LocaliseFn)
 import Intl.Terms (Term(Journal, Session))
 import Intl.Terms.Journals (Journals(..))
-import Intl.Terms.Sessions (Sessions(Login))
+import Intl.Terms.Sessions (Sessions(..))
 import Model (Session)
 import Style.Bulogen as SB
 
 
 data Query a
   = ToggleBurger a
-  | UpdateSession (Maybe Session) a
+  | Initialize a
+  | Synchronize Routes a
+  | PerformLogout a
 
 data Slot = Slot
 derive instance eqSlot :: Eq Slot
@@ -36,28 +44,34 @@ derive instance ordSlot :: Ord Slot
 type State =
   { session :: Maybe Session
   , expandedBurger :: Boolean
+  , currentRouteContext :: Routes
   }
 
-type Input = Maybe Session
+type Input = Routes
 
 type Message = Unit
 
 initialState :: Input -> State
-initialState s =
-  { session: s
+initialState r =
+  { session: Nothing
   , expandedBurger: false
+  , currentRouteContext: r
   }
 
 component 
-  :: forall m
-  . MonadAff m
+  :: forall m r
+  .  MonadAff m
+  => MonadEffect m
+  => MonadAsk (CurrentSessionRow' r) m
   => LocaliseFn -> H.Component HH.HTML Query Input Unit m
 component t =
-  H.component
+  H.lifecycleComponent
     { initialState
     , render
     , eval
     , receiver
+    , initializer: Just $ Initialize unit
+    , finalizer: Nothing
     }
     where
 
@@ -69,19 +83,35 @@ component t =
 
   eval
     :: forall t
-    . MonadState State t
+    .  MonadState State t
+    => MonadEffect t
+    => MonadAsk (CurrentSessionRow' r) t
     => Query ~> t
   eval query = case query of
     ToggleBurger next -> do
       expandedBurger <- gets (_.expandedBurger)
       modify_ (_{ expandedBurger = not expandedBurger })
       pure next
-    UpdateSession newSession next -> do
-      modify_ (_{ session = newSession })
+    Initialize next -> do
+      syncSession
       pure next
+    Synchronize r next -> do
+      syncSession
+      modify_ (_{ currentRouteContext = r })
+      pure next
+    PerformLogout next -> do
+      logout
+      syncSession
+      pure next
+    where
+      syncSession = do
+        session <- asks _.currentSession >>= Ref.read >>> liftEffect
+        modify_ (_{ session = session })
+
+
 
   receiver :: Input -> Maybe (Query Unit)
-  receiver newSession = Just (UpdateSession newSession unit)
+  receiver r = Just $ Synchronize r unit
 
 
 sessionlessMenuItems
@@ -202,7 +232,7 @@ sessionedMenuItems
 sessionedMenuItems t _ =
   Tuple
     leftItems
-    []
+    rightItems
     where
     leftItems =
       ( link t $ Right $ Tuple (Journal Journals)
@@ -210,6 +240,24 @@ sessionedMenuItems t _ =
         , R.Journals RJ.List
         ]
       ) : []
+    rightItems =
+      [ HH.div
+          [ HP.classes
+            [ SB.navbarItem
+            ]
+          ]
+          [ HH.a
+            [ HP.classes
+              [ SB.button
+              , SB.info
+              ]
+              , HE.onClick (HE.input_ $ PerformLogout)
+            ]
+            [ HH.text $ t $ Session Logout
+            ]
+          ]
+      ]
+
 
 link
   :: LocaliseFn
