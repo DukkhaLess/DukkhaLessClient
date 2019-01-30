@@ -5,10 +5,13 @@ import Prelude
 
 import AppM (CurrentSessionRow')
 import Components.Helpers.StateAccessors (logout)
+import Components.Helpers.Class (makeIcon)
 import Control.Monad.Reader (class MonadAsk, asks)
 import Control.Monad.State (class MonadState, gets, modify_)
 import Data.Array (cons, (:))
+import Data.Maybe (maybe)
 import Data.Either (Either(..))
+import Data.Foldable (foldr)
 import Data.Guards (mapIf)
 import Data.Maybe (Maybe(..))
 import Data.Routing.Routes (Routes)
@@ -266,7 +269,10 @@ component t =
             [ SB.navbarItem
             ]
           ]
-          [ HH.text $ t $ describe r ]
+          (foldr cons
+            [ HH.span_ [HH.text $ t $ describe r]
+            ]
+            (makeIcon r))
       Right (Tuple term rs) ->
         HH.div
           [ HP.classes
