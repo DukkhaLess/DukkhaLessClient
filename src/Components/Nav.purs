@@ -24,6 +24,7 @@ import Halogen.HTML as HH
 import Halogen.HTML.Events as HE
 import Halogen.HTML.Properties as HP
 import Intl (LocaliseFn)
+import Intl.Class (describe)
 import Intl.Terms (Term(Journal, Session))
 import Intl.Terms.Journals (Journals(..))
 import Intl.Terms.Sessions (Sessions(..))
@@ -265,7 +266,7 @@ component t =
             [ SB.navbarItem
             ]
           ]
-          [ HH.text $ R.reverseRoute r ]
+          [ HH.text $ t $ describe r ]
       Right (Tuple term rs) ->
         HH.div
           [ HP.classes

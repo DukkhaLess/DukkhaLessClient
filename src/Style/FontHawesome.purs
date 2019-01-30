@@ -29,3 +29,9 @@ list = HH.ClassName "list"
 
 book :: HH.ClassName
 book = HH.ClassName "book"
+
+userPlus :: HH.ClassName
+userPlus = HH.ClassName "user-plus"
+
+penSquare :: HH.ClassName
+penSquare = HH.ClassName "pen-square"

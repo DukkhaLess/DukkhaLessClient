@@ -112,7 +112,7 @@ component t =
 
       eval :: Query ~> H.ParentDSL State Query ChildQuery ChildSlot Message m
       eval (Initialise next) = do
-        _ <- guardSession
+        -- _ <- guardSession
         pure next
 
       receive :: Input -> Maybe (Query Unit)
