@@ -78,8 +78,8 @@ component t =
   render :: State -> H.ComponentHTML Query
   render state =
     case state.session of
-      Nothing -> sessionlessMenu state t
-      Just session -> sessionedMenu state t session
+      Nothing -> sessionlessMenu state
+      Just session -> sessionedMenu state session
 
   eval
     :: forall t
@@ -113,186 +113,179 @@ component t =
   receiver :: Input -> Maybe (Query Unit)
   receiver r = Just $ Synchronize r unit
 
-
-sessionlessMenuItems
- :: LocaliseFn
- -> Tuple (Array (H.ComponentHTML Query)) (Array (H.ComponentHTML Query))
-sessionlessMenuItems t = 
-  Tuple
-  (map (Left >>> link t) [])
-  [ HH.div
-      [ HP.classes
-        [ SB.navbarItem
-        ]
-      ]
-      [ HH.a
-        [ HP.href $ R.reverseRoute $ R.Sessions RS.Login 
-        , HP.classes
-          [ SB.button
-          , SB.info
-          ]
-        ]
-        [ HH.text $ t $ Session Login
-        ]
-      ]
-  ]
-
-navWrapper
-  :: State
-  -> LocaliseFn
-  -> Tuple (Array (H.ComponentHTML Query)) (Array (H.ComponentHTML Query))
-  -> H.ComponentHTML Query
-navWrapper state t (Tuple leftItems rightItems) =
-  HH.div
-    [ HP.classes
-      [ SB.paddingless
-      ]
-    ]
-    [
-      HH.nav
-        [ HP.classes
-          [ SB.navbar
-          , SB.primary
-          ]
-        ]
-        [ HH.div
-          [ HP.classes
-            [ SB.navbarBrand
-            ]
-          ]
-          [ HH.a
-              [ HP.classes
-                [ SB.navbarItem
-                ]
-                , HP.href $ R.reverseRoute R.Intro
-              ]
-              [ HH.img
-                  [ HP.alt "DukkhaLess, a self-care and jounraling application for everyone!"
-                  , HP.src "static/assets/branding.png"
-                  , HP.width 120
-                  , HP.height 28
-                  ]
-              ]
-          , HH.div
-            [ HP.classes $
-                mapIf
-                  (const state.expandedBurger)
-                  [ SB.navbarBurger
-                  , SB.burger
-                  ]
-                  (cons SB.active)
-            , HE.onClick (HE.input_ ToggleBurger)
-            ]
-            [ HH.span_ []
-            , HH.span_ []
-            , HH.span_ []
-            ]
-          ]
-        , HH.div 
-          [ HP.classes $
-              mapIf
-              (const state.expandedBurger)
-              [ SB.navbarMenu
-              ]
-              (cons SB.active)
-          ]
-          [ HH.div
-            [ HP.classes
-              [ SB.navbarStart
-              ]
-            ]
-            leftItems
-          , HH.div
-            [ HP.classes
-              [ SB.navbarEnd
-              ]
-            ]
-            rightItems
-          ]
-        ]
-    ]
-   
-sessionlessMenu
-  :: State 
-  -> LocaliseFn
-  -> H.ComponentHTML Query
-sessionlessMenu state t = navWrapper state t (sessionlessMenuItems t)
-
-sessionedMenu
-  :: State 
-  -> LocaliseFn
-  -> Session
-  -> H.ComponentHTML Query
-sessionedMenu state t = sessionedMenuItems t >>> navWrapper state t
-
-sessionedMenuItems
-  :: LocaliseFn
-  -> Session
-  -> Tuple (Array (H.ComponentHTML Query)) (Array (H.ComponentHTML Query))
-sessionedMenuItems t _ =
-  Tuple
-    leftItems
-    rightItems
-    where
-    leftItems =
-      ( link t $ Right $ Tuple (Journal Journals)
-        [ R.Journals $ RJ.Edit Nothing
-        , R.Journals RJ.List
-        ]
-      ) : []
-    rightItems =
-      [ HH.div
-          [ HP.classes
-            [ SB.navbarItem
-            ]
-          ]
-          [ HH.a
-            [ HP.classes
-              [ SB.button
-              , SB.info
-              ]
-              , HE.onClick (HE.input_ $ PerformLogout)
-            ]
-            [ HH.text $ t $ Session Logout
-            ]
-          ]
-      ]
-
-
-link
-  :: LocaliseFn
-  -> Either R.Routes (Tuple Term (Array R.Routes))
-  -> H.ComponentHTML Query
-link t routes =
-  case routes of
-    Left r ->
-      HH.a 
-        [ HP.href $ R.reverseRoute r
-        , HP.classes
-          [ SB.navbarItem
-          ]
-        ]
-        [ HH.text $ R.reverseRoute r ]
-    Right (Tuple term rs) ->
-      HH.div
+  sessionlessMenuItems
+    :: Tuple (Array (H.ComponentHTML Query)) (Array (H.ComponentHTML Query))
+  sessionlessMenuItems = 
+    Tuple
+    (map (Left >>> link) [])
+    [ HH.div
         [ HP.classes
           [ SB.navbarItem
-          , SB.hasDropdown
-          , SB.hoverable
           ]
         ]
         [ HH.a
-          [ HP.classes
-            [ SB.navbarLink
+          [ HP.href $ R.reverseRoute $ R.Sessions RS.Login 
+          , HP.classes
+            [ SB.button
+            , SB.info
             ]
           ]
-          [ HH.text $ t $ term
-          , HH.div
-            [ HP.classes
-              [ SB.navbarDropdown
-              ]
-            ]
-            (map (Left >>> link t) rs)
+          [ HH.text $ t $ Session Login
+          ]
+        ]
+    ]
+
+  navWrapper
+    :: State
+    -> Tuple (Array (H.ComponentHTML Query)) (Array (H.ComponentHTML Query))
+    -> H.ComponentHTML Query
+  navWrapper state (Tuple leftItems rightItems) =
+    HH.div
+      [ HP.classes
+        [ SB.paddingless
         ]
       ]
-        
+      [
+        HH.nav
+          [ HP.classes
+            [ SB.navbar
+            , SB.primary
+            ]
+          ]
+          [ HH.div
+            [ HP.classes
+              [ SB.navbarBrand
+              ]
+            ]
+            [ HH.a
+                [ HP.classes
+                  [ SB.navbarItem
+                  ]
+                  , HP.href $ R.reverseRoute R.Intro
+                ]
+                [ HH.img
+                    [ HP.alt "DukkhaLess, a self-care and jounraling application for everyone!"
+                    , HP.src "static/assets/branding.png"
+                    , HP.width 120
+                    , HP.height 28
+                    ]
+                ]
+            , HH.div
+              [ HP.classes $
+                  mapIf
+                    (const state.expandedBurger)
+                    [ SB.navbarBurger
+                    , SB.burger
+                    ]
+                    (cons SB.active)
+              , HE.onClick (HE.input_ ToggleBurger)
+              ]
+              [ HH.span_ []
+              , HH.span_ []
+              , HH.span_ []
+              ]
+            ]
+          , HH.div 
+            [ HP.classes $
+                mapIf
+                (const state.expandedBurger)
+                [ SB.navbarMenu
+                ]
+                (cons SB.active)
+            ]
+            [ HH.div
+              [ HP.classes
+                [ SB.navbarStart
+                ]
+              ]
+              leftItems
+            , HH.div
+              [ HP.classes
+                [ SB.navbarEnd
+                ]
+              ]
+              rightItems
+            ]
+          ]
+      ]
+    
+  sessionlessMenu
+    :: State 
+    -> H.ComponentHTML Query
+  sessionlessMenu state = navWrapper state (sessionlessMenuItems)
+
+  sessionedMenu
+    :: State 
+    -> Session
+    -> H.ComponentHTML Query
+  sessionedMenu state = sessionedMenuItems >>> navWrapper state
+
+  sessionedMenuItems
+    :: Session
+    -> Tuple (Array (H.ComponentHTML Query)) (Array (H.ComponentHTML Query))
+  sessionedMenuItems _ =
+    Tuple
+      leftItems
+      rightItems
+      where
+      leftItems =
+        ( link $ Right $ Tuple (Journal Journals)
+          [ R.Journals $ RJ.Edit Nothing
+          , R.Journals RJ.List
+          ]
+        ) : []
+      rightItems =
+        [ HH.div
+            [ HP.classes
+              [ SB.navbarItem
+              ]
+            ]
+            [ HH.a
+              [ HP.classes
+                [ SB.button
+                , SB.info
+                ]
+                , HE.onClick (HE.input_ $ PerformLogout)
+              ]
+              [ HH.text $ t $ Session Logout
+              ]
+            ]
+        ]
+
+
+  link
+    :: Either R.Routes (Tuple Term (Array R.Routes))
+    -> H.ComponentHTML Query
+  link routes =
+    case routes of
+      Left r ->
+        HH.a 
+          [ HP.href $ R.reverseRoute r
+          , HP.classes
+            [ SB.navbarItem
+            ]
+          ]
+          [ HH.text $ R.reverseRoute r ]
+      Right (Tuple term rs) ->
+        HH.div
+          [ HP.classes
+            [ SB.navbarItem
+            , SB.hasDropdown
+            , SB.hoverable
+            ]
+          ]
+          [ HH.a
+            [ HP.classes
+              [ SB.navbarLink
+              ]
+            ]
+            [ HH.text $ t $ term
+            , HH.div
+              [ HP.classes
+                [ SB.navbarDropdown
+                ]
+              ]
+              (map (Left >>> link) rs)
+          ]
+        ]
+          
