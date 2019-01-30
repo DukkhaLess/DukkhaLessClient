@@ -14,6 +14,9 @@ See the License for the specific language governing permissions and
 limitations under the License.
 -}
 
+
+-- | This module provides simple classname wrappers for Bulma Classnames
+-- | The intent is to allow compile time checks of spelling, and nothing more
 module Style.Bulogen where
 
 import Halogen.HTML as HH
