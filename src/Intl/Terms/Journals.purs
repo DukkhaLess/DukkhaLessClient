@@ -10,3 +10,5 @@ data Journals
   | Uninitialised
   | FieldPlaceholderTitle
   | FieldPlaceholderContent
+  | EditExisting String
+  | ListEntries

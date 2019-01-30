@@ -64,15 +64,17 @@ localiseValidation msg = case msg of
   
 localiseJournal :: Journals.Journals -> Maybe String
 localiseJournal msg = case msg of
-  Journals.JournalEntries -> j $ "Journal Entries"
-  Journals.Create -> j $ "New Entry"
-  Journals.Journals -> j $ "Journals"
-  Journals.PlaceholderContent -> j $ "# Your Journal Entry"
-  Journals.PlaceholderTitle -> j $ "Journal Entry Name"
-  Journals.LoadingError -> j $ "Loading failed."
-  Journals.Uninitialised -> j $ "No journal entry was selected."
-  Journals.FieldPlaceholderContent -> j $ "Enter your journal entry"
-  Journals.FieldPlaceholderTitle -> j $ "Title your journal entry"
+  Journals.JournalEntries -> j "Journal Entries"
+  Journals.Create -> j "New Entry"
+  Journals.Journals -> j "Journals"
+  Journals.PlaceholderContent -> j "# Your Journal Entry"
+  Journals.PlaceholderTitle -> j "Journal Entry Name"
+  Journals.LoadingError -> j "Loading failed."
+  Journals.Uninitialised -> j "No journal entry was selected."
+  Journals.FieldPlaceholderContent -> j "Enter your journal entry"
+  Journals.FieldPlaceholderTitle -> j "Title your journal entry"
+  Journals.EditExisting s -> j s
+  Journals.ListEntries -> j "List"
 
 localiseCommon :: Common.Common -> Maybe String
 localiseCommon msg = case msg of
