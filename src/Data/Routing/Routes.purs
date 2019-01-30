@@ -11,14 +11,13 @@ import Control.Alternative ((<|>))
 import Data.Array (tail)
 import Data.Foldable (foldl)
 import Data.Maybe (Maybe(..), fromMaybe)
-import Data.Routing.Class (class DescribeRoute, class ReverseRoute, reverseRoute)
+import Data.Routing.Class (class ReverseRoute, reverseRoute)
 import Data.Routing.Class (class ReverseRoute, reverseRoute) as ARC
 import Data.Routing.Routes.Journals (Journals)
 import Data.Routing.Routes.Journals as RJ
 import Data.Routing.Routes.Sessions (Sessions)
 import Data.Routing.Routes.Sessions as RS
 import Data.String (toLower, split, Pattern(..))
-import Intl.Terms as Term
 import Routing.Match (Match, lit, end, str)
 
 data Routes
@@ -35,10 +34,6 @@ instance reverseRouteRoutes :: ReverseRoute Routes where
     NotFound -> "notfound"
     (Sessions s) -> sessionsName <> "/" <> reverseRoute s
     (Journals j) -> journalsName <> "/" <> reverseRoute j
-
-instance describeRouteRoutes :: DescribeRoute Routes where
-  describe r = case r of
-    Intro -> Term.
 
 routes :: Match Routes
 routes

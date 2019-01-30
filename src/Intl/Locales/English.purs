@@ -77,4 +77,5 @@ localiseJournal msg = case msg of
 localiseCommon :: Common.Common -> Maybe String
 localiseCommon msg = case msg of
   Common.Save -> j $ "Save"
+  Common.ProductName -> j $ "DukkhaLess"
     

@@ -11,5 +11,3 @@ instance reverseRouteSessions :: ReverseRoute Sessions where
   reverseRoute r = case r of
     Login -> "login"
     Register -> "register"
-
-
