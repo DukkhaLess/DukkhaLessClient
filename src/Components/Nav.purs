@@ -33,6 +33,7 @@ import Intl.Terms.Journals (Journals(..))
 import Intl.Terms.Sessions (Sessions(..))
 import Model (Session)
 import Style.Bulogen as SB
+import Style.FontHawesome as FA
 
 
 data Query a
@@ -134,7 +135,8 @@ component t =
             , SB.info
             ]
           ]
-          [ HH.text $ t $ Session Login
+          [ HH.i [ HP.classes [FA.solid, FA.signInAlt]] []
+          , HH.span_ [ HH.text $ t $ Session Login ]
           ]
         ]
     ]
@@ -251,7 +253,8 @@ component t =
                 ]
                 , HE.onClick (HE.input_ $ PerformLogout)
               ]
-              [ HH.text $ t $ Session Logout
+              [ HH.i [ HP.classes [FA.solid, FA.signOutAlt]] []
+              , HH.span_ [ HH.text $ t $ Session Logout ]
               ]
             ]
         ]
