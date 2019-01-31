@@ -19,6 +19,7 @@ import Data.Routing.Routes as R
 import Data.Routing.Routes.Journals as RJ
 import Data.Routing.Routes.Sessions as RS
 import Data.Tuple (Tuple(..))
+import Data.Tuple.Nested ((/\), type (/\))
 import Effect.Aff.Class (class MonadAff)
 import Effect.Class (class MonadEffect, liftEffect)
 import Effect.Ref as Ref
@@ -235,7 +236,7 @@ component t =
       rightItems
       where
       leftItems =
-        ( link $ Right $ Tuple (Journal Journals)
+        ( link $ Right $ Journal Journals /\ Just FA.penAlt /\
           [ R.Journals $ RJ.Edit Nothing
           , R.Journals RJ.List
           ]
@@ -261,7 +262,7 @@ component t =
 
 
   link
-    :: Either R.Routes (Tuple Term (Array R.Routes))
+    :: Either R.Routes (Term /\ Maybe (FontAwesomeIconClass) /\ Array R.Routes)
     -> H.ComponentHTML Query
   link routes =
     case routes of
@@ -276,7 +277,7 @@ component t =
             [ HH.span_ [HH.text $ t $ describe r]
             ]
             (makeIcon r))
-      Right (Tuple term rs) ->
+      Right (term /\ iconClass /\ rs) ->
         HH.div
           [ HP.classes
             [ SB.navbarItem
@@ -289,13 +290,19 @@ component t =
               [ SB.navbarLink
               ]
             ]
-            [ HH.text $ t $ term
-            , HH.div
-              [ HP.classes
-                [ SB.navbarDropdown
+            (foldr cons
+              [ HH.span_ [ HH.text $ t $ term ]
+              , HH.div
+                [ HP.classes
+                  [ SB.navbarDropdown
+                  ]
                 ]
+                (map (Left >>> link) rs)
               ]
-              (map (Left >>> link) rs)
-          ]
+              (iconClass <#> \c ->
+                HH.i [HP.classes [ FA.solid, c ]] []
+              )
+            )
         ]
           
+type FontAwesomeIconClass = HH.ClassName
