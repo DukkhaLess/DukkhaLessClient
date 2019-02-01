@@ -1,4 +1,10 @@
-module Data.HTTP.Helpers where
+module Data.HTTP.Helpers
+  ( get
+  , post
+  , request
+  , plaintextPost
+  , ApiPath(..)
+  ) where
 
 import Prelude
 
@@ -7,7 +13,7 @@ import Affjax as AJ
 import Affjax.RequestBody as RB
 import Affjax.RequestHeader (RequestHeader(..))
 import Affjax.ResponseFormat (json)
-import Data.Crypto.Class (class CipherText)
+import Data.Crypto.Class (class CipherText, class PlainText)
 import Data.Argonaut.Core (Json)
 import Data.Argonaut.Decode (class DecodeJson, decodeJson)
 import Data.Argonaut.Encode (class EncodeJson, encodeJson)
@@ -53,6 +59,9 @@ post a p = sessionHeaders (unsafePostCleartext a $ Just p)
 
 get :: ApiPath -> SessionToken -> Request Json
 get a = sessionHeaders (unsafeRequestCleartext GET a Nothing)
+
+plaintextPost :: forall p. PlainText p => ApiPath -> p -> Request Json
+plaintextPost = unsafePostCleartext
 
 withLeadingSlash :: String -> String
 withLeadingSlash s = case charAt 0 s of

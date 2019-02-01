@@ -1,7 +1,6 @@
 module Data.HTTP.Request where
 
 import Data.HTTP.Helpers
-import Data.HTTP.Payloads
 import Prelude
 
 import Affjax (Response)
@@ -14,11 +13,6 @@ import Effect.Aff.Class (class MonadAff)
 import Model (SessionToken)
 import Model.Journal (JournalEntry(..))
 import Model.Keyring (Keyring(..))
-
-login :: forall m. MonadAff m => SubmitLogin -> m (Either String SessionToken)
-login payload = do
-  response <- request (unsafePostCleartext (ApiPath "/login") payload)
-  pure response.body
 
 getJournalEntry
   :: forall m

@@ -6,7 +6,7 @@ import Components.Helpers.Forms as HF
 import Control.Monad.Error.Class (throwError)
 import Control.Monad.State (class MonadState, get, put, modify_)
 import Data.Either (Either(..), note, either)
-import Data.HTTP.Helpers (ApiPath(..), unsafePostCleartext, request)
+import Data.HTTP.Helpers (ApiPath(..), plaintextPost, request)
 import Data.HTTP.Payloads (SubmitLogin(SubmitLogin))
 import Data.Maybe (Maybe(..))
 import Data.Newtype (wrap)
@@ -147,7 +147,7 @@ component t =
       payloadAndKeyring <- liftAff $ either throwError pure (prepareLoginPayload state)
       let payload = fst payloadAndKeyring
       let keyring = snd payloadAndKeyring
-      response <- liftAff $ request (unsafePostCleartext (ApiPath "/login") payload)
+      response <- liftAff $ request (plaintextPost (ApiPath "/login") payload)
       case response.body of
         Right token -> do
           raise $ SessionCreated $ wrap { username: state.username, keyringUsage: Enabled keyring, sessionToken: token }

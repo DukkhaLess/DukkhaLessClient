@@ -1,22 +1,22 @@
 module Data.Crypto.Class where
 
+import Data.Crypto.Types
 import Prelude
 
-import Crypt.NaCl (BoxPublicKey, BoxSecretKey, boxAfter, boxBefore, boxOpenAfter, fromUint8Array, generateNonce, secretBox, secretBoxOpen, toUint8Array)
+import Crypt.NaCl (boxAfter, boxBefore, boxOpenAfter, fromUint8Array, generateNonce, secretBox, secretBoxOpen, toUint8Array)
 import Crypt.NaCl.Types (BoxSharedKey, Message, Nonce, SecretBoxKey)
 import Data.Argonaut.Encode (class EncodeJson)
 import Data.ArrayBuffer.ArrayBuffer (fromString, decodeToString)
 import Data.ArrayBuffer.DataView (whole, buffer)
 import Data.ArrayBuffer.Typed (asUint8Array, dataView)
 import Data.ArrayBuffer.Types (ArrayBuffer)
-import Data.Base64 (Base64(..), encodeBase64, decodeBase64)
 import Data.Bifunctor (lmap)
-import Data.Crypto.Types
 import Data.Either (Either, note)
+import Data.HTTP.Payloads (SubmitLogin, SubmitRegister)
 import Data.Newtype (unwrap)
 import Effect.Aff.Class (class MonadAff)
 import Effect.Class (liftEffect)
-import Model.Keyring (Keyring(..), boxPrivateKey, boxPublicKey, secretBoxKey)
+import Model.Keyring (Keyring, boxPrivateKey, boxPublicKey, secretBoxKey)
 
 class EncodeJson a <= CipherText a
 
@@ -67,3 +67,9 @@ encryptMessage message keyFn keyring nonce = cryptoFn key where
     sharedKey = boxBefore recipientPublic senderPrivate
   cryptoFn (SecretBox secretKey) =  EncryptedMessage { nonce: nonce, contents: contents } where
     contents =  SecretBoxed (secretBox message nonce secretKey)
+
+
+class EncodeJson a <= PlainText a
+
+instance plaintextSubmitRegister :: PlainText SubmitRegister
+instance plaintextSubmitLogion :: PlainText SubmitLogin
