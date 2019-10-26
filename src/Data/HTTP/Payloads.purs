@@ -1,12 +1,11 @@
 module Data.HTTP.Payloads where
 
 import Model
-import Prelude
+import Prelude (class Show)
 
 import Crypt.NaCl.Class (toUint8Array)
-import Crypt.NaCl.Types (BoxPublicKey(..))
+import Crypt.NaCl.Types (BoxPublicKey)
 import Data.Argonaut (jsonEmptyObject)
-import Data.Argonaut.Decode.Class (class DecodeJson)
 import Data.Argonaut.Encode.Class (class EncodeJson)
 import Data.Argonaut.Encode.Combinators ((~>), (:=))
 import Data.Generic.Rep (class Generic)

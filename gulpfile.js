@@ -13,19 +13,19 @@ const browserSync = require('browser-sync').create();
 const sass = require('gulp-sass');
 const cleanCss = require('gulp-clean-css');
 const rename = require('gulp-rename');
-const reload      = browserSync.reload;
+const reload = browserSync.reload;
 
 const sources = [
   "src/**/*.purs",
   "bower_components/purescript-*/src/**/*.purs",];
 
-gulp.task("cleanIntermediate", function() {
+gulp.task("cleanIntermediate", function () {
   return del([
     "intermediate/**/**",
   ]);
 });
 
-gulp.task("cleanDist", function() {
+gulp.task("cleanDist", function () {
   return del([
     "dist/**/**",
   ]);
@@ -40,21 +40,21 @@ gulp.task("bundle", ["make", "sass"], function () {
     .bundle({ src: "output/**/*.js", output: "intermediate/initial/app.js", module: "Main", main: "Main" });
 });
 
-gulp.task("runIncludes", ["bundle"], function(done) {
-  exec('browserify intermediate/initial/app.js -o intermediate/app.js', function(err, out, err) {
+gulp.task("runIncludes", ["bundle"], function (done) {
+  exec('browserify intermediate/initial/app.js -o intermediate/app.js', function (err, out, err) {
     console.log(err);
     done();
   });
 });
 
-gulp.task("minifyCss", ["sass"], function() {
+gulp.task("minifyCss", ["sass"], function () {
   return gulp.src('intermediate/styles.css')
-    .pipe(cleanCss({compatibility: 'ie10'}))
+    .pipe(cleanCss({ compatibility: 'ie10' }))
     .pipe(rename("styles-min.css"))
     .pipe(gulp.dest('intermediate'));
 });
 
-gulp.task("minify", ["runIncludes"], function() {
+gulp.task("minify", ["runIncludes"], function () {
   return gulp.src('intermediate/app.js')
     .pipe(closureCompiler({
       compilation_level: 'SIMPLE',
@@ -70,7 +70,7 @@ function revisionFn(isMinified) {
   return () => {
     const assetFilter = filter(['**/*', '!**/index.html'], { restore: true });
     const appFile = isMinified ? "app-min.js" : "app.js";
-    const styleFile = isMinified ? "styles-min.css" :  "styles.css";
+    const styleFile = isMinified ? "styles-min.css" : "styles.css";
     gulp.src(`index.html`)
       .pipe(replace("static/app.js", `static/${appFile}`))
       .pipe(replace("static/styles.css", `static/${styleFile}`))
@@ -84,7 +84,7 @@ function revisionFn(isMinified) {
   };
 }
 
-gulp.task("sass", function(){
+gulp.task("sass", function () {
   return gulp.src('styles/**/*.scss')
     .pipe(sass().on('error', sass.logError))
     .pipe(gulp.dest('intermediate'));
@@ -97,20 +97,20 @@ function revisionRewriteFn() {
   const manifest = gulp.src('intermediate/rev-manifest.json');
 
   return gulp.src(['intermediate/*.html'])
-    .pipe(revRewrite({manifest}))
+    .pipe(revRewrite({ manifest }))
     .pipe(gulp.dest('dist'));
 }
 
-gulp.task("designPage", ["revision"], function(){
+gulp.task("designPage", ["revision"], function () {
   return gulp.src("styles/designPage.html")
     .pipe(gulp.dest("intermediate"));
 });
 
-gulp.task("revisionRewrite", ['designPage'], revisionRewriteFn);
+gulp.task("revisionRewrite", ['copyStaticAssets'], revisionRewriteFn);
 
 gulp.task("revisionRewriteProd", ['revisionProd'], revisionRewriteFn);
 
-gulp.task("buildToProd", ['revisionRewriteProd'], function() {
+gulp.task("buildToProd", ['copyStaticAssetsProd'], function () {
   return gulp.src(['dist/static/*.js', 'dist/static/*.css'])
     .pipe(gzip({
       gzipOptions: {
@@ -120,12 +120,20 @@ gulp.task("buildToProd", ['revisionRewriteProd'], function() {
     .pipe(gulp.dest('dist/static'));
 });
 
-gulp.task('devServer', function() {
+function copyStaticAssetsFn() {
+  return gulp.src(['./static/assets/*.png', './static/assets/*.jpg'])
+    .pipe(gulp.dest('./dist/static/assets'));
+}
+
+gulp.task('copyStaticAssetsProd', ['revisionRewriteProd'], copyStaticAssetsFn);
+gulp.task('copyStaticAssets', ['designPage'], copyStaticAssetsFn);
+
+gulp.task('devServer', function () {
   // Serve files from the root of this project
   browserSync.init({
     startPath: '/index.html',
     proxy: 'localhost:4000',
-    serveStatic:  [
+    serveStatic: [
       {
         route: '/index.html',
         dir: ['./dist/index.html']
@@ -148,13 +156,13 @@ gulp.task("dotpsci", function () {
     .pipe(gulp.dest("."));
 });
 
-gulp.task("test", ["make"], function() {
+gulp.task("test", ["make"], function () {
   return purescript.bundle({ src: "output/**/*.js", main: "Test.Main" })
     .pipe(run("node"));
 });
 
 const DEV_TASK = ["revisionRewrite"];
-gulp.task("dev", ['devServer'], function() {
+gulp.task("dev", ['devServer'], function () {
   gulp.watch('./src/**/*.purs', DEV_TASK);
   gulp.watch('./src/**/*.js', DEV_TASK);
   gulp.watch('./index.html', DEV_TASK);

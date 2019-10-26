@@ -2,26 +2,36 @@ module Components.Sessions where
 
 import Prelude
 
-import AppRouting.Routes as R
+import AppM (CurrentSessionRow')
 import Components.Sessions.Login as Login
 import Components.Sessions.Register as Register
+import Control.Monad.Reader (class MonadAsk, asks)
 import Data.Const (Const)
 import Data.Maybe (Maybe(..))
-import Effect.Aff (Aff)
-import Effect.Console (log)
+import Data.Routing.Routes (Routes(..), reverseRoute)
+import Data.Routing.Routes as R
+import Data.Routing.Routes.Sessions as RS
+import Effect.Aff.Class (class MonadAff)
+import Effect.Class (class MonadEffect)
+import Effect.Ref as Ref
+import Halogen (liftEffect)
 import Halogen as H
 import Halogen.Component.ChildPath (ChildPath, cpL, cpR, (:>))
 import Halogen.Data.Prism (type (<\/>), type (\/))
 import Halogen.HTML as HH
 import Intl (LocaliseFn)
+import Intl.Terms as Term
+import Intl.Terms.Sessions (Sessions(..))
 import Model (Session)
+import Routing.Hash (setHash)
 
 data Query a
-  = UpdateRoute R.Sessions a
+  = UpdateRoute RS.Sessions a
   | ReceivedSession Session a
 
 data Message
   = SessionCreated Session
+  | SessionErased
 
 type ChildQuery
   = Login.Query
@@ -34,11 +44,11 @@ type ChildSlot
   \/ Void
 
 data Input
-  = RouteContext R.Sessions
+  = RouteContext RS.Sessions
 
 type State =
   { session :: Maybe Session
-  , routeContext :: R.Sessions
+  , routeContext :: RS.Sessions
   }
 
 pathToLogin :: ChildPath Login.Query ChildQuery Login.Slot ChildSlot
@@ -57,7 +67,13 @@ data Slot = Slot
 derive instance eqSlot :: Eq Slot
 derive instance ordSlot :: Ord Slot
 
-component :: LocaliseFn -> H.Component HH.HTML Query Input Message Aff
+component
+  :: forall m r
+  .  MonadAff m
+  => MonadEffect m
+  => MonadAsk (CurrentSessionRow' r) m
+  => LocaliseFn
+  -> H.Component HH.HTML Query Input Message m
 component t =
   H.parentComponent
     { initialState
@@ -66,21 +82,21 @@ component t =
     , receiver: receive
     }
     where
-      render :: State -> H.ParentHTML Query ChildQuery ChildSlot Aff
+      render :: State -> H.ParentHTML Query ChildQuery ChildSlot m
       render s = case s.session of
         Nothing -> renderUnAuthed s
         Just session -> HH.text "Authenticated!"
       
-      renderUnAuthed :: State -> H.ParentHTML Query ChildQuery ChildSlot Aff
+      renderUnAuthed :: State -> H.ParentHTML Query ChildQuery ChildSlot m
       renderUnAuthed s = case s.routeContext of
-        R.Login ->
+        RS.Login ->
           HH.slot'
             pathToLogin
             Login.Slot
             (Login.component t)
             unit
             mapLoginMessage
-        R.Register ->
+        RS.Register ->
           HH.slot'
             pathToRegister
             Register.Slot
@@ -88,14 +104,15 @@ component t =
             unit
             mapRegisterMessage
       
-      eval :: Query ~> H.ParentDSL State Query ChildQuery ChildSlot Message Aff
+      eval :: Query ~> H.ParentDSL State Query ChildQuery ChildSlot Message m
       eval (UpdateRoute route next) = do
         H.modify_ (_{ routeContext = route })
         pure next
       eval (ReceivedSession s next) = do
         H.modify_ (_{ session = Just s })
-        H.liftEffect $ log "Session received"
+        asks _.currentSession >>= Ref.write (Just s) >>> liftEffect
         H.raise $ SessionCreated s
+        liftEffect $ setHash $ reverseRoute $ Intro
         pure next
 
       receive :: Input -> Maybe (Query Unit)

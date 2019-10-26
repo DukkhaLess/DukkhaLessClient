@@ -9,7 +9,6 @@ import Prelude
 
 import Control.Bind (bindFlipped)
 import Data.Array (snoc, head, catMaybes, nub)
-import Data.Foldable (foldl)
 import Data.Generic.Rep as G
 import Data.Generic.Rep.Show as GShow
 import Data.Generic.Rep.Eq as GEq
@@ -17,7 +16,6 @@ import Data.Generic.Rep.Ord as GOrd
 import Data.Maybe (Maybe(..))
 import Data.String (split, Pattern(..))
 import Effect (Effect)
-import Effect.Console (log)
 
 data Polity
   = Sweden

@@ -1,11 +1,13 @@
 module Intl.Locales.English where
 
-import Data.Maybe (Maybe(..))
+import Data.Maybe (Maybe)
 import Data.Semigroup ((<>))
-import Data.Validation (Validation)
-import Intl.Terms (j, n)
+import Intl.Terms (j)
 import Intl.Terms as Term
+import Intl.Terms.Common as Common
 import Intl.Terms.Introduction as Intro
+import Intl.Terms.Journals as Journals
+import Intl.Terms.Journals as Journals
 import Intl.Terms.NotFound as NotFound
 import Intl.Terms.Resources as Resource
 import Intl.Terms.Sessions as Sessions
@@ -20,6 +22,8 @@ localise term = case term of
   Term.Session session -> localiseSession session
   Term.NotFound notFound -> localiseNotFound notFound
   Term.Validation validation -> localiseValidation validation
+  Term.Journal journal -> localiseJournal journal
+  Term.Common common -> localiseCommon common
 
 localiseIntro :: Intro.Introduction -> Maybe String
 localiseIntro Intro.Title = j "Dukkhaless Self-Care"
@@ -57,3 +61,23 @@ localiseValidation msg = case msg of
   (RequiredCharacters cts) -> j $ "Must contain: "
   (MustMatchOtherField field) -> j $ "Does not match"
   (ParserFailed reason) -> j $ "Parsing failed. Reason given was: " <> reason
+  
+localiseJournal :: Journals.Journals -> Maybe String
+localiseJournal msg = case msg of
+  Journals.JournalEntries -> j "Journal Entries"
+  Journals.Create -> j "New Entry"
+  Journals.Journals -> j "Journals"
+  Journals.PlaceholderContent -> j "# Your Journal Entry"
+  Journals.PlaceholderTitle -> j "Journal Entry Name"
+  Journals.LoadingError -> j "Loading failed."
+  Journals.Uninitialised -> j "No journal entry was selected."
+  Journals.FieldPlaceholderContent -> j "Enter your journal entry"
+  Journals.FieldPlaceholderTitle -> j "Title your journal entry"
+  Journals.EditExisting s -> j s
+  Journals.ListEntries -> j "List"
+
+localiseCommon :: Common.Common -> Maybe String
+localiseCommon msg = case msg of
+  Common.Save -> j $ "Save"
+  Common.ProductName -> j $ "DukkhaLess"
+    

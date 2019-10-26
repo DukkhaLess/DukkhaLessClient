@@ -21,27 +21,32 @@ module Main where
 
 import Prelude
 
+import AppM (makeAppState, runAppM)
+import Data.Maybe (Maybe(..))
 import Effect (Effect)
 import Effect.Aff (forkAff)
 import Effect.Class (liftEffect)
 import Halogen.VDom.Driver (runUI)
+import Halogen as H
 import Intl (localiseString)
 import Intl.Locales (preferredUserLanguages)
 
-import AppRouting.Router as Router
+import Components.Router as Router
 import Halogen.Aff as HA
-import Model as ML
 
 foreign import removeLoader :: Effect Unit
 
 main :: Effect Unit
-main = HA.runHalogenAff do
+main = HA.runHalogenAff $ do
     userLanguages <- liftEffect preferredUserLanguages
     let translate = localiseString userLanguages
         
-    let initialModel = ML.initial translate
+    env <- makeAppState translate
+
+    let existingSession = Nothing
         
     body <- HA.awaitBody
     _ <- liftEffect removeLoader
-    router <- runUI (Router.component initialModel) unit body
+    let rootComponent = H.hoist (runAppM env) (Router.component translate)
+    router <- runUI rootComponent unit body
     forkAff $ liftEffect $ Router.routeSignal router

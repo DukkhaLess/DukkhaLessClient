@@ -3,12 +3,15 @@ module Model.Keyring
   , runSecretBoxKey
   , runBoxKeyPair
   , Keyring(..)
+  , boxPrivateKey
+  , boxPublicKey
+  , secretBoxKey
   ) where
 
 import Prelude
 
 import Crypt.NaCl (BoxKeyPair(..), fromUint8Array, generateBoxKeyPair, generateSecretBoxKey, toUint8Array)
-import Crypt.NaCl.Types (BoxKeyPair, SecretBoxKey)
+import Crypt.NaCl.Types (BoxKeyPair, SecretBoxKey, BoxSecretKey, BoxPublicKey)
 import Data.Argonaut.Core (Json, caseJsonObject, jsonEmptyObject, stringify)
 import Data.Argonaut.Decode (class DecodeJson, decodeJson)
 import Data.Argonaut.Decode.Combinators ((.?))
@@ -16,7 +19,8 @@ import Data.Argonaut.Encode (class EncodeJson, encodeJson)
 import Data.Argonaut.Encode.Combinators ((~>), (:=))
 import Data.Argonaut.Parser (jsonParser)
 import Data.ArrayBuffer.ArrayBuffer (decodeToString, fromString)
-import Data.Base64 (Base64(..), decodeBase64, encodeBase64, runBase64)
+import Data.Base64 (decodeBase64, encodeBase64, runBase64)
+import Data.Base64 as B64
 import Data.Bifunctor (lmap)
 import Data.Crypto.Codec (decodeBytes, encodeBytes)
 import Data.Either (Either(..), note)
@@ -39,13 +43,24 @@ newtype Keyring = Keyring
   }
 derive instance newtypeKeyring :: Newtype Keyring _
 
+boxPrivateKey :: Keyring -> BoxSecretKey
+boxPrivateKey (Keyring keyring) = privKey keyring.boxKeyPair where
+  privKey (BoxKeyPair pair) = pair.secretKey
+
+boxPublicKey :: Keyring -> BoxPublicKey
+boxPublicKey (Keyring keyring) = pubKey keyring.boxKeyPair where
+  pubKey (BoxKeyPair pair) = pair.publicKey
+
+secretBoxKey :: Keyring -> SecretBoxKey
+secretBoxKey (Keyring keyring) = keyring.secretBoxKey
+
 instance showKeyring :: Show Keyring where
   show = runBase64 <<< encodeBase64 <<< fromString <<< stringify <<< encodeJson
 
 instance readKeyring :: Read Keyring where
   read
-    = Base64
-    >>> decodeBase64
+    = B64.fromString
+    >>> map decodeBase64
     >>> note "Base 64 decoding failed"
     >=> (decodeToString >>> (lmap message))
     >=> jsonParser

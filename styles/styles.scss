@@ -159,3 +159,28 @@ $strong-color: $text-strong;
 $strong-weight: $weight-bold;
 
 @import "../node_modules/bulma/bulma.sass";
+
+
+.markdown-body {
+  min-width: 200px;
+  min-height: 200px;
+  ul {
+    list-style: initial;
+  }
+  ol {
+    list-style: initial;
+  }
+}
+
+.x-wrapped {
+  overflow-y: auto;
+  overflow-wrap: break-word;
+}
+
+.pad-bottom {
+  padding-bottom: 1.5em;
+}
+
+.pad-top {
+  padding-top: 1.5em;
+}

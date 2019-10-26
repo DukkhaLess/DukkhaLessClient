@@ -2,19 +2,20 @@ module Components.Sessions.Register where
 
 import Prelude
 
-import AppRouting.Routes as R
+import Data.Routing.Routes as R
+import Data.Routing.Routes.Sessions as RS
 import Components.Helpers.Forms as HF
 import Control.Monad.Error.Class (throwError)
 import Crypt.NaCl.Types (BoxKeyPair(..))
 import Data.Either (Either, either, note)
-import Data.HTTP.Helpers (ApiPath(..), unsafePostCleartext, request)
+import Data.HTTP.Helpers (ApiPath(..), plaintextPost, request)
 import Data.HTTP.Payloads (SubmitRegister)
 import Data.Maybe (Maybe(..), fromMaybe, fromJust)
 import Data.Newtype (wrap, unwrap)
 import Data.Tuple (Tuple(..))
 import Data.Validation as V
 import Data.Validation.Rules as VR
-import Effect.Aff (Aff)
+import Effect.Aff.Class (class MonadAff)
 import Effect.Clipboard as EC
 import Effect.Exception (error, Error)
 import Halogen as H
@@ -25,10 +26,10 @@ import Intl (LocaliseFn)
 import Intl.Terms as Term
 import Intl.Terms.Sessions as Sessions
 import Intl.Terms.Validation as TV
-import Model (Password, SessionToken(..), Username(..), KeyringUsage(Enabled), Session)
+import Model (KeyringUsage(Enabled), Password, Session, Username(..))
 import Model.Keyring (Keyring, generateKeyring)
 import Partial.Unsafe (unsafePartial)
-import Style.Bulogen (block, button, container, hero, heroBody, input, link, primary, pullRight, spaced, subtitle, textarea, title, textCentered)
+import Style.Bulogen (block, button, container, hero, heroBody, input, link, primary, pullRight, spaced, subtitle, textarea, title, textCentered, success)
 
 data Query a
   = GenerateKeyring a
@@ -62,7 +63,11 @@ data Slot = Slot
 derive instance eqSlot :: Eq Slot
 derive instance ordSlot :: Ord Slot
 
-component :: forall a. LocaliseFn -> H.Component HH.HTML Query a Message Aff
+component
+  :: forall a m
+  . MonadAff m
+  => LocaliseFn
+  -> H.Component HH.HTML Query a Message m
 component t =
   H.lifecycleComponent
     { initialState
@@ -114,14 +119,14 @@ component t =
                 ]
               , keyBox state.preparedRing
               , HH.a
-                [ HP.classes [button, primary, block]
+                [ HP.classes [button, success, block]
                 , HE.onClick (HE.input_ AttemptSubmit)
                 ]
                 [ HH.text $ t $ Term.Session Sessions.Submit
                 ]
               , HH.a
                 [ HP.classes [block, textCentered]
-                , HP.href $ R.reverseRoute $ R.Sessions R.Login
+                , HP.href $ R.reverseRoute $ R.Sessions RS.Login
                 ]
                 [ HH.text $ t $ Term.Session Sessions.LoginInstead
                 ]
@@ -146,7 +151,7 @@ component t =
             , HP.placeholder "Your secret keys."
             ]
 
-  eval :: Query ~> H.ComponentDSL State Query Message Aff
+  eval :: Query ~> H.ComponentDSL State Query Message m
   eval (GenerateKeyring next) = do
     state <- H.get
     nextState <- do
@@ -182,7 +187,7 @@ component t =
       passwordConfirmation = V.touch state.passwordConfirmation
     })
     payload <- H.liftAff $ either throwError pure (preparePayload state)
-    response <- H.liftAff $ request (unsafePostCleartext (ApiPath "/register") payload)
+    response <- H.liftAff $ request (plaintextPost (ApiPath "/register") payload)
     let keyringUsage = Enabled $ unsafePartial $ fromJust state.preparedRing
     let username = Username $ V.inputValue state.username
     sessionToken <- H.liftAff $ either (throwError <<< error) pure response.body

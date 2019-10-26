@@ -2,9 +2,8 @@ module Data.Crypto.Types where
 
 import Prelude
 
-import Crypt.NaCl (Box, Nonce, SecretBox, fromUint8Array, toUint8Array)
+import Crypt.NaCl (Box, BoxSecretKey, BoxPublicKey, BoxSharedKey, Nonce, SecretBox, SecretBoxKey, fromUint8Array, toUint8Array)
 import Data.Argonaut (jsonEmptyObject)
-import Data.Argonaut.Core as AC
 import Data.Argonaut.Decode (class DecodeJson, decodeJson)
 import Data.Argonaut.Decode.Combinators ((.?))
 import Data.Argonaut.Encode (class EncodeJson, encodeJson)
@@ -15,13 +14,18 @@ import Data.DateTime.ISO (ISO(..), unwrapISO)
 import Data.Either (Either(..))
 import Data.JsonDecode.Helpers (decodeJObject, decodeJString)
 import Data.Maybe (Maybe)
+import Data.Newtype (class Newtype)
+import Effect.Exception (Error)
+
+newtype SenderPublicKey = SenderPublicKey BoxPublicKey
 
 data MessageContents
-  = Boxed Box
+  = Boxed Box SenderPublicKey
   | SecretBoxed SecretBox
 
-data DocumentId
+newtype DocumentId
   = UUID String
+derive instance newtypeDocumentId :: Newtype DocumentId _
 
 instance encodeDocumentId :: EncodeJson DocumentId where
   encodeJson (UUID id) = encodeJson id
@@ -30,9 +34,13 @@ instance decodeDocumentId :: DecodeJson DocumentId where
   decodeJson json = decodeJString json <#> UUID
 
 instance encodeJsonMessageContents :: EncodeJson MessageContents where
-  encodeJson (Boxed box)
+  encodeJson (Boxed box (SenderPublicKey senderKey))
     = "type" := "boxed"
-    ~> "data" := (encodeBytes $ toUint8Array box)
+    ~> "data" :=
+      ( "box" := (encodeBytes $ toUint8Array box)
+      ~> "senderPublicKey" := (encodeBytes $ toUint8Array senderKey)
+      ~> jsonEmptyObject
+      )
     ~> jsonEmptyObject
   encodeJson (SecretBoxed box)
     = "type" := "secretBoxed"
@@ -43,15 +51,19 @@ instance encodeJsonMessageContents :: EncodeJson MessageContents where
 instance decodeJsonMessageContents :: DecodeJson MessageContents where
   decodeJson json = do
     obj <- decodeJObject json
-    bytes <- obj .? "data"
-    dataBytes <- decodeBytes bytes
+    dataComponent <- obj .? "data"
     discriminator <- obj .? "type"
     case discriminator of
-      "boxed" -> Right $ Boxed (fromUint8Array dataBytes)
-      "secretBoxed" -> Right $ SecretBoxed (fromUint8Array dataBytes)
+      "boxed" -> do
+        box <- obj .? "box" >>= decodeBytes <#> fromUint8Array
+        senderPublicKey <- obj .? "senderPublicKey" >>= decodeBytes <#> fromUint8Array
+        pure $ Boxed box (SenderPublicKey senderPublicKey)
+      "secretBoxed" -> decodeBytes dataComponent <#> fromUint8Array <#> SecretBoxed
       other -> Left $ other <> " is not a valid type discriminator."
 
 newtype Title = Title EncryptedMessage
+
+derive instance newtypeTitle :: Newtype Title _
 
 instance encodeJsonTitle :: EncodeJson Title where
   encodeJson (Title msg) = encodeJson msg
@@ -61,11 +73,15 @@ instance decodeJsonTitle :: DecodeJson Title where
 
 newtype DocumentContent = DocumentContent EncryptedMessage
 
+derive instance newtypeDocumentContent :: Newtype DocumentContent _
+
 newtype EncryptedMessage
   = EncryptedMessage
   { nonce :: Nonce
   , contents :: MessageContents
   }
+
+derive instance newtypeEncryptedMessage :: Newtype EncryptedMessage _
 
 instance encodeJsonEncryptedMessage :: EncodeJson EncryptedMessage where
   encodeJson (EncryptedMessage message)
@@ -120,6 +136,8 @@ instance decodeJsonDocumentMetaData :: DecodeJson DocumentMetaData where
      , id: id
      }
 
+derive instance newtypeDocumentMeta :: Newtype DocumentMetaData _
+
 newtype Document
   = Document
     { metaData :: DocumentMetaData
@@ -141,3 +159,14 @@ instance decodeJsonDocument :: DecodeJson Document where
       { metaData: metaData
       , content: content
       }
+derive instance newtypeDocument :: Newtype Document _
+
+data DecryptionError
+  = Description String
+  | Exception Error
+  | InvalidKeys
+
+data CryptoKey
+  = BoxPair BoxPublicKey BoxSecretKey
+  | SecretBox SecretBoxKey
+

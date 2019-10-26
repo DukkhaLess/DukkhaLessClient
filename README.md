@@ -71,13 +71,8 @@ do not be confused, and to protect and thank those authors who made this work po
 - The project uses [purescript-halogen](https://github.com/slamdata/purescript-halogen) For rendering
 - It's important to note that the documentation for halogen on [pursuit](https://pursuit.purescript.org/packages/purescript-halogen/) is not up to date.
 
-## Contributing
-
-- Basically, just follow the steps in the [GitHub Flow](https://guides.github.com/introduction/flow/), up until but not including the deployment part.
-- Submit a pull request with the feature you wish to add and a short description of intent for the PR.
-- I'm not super particular about it, I'll read the code anyway to see what it does, after all.
-- When adding issues, please try to describe as much as possible the state that application needs to be in to replicate the issue, if appropraite.
-
+## Contributing Guidelines
+- Cotribution guidelines can be found [here](CONTRIBUTING.md)
 
 ## Working with the bulma design stuff
 

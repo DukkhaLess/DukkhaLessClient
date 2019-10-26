@@ -1,57 +1,67 @@
-module Data.HTTP.Helpers where
+module Data.HTTP.Helpers
+  ( get
+  , post
+  , request
+  , plaintextPost
+  , ApiPath(..)
+  ) where
 
 import Prelude
 
-import Affjax (defaultRequest, Request, Response, ResponseFormatError, printResponseFormatError)
+import Affjax (defaultRequest, Request, Response, printResponseFormatError)
 import Affjax as AJ
 import Affjax.RequestBody as RB
 import Affjax.RequestHeader (RequestHeader(..))
 import Affjax.ResponseFormat (json)
-import Affjax.ResponseFormat as RF
-import Data.Crypto.Class (class CipherText)
+import Data.Crypto.Class (class CipherText, class PlainText)
 import Data.Argonaut.Core (Json)
 import Data.Argonaut.Decode (class DecodeJson, decodeJson)
 import Data.Argonaut.Encode (class EncodeJson, encodeJson)
 import Data.Bifunctor (lmap)
-import Data.Either (Either(Left), hush)
+import Data.Either (Either(Left))
 import Data.HTTP.Method (Method(..))
 import Data.Maybe (Maybe(..))
-import Data.Newtype (class Newtype)
-import Data.Semigroup ((<>))
+import Data.Newtype (class Newtype, unwrap, wrap)
 import Data.String.CodeUnits (charAt)
-import Effect.Aff (Aff)
-import Effect.Class (liftEffect)
+import Effect.Aff.Class (class MonadAff, liftAff)
 import Model (SessionToken(..))
 
 newtype ApiPath = ApiPath String
 derive instance newtypeApiPath :: Newtype ApiPath _
+instance semigroupApiPath :: Semigroup ApiPath where
+  append a b = wrap $ unwrap a <> unwrap b
 
 apiLocation :: String
 apiLocation = "/api"
 
-unsafePostCleartext :: forall a. EncodeJson a => ApiPath -> a -> Request Json
-unsafePostCleartext (ApiPath path) payload
+unsafeRequestCleartext :: Method -> ApiPath -> Maybe Json -> Request Json
+unsafeRequestCleartext method (ApiPath path) payload
  = defaultRequest
   { url = path'
-  , content = Just $ RB.Json (encodeJson payload)
-  , method = Left POST
-    , responseFormat = json
+  , content = RB.Json <$> payload
+  , method = Left method
+  , responseFormat = json
   } where
-    payload' = encodeJson payload
     path' = apiLocation <> withLeadingSlash path
 
-post :: forall a. CipherText a => ApiPath -> a -> Request Json
-post = unsafePostCleartext
+unsafePostCleartext :: forall p. EncodeJson p => ApiPath -> p -> Request Json
+unsafePostCleartext a = unsafeRequestCleartext POST a <<< Just <<< encodeJson
 
-unsafePostCleartext' :: forall a. EncodeJson a => ApiPath -> a -> SessionToken-> Request Json
-unsafePostCleartext' a p (SessionToken t)
-  = (unsafePostCleartext a p)
+sessionHeaders :: Request Json -> SessionToken -> Request Json
+sessionHeaders req (SessionToken t) =
+    req 
     { headers = [RequestHeader "Authorization" t]
     , withCredentials = true
     }
 
-post' :: forall a. CipherText a => ApiPath -> a -> SessionToken-> Request Json
-post' = unsafePostCleartext'
+post :: forall p. CipherText p => ApiPath -> p -> SessionToken -> Request Json
+post a p = sessionHeaders (unsafePostCleartext a $ Just p)
+
+get :: ApiPath -> SessionToken -> Request Json
+get a = sessionHeaders (unsafeRequestCleartext GET a Nothing)
+
+plaintextPost :: forall p. PlainText p => ApiPath -> p -> Request Json
+plaintextPost = unsafePostCleartext
 
 withLeadingSlash :: String -> String
 withLeadingSlash s = case charAt 0 s of
@@ -59,9 +69,14 @@ withLeadingSlash s = case charAt 0 s of
   Just '/' -> s
   Just _   -> "/" <> s
 
-request :: forall a. DecodeJson a => Request Json -> Aff (Response (Either String a))
+-- | Request the desired JSON endpoint, parsing the result from JSON using the needed decoder
+request
+  :: forall a m
+  . DecodeJson a
+  => MonadAff m
+  => Request Json -> m (Response (Either String a))
 request req = do
-  resp <- AJ.request req
+  resp <- liftAff $ AJ.request req
   let body = lmap printResponseFormatError resp.body >>= decodeJson
   pure $ resp
     { body = body

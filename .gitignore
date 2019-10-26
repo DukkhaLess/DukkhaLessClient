@@ -19,3 +19,5 @@ i# -*- mode: gitignore; -*-
 auto-save-list
 tramp
 .\#*
+yarn.lock
+package-lock.json

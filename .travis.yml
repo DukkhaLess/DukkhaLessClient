@@ -9,7 +9,6 @@ addons:
 cache:
   directories:
     - node_modules
-    - bower_components
 install:
   - npm install bower browserify -g
   - npm install
