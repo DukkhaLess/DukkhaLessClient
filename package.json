@@ -14,12 +14,14 @@
     "browserify": "^16.2.2",
     "bulma": "0.7.1",
     "global": "^4.3.2",
+    "purs-loader": "^3.6.0",
     "text-encoding": "^0.6.4",
     "tweetnacl": "^1.0.0"
   },
   "devDependencies": {
     "purescript": "^0.13.4",
     "spago": "^0.10.0",
-    "webpack": "^4.41.2"
+    "webpack": "^4.41.2",
+    "webpack-cli": "^3.3.9"
   }
 }

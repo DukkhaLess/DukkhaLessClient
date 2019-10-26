@@ -1,23 +1,27 @@
 {
-    "files.watcherExclude": {
-        "**/.git/objects/**": true,
-        "**/.git/subtree-cache/**": true,
-        "**/node_modules/**": true,
-        "**/output/**": true,
-        "**/bower_components/**": true,
-        "**/intermediate/**": true,
-        "**/dist/**": true
-    },
-    "files.exclude": {
-        "**/.git": true,
-        "**/.svn": true,
-        "**/.hg": true,
-        "**/CVS": true,
-        "**/.DS_Store": true,
-        "**/node_modules/**": true,
-        "**/output/**": true,
-        "**/bower_components/**": true,
-        "**/intermediate/**": true,
-        "**/dist/**": true
-    }
+  "files.watcherExclude": {
+    "**/.git/objects/**": true,
+    "**/.git/subtree-cache/**": true,
+    "**/node_modules/**": true,
+    "**/output/**": true,
+    "**/bower_components/**": true,
+    "**/intermediate/**": true,
+    "**/dist/**": true,
+    "**/.spago/**": true,
+    "**/.pulp-cache/**": true
+  },
+  "files.exclude": {
+    "**/.git": true,
+    "**/.svn": true,
+    "**/.hg": true,
+    "**/CVS": true,
+    "**/.DS_Store": true,
+    "**/node_modules/**": true,
+    "**/output/**": true,
+    "**/bower_components/**": true,
+    "**/intermediate/**": true,
+    "**/.spago/**": true,
+    "**/.pulp-cache/**": true,
+    "**/dist/**": true
+  }
 }
