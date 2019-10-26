@@ -1,17 +1,11 @@
 {
   "name": "dukkhaless-client",
-  "ignore": [
-    "**/.*",
-    "node_modules",
-    "bower_components",
-    "output"
-  ],
+  "ignore": ["**/.*", "node_modules", "bower_components", "output"],
   "dependencies": {
     "purescript-prelude": "^4.0.0",
     "purescript-console": "^4.1.0",
     "purescript-datetime-iso": "^2.0.0",
     "purescript-halogen": "^4.0.0",
-    "purescript-bulma": "2.0.0",
     "purescript-css": "^4.0.0",
     "purescript-aff": "^5.0.0",
     "purescript-aff-promise": "^2.0.0",
