@@ -22,8 +22,6 @@ import Effect.Aff.Class (class MonadAff)
 import Effect.Class (class MonadEffect, liftEffect)
 import Effect.Now (nowDateTime)
 import Halogen as H
-import Halogen.Component.ChildPath (ChildPath, cpL, cpR, (:>))
-import Halogen.Data.Prism (type (<\/>), type (\/))
 import Halogen.HTML as HH
 import Halogen.HTML.Events as HE
 import Halogen.HTML.Properties as HP

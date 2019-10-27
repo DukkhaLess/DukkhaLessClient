@@ -16,7 +16,6 @@ import Effect (Effect)
 import Effect.Aff (Aff, launchAff)
 import Effect.Aff.Class (class MonadAff)
 import Halogen as H
-import Halogen.Data.Prism (type (<\/>), type (\/))
 import Halogen.HTML as HH
 import Intl (LocaliseFn)
 import Prelude (type (~>), Unit, Void, const, pure, unit, (<<<), bind, ($), discard, map)

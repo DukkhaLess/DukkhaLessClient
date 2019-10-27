@@ -16,8 +16,6 @@ import Effect.Class (class MonadEffect)
 import Effect.Ref as Ref
 import Halogen (liftEffect)
 import Halogen as H
-import Halogen.Component.ChildPath (ChildPath, cpL, cpR, (:>))
-import Halogen.Data.Prism (type (<\/>), type (\/))
 import Halogen.HTML as HH
 import Intl (LocaliseFn)
 import Intl.Terms as Term

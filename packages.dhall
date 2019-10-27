@@ -189,6 +189,15 @@ let additions = {
     ],
     repo = "https://github.com/AlexaDeWit/purescript-tweetnacl.git",
     version = "v0.5.2"
+  },
+  html-parser-halogen = {
+    dependencies = [
+      "string-parsers",
+      "generics-rep",
+      "halogen"
+    ],
+    repo = "https://github.com/rnons/purescript-html-parser-halogen.git",
+    version = "7d37fd6a29bff2a143d91c2ebfe5ca582ca76018"
   }
 }
 
