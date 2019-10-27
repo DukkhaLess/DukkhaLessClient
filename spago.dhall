@@ -17,6 +17,7 @@ You can edit this file as you like.
     , "datetime"
     , "datetime-iso"
     , "effect"
+    , "form-urlencoded"
     , "generics-rep"
     , "halogen"
     , "html-parser-halogen"

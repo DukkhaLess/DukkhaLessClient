@@ -121,7 +121,21 @@ let additions =
 let upstream =
       https://github.com/purescript/package-sets/releases/download/psc-0.13.4-20191025/packages.dhall sha256:f9eb600e5c2a439c3ac9543b1f36590696342baedab2d54ae0aa03c9447ce7d4
 
-let overrides = {=}
+let overrides = {
+  form-urlencoded = {
+    dependencies = [
+      "globals",
+      "maybe",
+      "newtype",
+      "prelude",
+      "strings",
+      "tuples",
+      "foldable-traversable"
+    ],
+    repo = "https://github.com/purescript-contrib/purescript-form-urlencoded.git",
+    version = "v4.0.1"
+  }
+}
 
 let additions = {
   base64-codec = {
