@@ -167,7 +167,7 @@ let additions = {
       "strings"
     ],
     repo = "https://github.com/AlexaDeWit/purescript-text-encoding.git",
-    version = "v0.0.9"
+    version = "v1.0.0"
   },
   affjax = {
     dependencies = [
@@ -202,7 +202,7 @@ let additions = {
       "text-encoding"
     ],
     repo = "https://github.com/AlexaDeWit/purescript-tweetnacl.git",
-    version = "v0.5.2"
+    version = "v1.0.0"
   },
   html-parser-halogen = {
     dependencies = [
