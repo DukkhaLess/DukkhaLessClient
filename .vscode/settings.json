@@ -18,10 +18,11 @@
     "**/.DS_Store": true,
     "**/node_modules/**": true,
     "**/output/**": true,
-    "**/bower_components/**": true,
     "**/intermediate/**": true,
-    "**/.spago/**": true,
     "**/.pulp-cache/**": true,
     "**/dist/**": true
-  }
+  },
+  "purescript.addSpagoSources": true,
+  "purescript.buildCommand": "spago build --json-errors",
+  "purescript.packagePath": ".spago"
 }
