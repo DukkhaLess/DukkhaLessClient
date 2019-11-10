@@ -1,22 +1,7 @@
 module Components.NotFound where
 
 import Prelude
-  ( class Eq
-  , class Ord
-  , type (~>)
-  , Unit
-  , const
-  , pure
-  , ($)
-  )
-import Style.Bulogen
-  ( container
-  , hero
-  , heroBody
-  , subtitle
-  , title
-  )
-import Data.Maybe (Maybe(..))
+import Data.Const (Const)
 import Effect.Aff.Class (class MonadAff)
 import Halogen as H
 import Halogen.HTML as HH
@@ -24,43 +9,32 @@ import Halogen.HTML.Properties as HP
 import Intl (LocaliseFn)
 import Intl.Terms as Term
 import Intl.Terms.NotFound as NF
+import Style.Bulogen (container, hero, heroBody, subtitle, title)
 
-data Query a = Query a
-
-type Message = Unit
-
-data Slot = Slot
-derive instance eqSlot :: Eq Slot
-derive instance ordSlot :: Ord Slot
-
-component
-  :: forall m
-  . MonadAff m
-  => LocaliseFn
-  -> H.Component HH.HTML Query Unit Message m
+component ::
+  forall m.
+  MonadAff m =>
+  LocaliseFn ->
+  H.Component HH.HTML (Const Void) Unit Void m
 component localiseFn =
-  H.component
+  H.mkComponent
     { initialState: const localiseFn
     , render
-    , eval
-    , receiver: const Nothing
+    , eval: H.mkEval $ H.defaultEval
     }
   where
-
-  render :: LocaliseFn -> H.ComponentHTML Query
+  render :: LocaliseFn -> H.ComponentHTML Void () m
   render state =
     let
       pageTitle = state $ Term.NotFound NF.Title
+
       pageExplanation = state $ Term.NotFound NF.Explanation
     in
-      HH.section [HP.classes [hero]]
-        [ HH.div [HP.classes [heroBody]]
-          [ HH.div [HP.classes [container]]
-            [ HH.h1 [ HP.classes [title]] [ HH.text pageTitle ]
-            , HH.h2 [ HP.classes [subtitle]] [ HH.text pageExplanation]
+      HH.section [ HP.classes [ hero ] ]
+        [ HH.div [ HP.classes [ heroBody ] ]
+            [ HH.div [ HP.classes [ container ] ]
+                [ HH.h1 [ HP.classes [ title ] ] [ HH.text pageTitle ]
+                , HH.h2 [ HP.classes [ subtitle ] ] [ HH.text pageExplanation ]
+                ]
             ]
-          ]
         ]
-
-  eval :: Query ~> H.ComponentDSL LocaliseFn Query Message m
-  eval (Query a)= pure a
