@@ -33,6 +33,9 @@ data Message
   = UpdatedContent String
   | Finalized
 
+type Slot
+  = H.Slot (Const Void) Message
+
 type ChildSlots
   = ()
 

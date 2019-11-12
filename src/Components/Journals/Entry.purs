@@ -46,7 +46,7 @@ data Action
   | ToggleTitleEdit Boolean
 
 type ChildSlots
-  = ( edit :: OpaqueSlot Unit
+  = ( edit :: Edit.Slot Unit
     )
 
 pathToEdit = SProxy :: SProxy "edit"
@@ -91,10 +91,11 @@ component t =
     , render
     , eval:
       H.mkEval
-        $ H.defaultEval
-            { initialize: Just $ H.query Initialize
-            , handleAction
-            }
+        $ ( H.defaultEval
+              { initialize = Just Initialize
+              , handleAction = handleAction H.raise
+              }
+          )
     }
   where
   render :: State -> H.ComponentHTML Action ChildSlots m
@@ -166,11 +167,12 @@ component t =
             true ->
               HH.slot
                 pathToEdit
+                unit
                 (Edit.component t)
                 { content: (unwrap entry).content
                 , fieldPrompt: Journal FieldPlaceholderContent
                 }
-                mapEditMessageToAction
+                (const Nothing)
         ]
       where
       title = (unwrap (unwrap entry).metaData).title
@@ -199,9 +201,9 @@ component t =
     MonadAff t =>
     MonadEffect t =>
     (Message -> t Unit) ->
-    Action ~> t
-  handleAction raise query = case query of
-    (Initialize next) -> do
+    Action -> t Unit
+  handleAction raise actiong = case actiong of
+    Initialize -> do
       desiredEntry <- MS.gets (_.desiredEntryId)
       case desiredEntry of
         Just id -> do
@@ -216,25 +218,20 @@ component t =
                   defaultEntry
           MS.modify_ (_ { entry = Success entry })
       raise $ MNoMsg
-      pure next
-    (ToggleContentEdit edit next) -> do
+    (ToggleContentEdit edit) -> do
       MS.modify_ (_ { contentEditing = edit })
-      pure next
-    (ToggleTitleEdit edit next) -> do
+    (ToggleTitleEdit edit) -> do
       MS.modify_ (_ { titleEditing = edit })
-      pure next
-    (UpdateContents mdText next) -> do
+    (UpdateContents mdText) -> do
       entry <- MS.gets (_.entry)
       let
         newEntry = (wrap <<< (_ { content = mdText }) <<< unwrap) <$> entry
       MS.modify_ (_ { entry = newEntry })
-      pure next
-    (UpdateTitle nextTitle next) -> do
+    (UpdateTitle nextTitle) -> do
       entry <- MS.gets (_.entry)
       let
         nextEntry = entry <#> setTitle nextTitle
       MS.modify_ (_ { entry = nextEntry })
-      pure next
 
   mapEditMessageToAction :: Edit.Message -> Maybe Action
   mapEditMessageToAction msg = case msg of
