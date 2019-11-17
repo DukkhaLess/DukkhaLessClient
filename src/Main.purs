@@ -20,33 +20,42 @@
 module Main where
 
 import Prelude
-
 import AppM (makeAppState, runAppM)
 import Data.Maybe (Maybe(..))
 import Effect (Effect)
 import Effect.Aff (forkAff)
 import Effect.Class (liftEffect)
+import Effect.Aff (Aff, launchAff, launchAff_)
 import Halogen.VDom.Driver (runUI)
 import Halogen as H
 import Intl (localiseString)
 import Intl.Locales (preferredUserLanguages)
-
 import Components.Router as Router
+import Data.Routing.Routes as Routes
+import Routing.Hash (matches)
 import Halogen.Aff as HA
 
 foreign import removeLoader :: Effect Unit
 
 main :: Effect Unit
-main = HA.runHalogenAff $ do
-    userLanguages <- liftEffect preferredUserLanguages
-    let translate = localiseString userLanguages
-        
-    env <- makeAppState translate
-
-    let existingSession = Nothing
-        
-    body <- HA.awaitBody
-    _ <- liftEffect removeLoader
-    let rootComponent = H.hoist (runAppM env) (Router.component translate)
-    router <- runUI rootComponent unit body
-    forkAff $ liftEffect $ Router.routeSignal router
+main =
+  HA.runHalogenAff
+    $ do
+        userLanguages <- liftEffect preferredUserLanguages
+        let
+          translate = localiseString userLanguages
+        env <- makeAppState translate
+        let
+          existingSession = Nothing
+        body <- HA.awaitBody
+        _ <- liftEffect removeLoader
+        let
+          rootComponent = H.hoist (runAppM env) (Router.component translate)
+        router <- runUI rootComponent unit body
+        forkAff
+          $ liftEffect
+              ( matches Routes.routes
+                  ( \_ newRoute ->
+                      launchAff_ $ router.query $ H.tell $ Router.Goto newRoute
+                  )
+              )
