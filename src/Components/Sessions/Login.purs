@@ -4,9 +4,11 @@ import Prelude
 import Components.Helpers.Forms as HF
 import Control.Monad.Error.Class (throwError)
 import Control.Monad.State (class MonadState, get, put, modify_)
+import Data.Const (Const(..))
 import Data.Either (Either(..), note, either)
 import Data.HTTP.Helpers (ApiPath(..), plaintextPost, request)
 import Data.HTTP.Payloads (SubmitLogin(SubmitLogin))
+import Data.List.Lazy (Step(..))
 import Data.Maybe (Maybe(..))
 import Data.Newtype (wrap)
 import Data.Routing.Routes as R
@@ -55,27 +57,23 @@ initialState =
     , keyring: V.validation (VR.parsableKeyring) ""
     }
 
-data Slot
-  = Slot
-
-derive instance eqSlot :: Eq Slot
-
-derive instance ordSlot :: Ord Slot
-
 component ::
   forall m.
   MonadAff m =>
   LocaliseFn ->
   H.Component HH.HTML (Const Void) Void Message m
 component t =
-  H.component
+  H.mkComponent
     { initialState: initialState
     , render
-    , eval: eval H.raise
-    , receiver: const Nothing
+    , eval:
+      H.mkEval
+        $ H.defaultEval
+            { handleAction = handleAction H.raise
+            }
     }
   where
-  render :: State -> H.ComponentHTML Query
+  render :: State -> H.ComponentHTML Action () m
   render state =
     HH.section [ HP.classes [ hero ] ]
       [ HH.div [ HP.classes [ heroBody ] ]
@@ -84,24 +82,24 @@ component t =
               , HH.input
                   [ HP.classes [ input ]
                   , HP.placeholder $ t $ Term.Session Sessions.Username
-                  , HE.onValueChange (HE.input UpdateUsername)
+                  , HE.onValueChange (Just <<< UpdateUsername)
                   ]
               , HH.input
                   [ HP.type_ HP.InputPassword
                   , HP.classes [ input ]
                   , HP.placeholder $ t (Term.Session Sessions.Password)
-                  , HE.onValueChange (HE.input UpdatePassword)
+                  , HE.onValueChange (Just <<< UpdatePassword)
                   ]
               , HF.validated' state.keyring t
                   $ HH.textarea
-                      [ HE.onValueChange (HE.input UpdateKey)
+                      [ HE.onValueChange (Just <<< UpdateKey)
                       , HP.classes [ textarea ]
                       , HP.placeholder "Your secret keys."
-                      , HE.onDrop $ HE.input (dataTransfer >>> files >>> DropFiles)
+                      , HE.onDrop (dataTransfer >>> files >>> DropFiles >>> Just)
                       ]
               , HH.a
                   [ HP.classes [ button, success, block ]
-                  , HE.onClick (HE.input_ Submit)
+                  , HE.onClick (const $ Just Submit)
                   ]
                   [ HH.text $ t $ Term.Session Sessions.Submit
                   ]
@@ -123,28 +121,25 @@ component t =
       [ HH.text $ t $ Term.Session Sessions.KeySubtitle
       ]
 
-  eval ::
+  handleAction ::
     forall t.
     MonadState State t =>
     MonadAff t =>
     (Message -> t Unit) ->
-    Query ~> t
-  eval raise query = case query of
-    (UpdateUsername username next) -> do
+    Action -> t Unit
+  handleAction raise action = case action of
+    (UpdateUsername username) -> do
       state <- get
       put state { username = wrap username }
-      pure next
-    (UpdatePassword password next) -> do
+    (UpdatePassword password) -> do
       state <- get
       put state { password = wrap password }
-      pure next
-    (UpdateKey keyStr next) -> do
+    (UpdateKey keyStr) -> do
       state <- get
       let
         keyringValidation = V.updateValidation state.keyring keyStr
       put state { keyring = keyringValidation }
-      pure next
-    (Submit next) -> do
+    (Submit) -> do
       state <- get
       modify_ (_ { keyring = V.touch state.keyring })
       payloadAndKeyring <- liftAff $ either throwError pure (prepareLoginPayload state)
@@ -156,11 +151,8 @@ component t =
       case response.body of
         Right token -> do
           raise $ SessionCreated $ wrap { username: state.username, keyringUsage: Enabled keyring, sessionToken: token }
-          pure next
-        Left _ -> do
-          pure next
-    (DropFiles files next) -> do
-      pure next
+        Left _ -> pure unit
+    (DropFiles files) -> pure unit
 
   prepareLoginPayload :: State -> Either Error (Tuple SubmitLogin Keyring)
   prepareLoginPayload state = note (error "Validation failed for login payload") result
