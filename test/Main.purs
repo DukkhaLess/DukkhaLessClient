@@ -1,11 +1,7 @@
 module Test.Main where
 
 import Prelude
-import Effect         (Effect)
-import Test.Model.Keyring as KR
-import Test.Spec.Reporter.Console (consoleReporter)
-import Test.Spec.Runner (run)
+import Effect (Effect)
 
 main :: Effect Unit
-main = run [consoleReporter] do
-  KR.test
+main = pure unit
