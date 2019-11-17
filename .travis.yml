@@ -5,7 +5,7 @@ node_js: stable
 addons:
   apt:
     packages:
-      - glibc
+      - build-essential
       - docker-ce
 cache:
   directories:
