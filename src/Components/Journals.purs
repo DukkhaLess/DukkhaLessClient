@@ -1,9 +1,11 @@
 module Components.Journals where
 
 import Prelude
+import AppM (CurrentSessionRow, JournalMetaCacheRow, EditingJournalEntryRow)
 import Components.Helpers.StateAccessors (guardSession)
 import Components.Journals.Entry as JournalEntry
 import Components.Journals.List as JournalList
+import Components.Util (OpaqueSlot)
 import Control.Monad.Reader.Class (class MonadAsk)
 import Data.Const (Const)
 import Data.Crypto.Types (DocumentId(..))
@@ -22,23 +24,10 @@ import Model.Journal as MJ
 import Style.Bulogen as SB
 import Type.Row (type (+))
 
-data Query a
-  = Initialise a
-
-data Message
-  = MNoOp
-
 newtype State
   = State
   { routeContext :: RJ.Journals
   }
-
-data Slot
-  = Slot
-
-derive instance eqSlot :: Eq Slot
-
-derive instance ordSlot :: Ord Slot
 
 data Input
   = JournalsContext
@@ -46,13 +35,13 @@ data Input
     }
 
 type ChildSlots
-  = ( edit :: H.Slot JournalEntry.Slot Void Unit
-    , list :: H.Slot JournalList.Slot Void Unit
+  = ( edit :: OpaqueSlot Unit
+    , list :: OpaqueSlot Unit
     )
 
-pathToEdit = SProxy :: SProxy "edit"
+pathToEdit = SProxy :: _ "edit"
 
-pathToList = SProxy :: SProxy "list"
+pathToList = SProxy :: _ "list"
 
 type RequiredState r
   = ( CurrentSessionRow
@@ -66,7 +55,7 @@ component ::
   MonadAff m =>
   MonadAsk (Record (RequiredState r)) m =>
   LocaliseFn ->
-  H.Component HH.HTML Query Input Message m
+  H.Component HH.HTML (Const Void) Input Void m
 component t =
   H.mkComponent
     { initialState
@@ -76,7 +65,7 @@ component t =
         $ H.defaultEval
     }
   where
-  render :: State -> H.ParentHTML Query ChildQuery ChildSlot m
+  render :: State -> H.ComponentHTML Void ChildSlots m
   render (State state) =
     HH.div
       [ HP.classes
@@ -85,21 +74,19 @@ component t =
       ]
       [ case state.routeContext of
           RJ.Edit id ->
-            HH.slot'
+            HH.slot
               pathToEdit
-              JournalEntry.Slot
-              (JournalEntry.component t)
-              ( JournalEntry.Input
-                  { desiredEntry: id <#> UUID }
-              )
-              (const Nothing)
-          RJ.List ->
-            HH.slot'
-              pathToList
-              JournalList.Slot
-              (JournalList.component t)
               unit
-              (const Nothing)
+              (JournalEntry.component t)
+              { desiredEntry: id <#> UUID }
+              absurd
+          RJ.List ->
+            HH.slot
+              pathToList
+              unit
+              (JournalList.component t)
+              {}
+              absurd
       ]
 
   initialState :: Input -> State

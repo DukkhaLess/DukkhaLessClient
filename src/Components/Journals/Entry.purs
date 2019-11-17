@@ -1,4 +1,4 @@
-module Components.Journals.Entry (component, Message, Input(..)) where
+module Components.Journals.Entry (component, Input(..)) where
 
 import Data.Guards
 import Prelude
@@ -51,9 +51,6 @@ type ChildSlots
 
 pathToEdit = SProxy :: SProxy "edit"
 
-data Message
-  = MNoMsg
-
 type State
   = { entry :: RemoteData DecryptionError JournalEntry
     , desiredEntryId :: Maybe DocumentId
@@ -61,13 +58,12 @@ type State
     , titleEditing :: Boolean
     }
 
-newtype Input
-  = Input
-  { desiredEntry :: Maybe DocumentId
-  }
+type Input
+  = { desiredEntry :: Maybe DocumentId
+    }
 
 initialState :: Input -> State
-initialState (Input input) =
+initialState input =
   { entry: NotAsked
   , contentEditing: false
   , desiredEntryId: input.desiredEntry
@@ -84,7 +80,7 @@ component ::
   forall m r.
   MonadAff m =>
   MonadAsk (Record (RequiredState r)) m =>
-  LocaliseFn -> H.Component HH.HTML (Const Void) Input Message m
+  LocaliseFn -> H.Component HH.HTML (Const Void) Input Void m
 component t =
   H.mkComponent
     { initialState
@@ -93,7 +89,7 @@ component t =
       H.mkEval
         $ ( H.defaultEval
               { initialize = Just Initialize
-              , handleAction = handleAction H.raise
+              , handleAction = handleAction
               }
           )
     }
@@ -200,9 +196,8 @@ component t =
     MonadState State t =>
     MonadAff t =>
     MonadEffect t =>
-    (Message -> t Unit) ->
     Action -> t Unit
-  handleAction raise actiong = case actiong of
+  handleAction actiong = case actiong of
     Initialize -> do
       desiredEntry <- MS.gets (_.desiredEntryId)
       case desiredEntry of
@@ -217,7 +212,6 @@ component t =
                   (_ { lastUpdated = Just currentDate, createdAt = Just currentDate })
                   defaultEntry
           MS.modify_ (_ { entry = Success entry })
-      raise $ MNoMsg
     (ToggleContentEdit edit) -> do
       MS.modify_ (_ { contentEditing = edit })
     (ToggleTitleEdit edit) -> do

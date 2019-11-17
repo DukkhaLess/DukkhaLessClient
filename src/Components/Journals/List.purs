@@ -27,17 +27,17 @@ type RequiredState r
     )
 
 component ::
-  forall a m r o.
+  forall m r.
   MonadAff m =>
   MonadAsk (Record (RequiredState r)) m =>
   LocaliseFn ->
-  H.Component HH.HTML (Const Unit) a o m
+  H.Component HH.HTML (Const Void) {} Void m
 component t =
   H.mkComponent
-    { initialState: initialState
+    { initialState
     , render
     , eval: mkEval $ H.defaultEval
     }
   where
-  render :: State -> H.ComponentHTML a ChildSlots m
+  render :: State -> H.ComponentHTML Void ChildSlots m
   render _ = HH.text "Hi"
