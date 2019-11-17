@@ -139,7 +139,7 @@ component t =
       let
         keyringValidation = V.updateValidation state.keyring keyStr
       put state { keyring = keyringValidation }
-    (Submit) -> do
+    Submit -> do
       state <- get
       modify_ (_ { keyring = V.touch state.keyring })
       payloadAndKeyring <- liftAff $ either throwError pure (prepareLoginPayload state)
