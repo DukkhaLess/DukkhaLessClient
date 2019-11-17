@@ -10,9 +10,7 @@ cache:
   directories:
     - node_modules
 install:
-  - npm install bower browserify -g
   - npm install
-  - bower install
 script:
   - npm run -s build
   - npm run -s test

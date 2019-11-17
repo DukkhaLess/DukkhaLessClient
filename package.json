@@ -8,6 +8,7 @@
   "license": "GPLv3",
   "scripts": {
     "setup": "yarn install && spago install",
+    "build": "spago build",
     "test": "spago test"
   },
   "dependencies": {
