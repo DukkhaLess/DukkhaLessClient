@@ -19,9 +19,7 @@
     "purs-loader": "^3.6.0",
     "text-encoding": "^0.6.4",
     "tweetnacl": "^1.0.0",
-    "xhr2": "^0.2.0"
-  },
-  "devDependencies": {
+    "xhr2": "^0.2.0",
     "copy-webpack-plugin": "^5.0.5",
     "html-webpack-plugin": "^3.2.0",
     "node-sass": "^4.13.0",
@@ -29,7 +27,9 @@
     "sass": "^1.23.6",
     "spago": "^0.10.0",
     "webpack": "^4.41.2",
-    "webpack-cli": "^3.3.9",
+    "webpack-cli": "^3.3.9"
+  },
+  "devDependencies": {
     "webpack-dev-server": "^3.9.0"
   }
 }
