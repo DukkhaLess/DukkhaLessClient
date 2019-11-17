@@ -72,7 +72,7 @@ component ::
   MonadAff m =>
   MonadEffect m =>
   MonadAsk (CurrentSessionRow' r) m =>
-  LocaliseFn -> H.Component HH.HTML (Const Void) Input Unit m
+  LocaliseFn -> H.Component HH.HTML (Const Void) Input Void m
 component t =
   H.mkComponent
     { initialState

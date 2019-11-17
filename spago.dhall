@@ -33,6 +33,7 @@ You can edit this file as you like.
     , "text-encoding"
     , "tuples"
     , "tweetnacl"
+    , "routing-duplex"
     ]
 , packages =
     ./packages.dhall

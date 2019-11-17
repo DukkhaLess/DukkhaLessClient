@@ -1,6 +1,5 @@
 module Components.Router where
 
-
 import AppM (AppState)
 import Components.Intro as Intro
 import Components.Journals as Journals
@@ -8,114 +7,106 @@ import Components.Nav as Nav
 import Components.NotFound as NotFound
 import Components.Resources as Resources
 import Components.Sessions as Sessions
+import Components.Util (OpaqueSlot, MessageSlot)
 import Control.Monad.Reader.Class (class MonadAsk)
+import Control.Monad.State (class MonadState)
 import Data.Const (Const)
 import Data.Maybe (Maybe(..))
 import Data.Routing.Routes as R
+import Data.Symbol (SProxy(..))
 import Effect (Effect)
-import Effect.Aff (Aff, launchAff)
 import Effect.Aff.Class (class MonadAff)
+import Halogen (modify_)
 import Halogen as H
 import Halogen.HTML as HH
 import Intl (LocaliseFn)
 import Prelude (type (~>), Unit, Void, const, pure, unit, (<<<), bind, ($), discard, map)
-import Routing.Hash (matches)
 
 data Query a
   = Goto R.Routes a
 
-type ChildQuery
-  =    Sessions.Query
-  <\/> NotFound.Query
-  <\/> Journals.Query
-  <\/> Nav.Query
-  <\/> Const Void
+type State
+  = { localiseFn :: LocaliseFn
+    , currentRoute :: R.Routes
+    }
 
-type ChildSlot
-  =  Sessions.Slot
-  \/ NotFound.Slot
-  \/ Journals.Slot
-  \/ Nav.Slot
-  \/ Void
-
-type State =
-  { localiseFn :: LocaliseFn
-  , currentRoute :: R.Routes
-  }
-
-
-nada  :: forall a b. a -> Maybe b
+nada :: forall a b. a -> Maybe b
 nada = const Nothing
 
-pathToSessions :: ChildPath Sessions.Query ChildQuery Sessions.Slot ChildSlot
-pathToSessions = cpL
+type ChildSlots
+  = ( sessions :: MessageSlot Sessions.Message Unit
+    , notFound :: OpaqueSlot Unit
+    , journals :: OpaqueSlot Unit
+    , nav :: OpaqueSlot Unit
+    )
 
-pathToNotFound :: ChildPath NotFound.Query ChildQuery NotFound.Slot ChildSlot
-pathToNotFound = cpR :> cpL
+pathToSessions = SProxy :: SProxy "sessions"
 
-pathToJournals :: ChildPath Journals.Query ChildQuery Journals.Slot ChildSlot
-pathToJournals = cpR :> cpR :> cpL
+pathToNotFound = SProxy :: SProxy "notFound"
 
-pathToNav :: ChildPath Nav.Query ChildQuery Nav.Slot ChildSlot
-pathToNav = cpR :> cpR :> cpR :> cpL
+pathToJournals = SProxy :: SProxy "journals"
 
-component
-  :: forall m
-  . MonadAff m
-  => MonadAsk AppState m
-  => LocaliseFn
-  -> H.Component HH.HTML Query Unit Void m
-component localiseFn = H.parentComponent
-  { initialState: const { localiseFn, currentRoute: R.Intro }
-  , render
-  , eval
-  , receiver: const Nothing
-  }
+pathToNav = SProxy :: SProxy "nav"
+
+component ::
+  forall m.
+  MonadAff m =>
+  MonadAsk AppState m =>
+  LocaliseFn ->
+  H.Component HH.HTML Query Unit Void m
+component localiseFn =
+  H.mkComponent
+    { initialState: const { localiseFn, currentRoute: R.Intro }
+    , render
+    , eval:
+      H.mkEval
+        ( H.defaultEval
+            { handleQuery = handleQuery
+            }
+        )
+    }
   where
-    render :: State -> H.ParentHTML Query ChildQuery ChildSlot m
-    render state = HH.div_ [navMenu, viewPage state] where
-      navMenu =
-        HH.slot'
-          pathToNav
-          Nav.Slot
-          (Nav.component localiseFn)
-          state.currentRoute
-          nada
+  render :: State -> H.ComponentHTML Unit ChildSlots m
+  render state = HH.div_ [ navMenu, viewPage state ]
+    where
+    navMenu =
+      HH.slot
+        pathToNav
+        unit
+        (Nav.component localiseFn)
+        state.currentRoute
+        nada
 
-    viewPage :: State -> H.ParentHTML Query ChildQuery ChildSlot m
-    viewPage { currentRoute } = case currentRoute of
-      R.Intro -> Intro.render localiseFn
-      R.Resources ->Resources.render localiseFn
-      (R.Sessions r) ->
-        HH.slot'
-          pathToSessions
-          Sessions.Slot
-          (Sessions.component localiseFn)
-          (Sessions.RouteContext r)
-          nada
-      R.NotFound ->
-        HH.slot'
-          pathToNotFound
-          NotFound.Slot
-          (NotFound.component localiseFn)
-          unit
-          nada
-      (R.Journals r) ->
-        HH.slot'
-          pathToJournals
-          Journals.Slot
-          (Journals.component localiseFn)
-          (Journals.JournalsContext { routeContext: r })
-          nada
+  viewPage :: State -> H.ComponentHTML Unit ChildSlots m
+  viewPage { currentRoute } = case currentRoute of
+    R.Intro -> Intro.render localiseFn
+    R.Resources -> Resources.render localiseFn
+    (R.Sessions r) ->
+      HH.slot
+        pathToSessions
+        unit
+        (Sessions.component localiseFn)
+        (Sessions.RouteContext r)
+        nada
+    R.NotFound ->
+      HH.slot
+        pathToNotFound
+        unit
+        (NotFound.component localiseFn)
+        unit
+        nada
+    (R.Journals r) ->
+      HH.slot
+        pathToJournals
+        unit
+        (Journals.component localiseFn)
+        (Journals.JournalsContext { routeContext: r })
+        nada
 
-    eval :: Query ~> H.ParentDSL State Query ChildQuery ChildSlot Void m
-    eval (Goto loc next) = do
-      H.modify_ (_{ currentRoute = loc})
-      pure next
-
-routeSignal :: H.HalogenIO Query Void Aff -> Effect (Effect Unit)
-routeSignal driver = matches R.routes hashChanged
-  where
-    hashChanged _ newRoute = do
-      _ <- launchAff $ driver.query <<< H.action <<< Goto $ newRoute
-      pure unit
+  handleQuery ::
+    forall a.
+    Query a -> H.HalogenM State Unit ChildSlots Void m (Maybe a)
+  handleQuery query = case query of
+    (Goto loc a) -> do
+      modify_ (_ { currentRoute = loc })
+      pure $ Just a
