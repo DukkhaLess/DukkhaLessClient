@@ -6,3 +6,6 @@ import Halogen as H
 
 type OpaqueSlot
   = H.Slot (Const Void) Void
+
+type MessageSlot
+  = H.Slot (Const Void)

@@ -58,10 +58,10 @@ initialState =
     }
 
 component ::
-  forall m.
+  forall m i.
   MonadAff m =>
   LocaliseFn ->
-  H.Component HH.HTML (Const Void) Void Message m
+  H.Component HH.HTML (Const Void) i Message m
 component t =
   H.mkComponent
     { initialState: initialState
