@@ -6,7 +6,6 @@
     "**/output/**": true,
     "**/bower_components/**": true,
     "**/intermediate/**": true,
-    "**/dist/**": true,
     "**/.spago/**": true,
     "**/.pulp-cache/**": true
   },
@@ -19,8 +18,7 @@
     "**/node_modules/**": true,
     "**/output/**": true,
     "**/intermediate/**": true,
-    "**/.pulp-cache/**": true,
-    "**/dist/**": true
+    "**/.pulp-cache/**": true
   },
   "purescript.addSpagoSources": true,
   "purescript.buildCommand": "spago build --json-errors",

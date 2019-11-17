@@ -1,7 +1,9 @@
 'use strict'
 
 const path = require('path')
+const HtmlWebpackPlugin = require('html-webpack-plugin')
 const webpack = require('webpack')
+const CopyPlugin = require('copy-webpack-plugin')
 const isWebpackDevServer = process.argv.some(
   a => path.basename(a) === 'webpack-dev-server'
 )
@@ -25,7 +27,7 @@ module.exports = {
   devtool: 'eval-source-map',
 
   devServer: {
-    contentBase: '.',
+    contentBase: './dist',
     port: 4008,
     stats: 'errors-only'
   },
@@ -35,9 +37,10 @@ module.exports = {
   entry: './src/Main.purs',
 
   output: {
-    path: __dirname + '/dist/static',
+    library: 'DukkhaLess',
+    path: __dirname + '/dist',
     pathinfo: true,
-    filename: 'app.js'
+    filename: 'static/js/app.[hash].js'
   },
 
   module: {
@@ -49,7 +52,7 @@ module.exports = {
             loader: 'purs-loader',
             options: {
               src: ['src/**/*.purs'],
-              bundle: false,
+              bundle: true,
               spago: true,
               watch: isWebpackDevServer || isWatch
             }
@@ -67,6 +70,8 @@ module.exports = {
   plugins: [
     new webpack.LoaderOptionsPlugin({
       debug: true
-    })
+    }),
+    new HtmlWebpackPlugin({ template: './index.html' }),
+    new CopyPlugin([{ from: './static/assets', to: './static/assets' }])
   ].concat(plugins)
 }
