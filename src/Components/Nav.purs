@@ -80,7 +80,7 @@ component t =
     , eval:
       H.mkEval
         $ ( H.defaultEval
-              { receive
+              { receive = receive
               }
           )
     }
@@ -95,7 +95,7 @@ component t =
     MonadState State t =>
     MonadEffect t =>
     MonadAsk (CurrentSessionRow' r) t =>
-    Action -> t
+    Action -> t Unit
   handleAction action = case action of
     ToggleBurger -> do
       expandedBurger <- gets (_.expandedBurger)

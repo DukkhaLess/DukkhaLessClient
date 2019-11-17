@@ -11,10 +11,10 @@ import Data.Routing.Routes.Journals as RJ
 import Style.FontHawesome as FA
 
 makeIcon ::
-  forall a.
+  forall a w i.
   Iconise a =>
   a ->
-  Maybe HH.PlainHTML
+  Maybe (HH.HTML w i)
 makeIcon a = makeElement <$> iconise a
   where
   makeElement classes =
