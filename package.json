@@ -7,7 +7,7 @@
   "author": "Alexandra DeWit <alexa.dewit@gmail.com>",
   "license": "GPLv3",
   "scripts": {
-    "setup": "yarn install && spago install",
+    "setup": "npm install && spago install",
     "build": "webpack",
     "test": "spago test"
   },

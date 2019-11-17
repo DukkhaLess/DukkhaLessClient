@@ -11,7 +11,7 @@ cache:
   directories:
     - node_modules
 install:
-  - npm install
+  - npm run -s setup
 script:
   - npm run -s build
   - npm run -s test
