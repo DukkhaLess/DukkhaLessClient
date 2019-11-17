@@ -14,23 +14,25 @@ A safe place to write your thoughts, and track the progress of mental health rec
 5. Support for creating and visualising timelines of events.
 6. DBT Template for analysing pros/cons of a possible decision
 7. CBT ABCD template with saving
-X. More to come, these are just the initial steps. User feedback and information will play a major role in where we go in the future.
-
+   X. More to come, these are just the initial steps. User feedback and information will play a major role in where we go in the future.
 
 ## Privacy System
 
 #### The Dukkhaless Self-Care platform identifies three key security concerns.
 
 1. The user must be able to encrypt data for themselves and only themselves to read.
-  - `Secretbox` algorithm is used to secure user data for their own viewing
-  - `Secretbox` makes use of your `symmetric key`.
+
+- `Secretbox` algorithm is used to secure user data for their own viewing
+- `Secretbox` makes use of your `symmetric key`.
 
 2. The user must be able to send data to a specific individual (ie. their physician such that only that individual can read it.)
-  - `Box` algorithm is used to send data between users.
-  - `Box` makes use of your `private key` and the recipient's `public key`
+
+- `Box` algorithm is used to send data between users.
+- `Box` makes use of your `private key` and the recipient's `public key`
 
 3. Only the owner of the user data should be able to change it.
-  - This goal is achieved via typical sign-in credentials, ie username and password.
+
+- This goal is achieved via typical sign-in credentials, ie username and password.
 
 #### Technical notes on addressing these concerns
 
@@ -43,13 +45,13 @@ X. More to come, these are just the initial steps. User feedback and information
   - The `private key` that is paired to the public key. This is used to read messages that are sent to you.
   - The `symmetric key` that is used to encrypt your data for you to read. This key should be treated as securely as the private key as it represents your personal access to your data.
 
-
 ### Problems That Still Require Solving
 
 - User password recovery without invading user privacy (i.e. demanding an email address)
 - Risk of user data loss when they key is lost.
 
 ## Software Licensing
+
 This program is licensed under the GNU General Public License Version 3. For details consult the LICENSE file.
 
 Some source files are special cases and licensed under more permissive licenses such as Apache Version 2. This is done where
@@ -59,19 +61,20 @@ do not be confused, and to protect and thank those authors who made this work po
 ## Setting Up Your Development Environment
 
 - Download latest stable nodejs from [here](https://nodejs.org/en/)
-- `npm install --global yarn purescript pulp bower`
-- From the project directory: `yarn install && bower install`
+- `npm install --global yarn`
+- From the project directory: `yarn setup`
 - Run the program in dev mode: `yarn dev`
 - Additional scripts for it can be found in `package.json`'s scripts object.
 - To create a new feature branch to do development, use `git checkout -b MYBRANCHNAME`
 - To contribute your feature back, please simply create a pull request with a description of its intent.
 
-
 ## Getting oriented.
+
 - The project uses [purescript-halogen](https://github.com/slamdata/purescript-halogen) For rendering
 - It's important to note that the documentation for halogen on [pursuit](https://pursuit.purescript.org/packages/purescript-halogen/) is not up to date.
 
 ## Contributing Guidelines
+
 - Cotribution guidelines can be found [here](CONTRIBUTING.md)
 
 ## Working with the bulma design stuff
