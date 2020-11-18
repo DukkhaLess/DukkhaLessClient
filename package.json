@@ -26,8 +26,8 @@
     "purescript": "^0.13.4",
     "sass": "^1.23.6",
     "spago": "^0.10.0",
-    "webpack": "^4.41.2",
-    "webpack-cli": "^3.3.9"
+    "webpack": "^5.1.1",
+    "webpack-cli": "^4.0.0"
   },
   "devDependencies": {
     "webpack-dev-server": "^3.9.0"
